@@ -22,6 +22,19 @@ public struct Matrix
     public int RowsAmount;
     public int ColumnsAmount;
 
+    public Matrix(double[] singleColumnValues)
+    {
+        this.values = new double[singleColumnValues.Length,1];
+
+        for (int i = 0; i < singleColumnValues.Length; i++)
+        {
+            values[i, 0] = singleColumnValues[i];
+        }
+
+        RowsAmount = singleColumnValues.Length;
+        ColumnsAmount = 1;
+    }
+
     public Matrix(double[,] values)
     {
         this.values = values;
@@ -139,16 +152,16 @@ public static class MatrixHandler
 
     private static Matrix EachElemenAssigment(Matrix a, Matrix b, Func<int, int, double> mathOperation)
     {
-        if (a.Values.GetLength(0) != b.Values.GetLength(0) || a.Values.GetLength(1) != b.Values.GetLength(1))
+        if (a.RowsAmount != b.RowsAmount || a.ColumnsAmount != b.ColumnsAmount)
         {
             throw new Exception("Matrices must have the same dimensions");
         }
 
         Matrix result = new Matrix(a.RowsAmount, a.ColumnsAmount);
 
-        for (int i = 0; i < a.Values.GetLength(0); i++)
+        for (int i = 0; i < a.RowsAmount; i++)
         {
-            for (int j = 0; j < a.Values.GetLength(1); j++)
+            for (int j = 0; j < a.ColumnsAmount; j++)
             {
                 result.Values[i, j] = mathOperation(i, j);
             }
