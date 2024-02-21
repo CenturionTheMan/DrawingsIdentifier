@@ -12,7 +12,7 @@ internal class Matrix
 {
     private static Random random = new();
 
-    internal double[,] Values { get; set; }
+    internal double[,] Values { get; internal set; }
     internal readonly int RowsAmount;
     internal readonly int ColumnsAmount;
 

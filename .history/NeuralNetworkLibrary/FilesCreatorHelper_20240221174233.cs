@@ -33,12 +33,12 @@ public static class FilesCreatorHelper
     }
 
 
-    public static bool CheckIfFileExists(string filePath)
+    public static bool CheckIfFileExists(string filePath, int? argNum = null)
     {
         return File.Exists(filePath);
     }
 
-    public static bool CheckIfDirectoryExists(string filePath)
+    public static bool CheckIfDirectoryExists(string filePath, int? argNum = null)
     {
         return Directory.Exists(filePath);
     }
@@ -111,15 +111,13 @@ public static class FilesCreatorHelper
 
             IEnumerable<XElement> collection;
 
-            var root = xml.Root!;
-
             if (getAllGenerations)
             {
-                collection = (String.IsNullOrEmpty(nameFilter)) ? root.Descendants() : root.Descendants(nameFilter);
+                collection = (String.IsNullOrEmpty(nameFilter)) ? xml.Root.Descendants() : xml.Root.Descendants(nameFilter);
             }
             else
             {
-                collection = (String.IsNullOrEmpty(nameFilter)) ? root.Elements() : root.Elements(nameFilter);
+                collection = (String.IsNullOrEmpty(nameFilter)) ? xml.Root.Elements() : xml.Root.Elements(nameFilter);
             }
 
             return collection.ToList();

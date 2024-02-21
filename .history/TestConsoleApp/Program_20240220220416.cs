@@ -1,5 +1,4 @@
-﻿using System.Net;
-using MyBaseLibrary;
+﻿using MyBaseLibrary;
 using NeuralNetworkLibrary;
 
 
@@ -11,6 +10,8 @@ class Program
 
     static void Main(string[] args)
     {
+        double trainPercentage = 0.8;
+
         Console.WriteLine("Loading data...");
         var trainData = GetMnistData(MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
         var testData = GetMnistData(MnistDataDirPath + "mnist_test_data.csv");
@@ -18,12 +19,7 @@ class Program
         Console.WriteLine("Training...");
         var nn = new ConvolutionalNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
 
-        nn.Train(trainData, 0.01, 30, 50, 0.01, (epoch, epochPercentFinish, batchError)=>{
-            Console.WriteLine(
-                $"Epoch: {epoch+1}\n" +
-                $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
-                $"Batch error: {batchError.ToString("0.000")}\n");
-        });
+        nn.Train(trainData, 0.01, 10, 50, 0.01);
 
         Console.WriteLine("Testing...");
         int guessed = 0;

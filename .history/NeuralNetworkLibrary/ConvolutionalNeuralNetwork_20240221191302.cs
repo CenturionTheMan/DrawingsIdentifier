@@ -1,12 +1,5 @@
 ﻿namespace NeuralNetworkLibrary;
 
-/// <summary>
-/// Represents a Convolutional Neural Network.
-/// </summary>
-/// <remarks>
-/// This class provides functionality for training and predicting using a Convolutional Neural Network.
-/// It supports various activation functions and implements backpropagation for learning.
-/// </remarks>
 public class ConvolutionalNeuralNetwork
 {
     private static Random random = new Random();
@@ -22,12 +15,6 @@ public class ConvolutionalNeuralNetwork
 
 #region Constructors
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConvolutionalNeuralNetwork"/> class.
-    /// </summary>
-    /// <param name="layersSizes"></param>
-    /// <param name="activationFunctions"></param>
-    /// <exception cref="ArgumentException"></exception>
     public ConvolutionalNeuralNetwork(int[] layersSizes, ActivationFunction[] activationFunctions)
     {
         if(layersSizes.Length != activationFunctions.Length + 1)
@@ -64,16 +51,6 @@ public class ConvolutionalNeuralNetwork
 
 #region Training and Predicting
 
-    /// <summary>
-    /// Trains the network using the given data.
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="learningRate"></param>
-    /// <param name="epochAmount"></param>
-    /// <param name="batchSize"></param>
-    /// <param name="expectedMaxError"></param>
-    /// <param name="onIteration"></param>
-    /// <exception cref="ArgumentException"></exception>
     public void Train((double[] inputs, double[] outputs)[] data, double learningRate, int epochAmount, int batchSize, double expectedMaxError = 0.001, Action<int, double, double>? onIteration = null)
     {
         if (data[0].inputs.Length != layersSizes[0])
@@ -114,12 +91,6 @@ public class ConvolutionalNeuralNetwork
         }
     }
 
-    /// <summary>
-    /// Predicts the output for the given inputs.
-    /// </summary>
-    /// <param name="inputs"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
     public double[] Predict(double[] inputs)
     {
         if(inputs.Length != layersSizes[0])
@@ -144,12 +115,6 @@ public class ConvolutionalNeuralNetwork
 
 #region Base Methods
 
-    /// <summary>
-    /// Performs a learning iteration using the given data samples (mini batch) and expected results.
-    /// </summary>
-    /// <param name="dataSamples"></param>
-    /// <param name="expectedResults"></param>
-    /// <returns></returns>
     private double PerformLearningIteration(Matrix[] dataSamples, Matrix[] expectedResults)
     {
         Matrix[] changesForWeightsSum = new Matrix[layersAmount - 1];
@@ -184,12 +149,6 @@ public class ConvolutionalNeuralNetwork
         return errorSum / (double)dataSamples.Length;
     }
 
-    /// <summary>
-    /// Feeds the input through the network and returns the output.
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     private Matrix Feedforward(Matrix input)
     {
         layersBeforeActivation[0] = input;
@@ -216,13 +175,6 @@ public class ConvolutionalNeuralNetwork
         return currentLayer;
     }
 
-    /// <summary>
-    /// Performs backpropagation and returns the changes for weights and biases.
-    /// </summary>
-    /// <param name="expectedResults"></param>
-    /// <param name="predictions"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     private (Matrix[] changeForWeights, Matrix[] changeForBiases) Backpropagation(Matrix expectedResults, Matrix predictions)
     {
         Matrix[] changeForWeights = new Matrix[layersAmount - 1];
@@ -260,13 +212,6 @@ public class ConvolutionalNeuralNetwork
 
 #region Activation Functions and Error
 
-    /// <summary>
-    /// Calculates the mean squared error between the expected and predicted results.
-    /// </summary>
-    /// <param name="expected"></param>
-    /// <param name="predictions"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
     private double CalculateMeanSquaredError(Matrix expected, Matrix predictions)
     {
         if(predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
@@ -287,13 +232,6 @@ public class ConvolutionalNeuralNetwork
         return sum / (predictions.RowsAmount * predictions.ColumnsAmount);
     }
 
-    /// <summary>
-    /// Calculates the cross entropy cost between the expected and predicted results.
-    /// </summary>
-    /// <param name="expected"></param>
-    /// <param name="predictions"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
     private double CalculateCrossEntropyCost(Matrix expected, Matrix predictions)
     {
         if(predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
@@ -314,41 +252,21 @@ public class ConvolutionalNeuralNetwork
         return -sum;
     }
 
-    /// <summary>
-    /// Applies the ReLU activation function to the given matrix.
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <returns></returns>
     private Matrix ReLU(Matrix mat)
     {
         return mat.ApplyFunction(x => { return x > 0 ? x : 0; });
     }
 
-    /// <summary>
-    /// Applies the derivative of the ReLU activation function to the given matrix.
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <returns></returns>
     private Matrix DerivativeReLU(Matrix mat)
     {
         return mat.ApplyFunction(x => { return x >= 0 ? 1.0 : 0.0; }); 
     }
 
-    /// <summary>
-    /// Applies the Sigmoid activation function to the given matrix.
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <returns></returns>
     private Matrix Sigmoid(Matrix mat)
     {
         return mat.ApplyFunction(x => 1 / (1 + Math.Exp(-x)) );
     }
 
-    /// <summary>
-    /// Applies the derivative of the Sigmoid activation function to the given matrix.
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <returns></returns>
     private Matrix DerivativeSigmoid(Matrix mat)
     {
         return mat.ApplyFunction(x => {
@@ -357,11 +275,6 @@ public class ConvolutionalNeuralNetwork
         });
     }
 
-    /// <summary>
-    /// Applies the Softmax activation function to the given matrix.
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <returns></returns>
     private Matrix Softmax(Matrix mat)
     {
         var expMat = mat.ApplyFunction(x => Math.Exp(x));
@@ -369,11 +282,6 @@ public class ConvolutionalNeuralNetwork
         return expMat.ApplyFunction(x => x / sumOfMatrix);
     }
 
-    /// <summary>
-    /// Applies the derivative of the Softmax activation function to the given matrix.
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <returns></returns>
     private Matrix DerivativeSoftmax(Matrix mat)
     {
         return Softmax(mat).ApplyFunction(x => x * (1 - x));

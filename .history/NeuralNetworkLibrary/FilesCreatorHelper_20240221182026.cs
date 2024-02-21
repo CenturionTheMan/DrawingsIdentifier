@@ -33,12 +33,12 @@ public static class FilesCreatorHelper
     }
 
 
-    public static bool CheckIfFileExists(string filePath)
+    public static bool CheckIfFileExists(string filePath, int? argNum = null)
     {
         return File.Exists(filePath);
     }
 
-    public static bool CheckIfDirectoryExists(string filePath)
+    public static bool CheckIfDirectoryExists(string filePath, int? argNum = null)
     {
         return Directory.Exists(filePath);
     }

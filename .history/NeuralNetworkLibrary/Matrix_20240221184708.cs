@@ -20,10 +20,10 @@ internal class Matrix
     {
         this.Values = new double[singleColumnValues.Length,1];
 
-        for (int i = 0; i < singleColumnValues.Length; i++)
+        Parallel.For(0, singleColumnValues.Length, i =>
         {
             Values[i, 0] = singleColumnValues[i];
-        }
+        });
 
         RowsAmount = singleColumnValues.Length;
         ColumnsAmount = 1;
@@ -89,13 +89,13 @@ internal class Matrix
 
         Matrix result = new Matrix(a.RowsAmount, a.ColumnsAmount);
 
-        for (int i = 0; i < a.RowsAmount; i++)
+        Parallel.For(0, a.RowsAmount, i =>
         {
-            for (int j = 0; j < a.ColumnsAmount; j++)
+            Parallel.For(0, a.ColumnsAmount, j =>
             {
                 result.Values[i, j] = mathOperation(i, j);
-            }
-        }
+            });
+        });
 
         return result;
     }

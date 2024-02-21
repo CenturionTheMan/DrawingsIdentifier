@@ -18,12 +18,12 @@ class Program
         Console.WriteLine("Training...");
         var nn = new ConvolutionalNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
 
-        nn.Train(trainData, 0.01, 30, 50, 0.01, (epoch, epochPercentFinish, batchError)=>{
+        nn.Train(trainData, 0.01, 30, 50, (epoch, epochPercentFinish, batchError)=>{
             Console.WriteLine(
                 $"Epoch: {epoch+1}\n" +
                 $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
                 $"Batch error: {batchError.ToString("0.000")}\n");
-        });
+        }, 0.01);
 
         Console.WriteLine("Testing...");
         int guessed = 0;
