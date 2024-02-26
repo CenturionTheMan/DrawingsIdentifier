@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="DrawingIdentifierGui.Controls.PredictionsCanvas"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DrawingIdentifierGui.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1080"
+             >
+
+    <Border x:Name="DrawingAreaBorder" 
+            CornerRadius="15 0 15 0" 
+            Background="{StaticResource gray}"
+            BorderBrush="{StaticResource dark}"
+            BorderThickness="1" 
+            >
+
+        <Grid x:Name="DrawingAreaGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="DrawingAreaHolderBorder"
+                            Grid.Column="0"
+                            CornerRadius="15 0 0 0"
+                            BorderBrush="{StaticResource dark}"
+                            BorderThickness="1"
+                            Margin="10">
+
+                <InkCanvas x:Name="drawingCanvas" Background="{StaticResource white}" 
+                           Cursor="Pen" MouseLeave="drawingCanvas_MouseLeave"
+                           >
+                    <InkCanvas.DefaultDrawingAttributes>
+                        <DrawingAttributes x:Name="strokeAtrib"
+                                           Color="Black"
+                                           Width="20"
+                                           Height="20"/>
+                    </InkCanvas.DefaultDrawingAttributes>
+                    
+                </InkCanvas>
+
+            </Border>
+
+            <Border x:Name="PredictionsHolderBorder"
+                            Grid.Column="1"
+                            CornerRadius="0 15 15 0"
+                            Background="{StaticResource dark_gray}"
+                            BorderBrush="{StaticResource dark}"
+                            BorderThickness="1"
+                            Margin="0 50 10 50">
+
+
+            </Border>
+
+        </Grid>
+    </Border>
+
+</UserControl>
