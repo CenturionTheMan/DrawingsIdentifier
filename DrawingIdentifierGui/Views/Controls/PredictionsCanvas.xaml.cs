@@ -4,7 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using static DrawingIdentifierGui.BitmapCustomExtender;
+using DrawingIdentifierGui.Utilities;
+using static DrawingIdentifierGui.Utilities.BitmapCustomExtender;
 
 namespace DrawingIdentifierGui.Controls
 {
@@ -18,21 +19,20 @@ namespace DrawingIdentifierGui.Controls
             InitializeComponent();
         }
 
-        
 
 
-
-        private void drawingCanvas_MouseLeave(object sender, MouseEventArgs e)
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             System.Drawing.Color color = System.Drawing.Color.Black;
 
-            var bitmap = drawingCanvas.GetBitmap();
+            var bitmap = drawingCanvas
+                .GetBitmap()
+                .CropWhite()
+                .Resize(28, 28)
+                .ToBlackWhite(reverse: true);
             bitmap.Save("D:\\GoogleDriveMirror\\Projects\\DrawingsIdentifier\\tmp1.png");
 
-            var bitmap2 = bitmap.CropByColor(color);
-            bitmap2.Save("D:\\GoogleDriveMirror\\Projects\\DrawingsIdentifier\\tmp2.png");
+          
         }
-
-
     }
 }

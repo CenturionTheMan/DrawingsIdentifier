@@ -59,7 +59,14 @@ public class ConvolutionalNeuralNetwork
         }
     }
 
-#endregion Constructors
+    #endregion Constructors
+
+
+#region Save and Load
+    
+
+
+#endregion Save and Load
 
 
 #region Training and Predicting

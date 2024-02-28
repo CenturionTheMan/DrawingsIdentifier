@@ -21,15 +21,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border x:Name="DrawingAreaHolderBorder"
+            <Grid x:Name="DrawingAreaHolderGrid"
                             Grid.Column="0"
-                            CornerRadius="15 0 0 0"
-                            BorderBrush="{StaticResource dark}"
-                            BorderThickness="1"
                             Margin="10">
 
                 <InkCanvas x:Name="drawingCanvas" Background="{StaticResource white}" 
-                           Cursor="Pen" MouseLeave="drawingCanvas_MouseLeave"
+                           Cursor="Pen"
+                           
                            >
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes x:Name="strokeAtrib"
@@ -40,7 +38,7 @@
                     
                 </InkCanvas>
 
-            </Border>
+            </Grid>
 
             <Border x:Name="PredictionsHolderBorder"
                             Grid.Column="1"
@@ -50,6 +48,10 @@
                             BorderThickness="1"
                             Margin="0 50 10 50">
 
+                <StackPanel>
+                    <Button Click="Button_Click" Height="100"/>
+
+                </StackPanel>
 
             </Border>
 

@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using DrawingIdentifierGui.MVVM;
+using DrawingIdentifierGui.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,38 +18,18 @@ namespace DrawingIdentifierGui
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
+            viewModel = new MainWindowViewModel(this);
+            this.DataContext = viewModel;
         }
 
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.Close();
-        }
-
-        private void MinMaxButton_Click(object sender, RoutedEventArgs e)
-        {
-            if(this.WindowState == WindowState.Maximized)
-            {
-                this.WindowState = WindowState.Normal;
-            }
-            else
-            {
-                this.WindowState = WindowState.Maximized;
-            }
-        }
-
-        private void MinimalizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.WindowState == WindowState.Minimized)
-            {
-                this.WindowState = WindowState.Normal;
-            }
-            else
-            {
-                this.WindowState = WindowState.Minimized;
-            }
+            this.DragMove();
         }
     }
 }

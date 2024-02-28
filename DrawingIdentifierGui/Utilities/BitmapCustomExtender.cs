@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
+using SystemMedia = System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Drawing.Printing;
-using System.Windows.Media.Media3D;
-using System.Windows;
-using static System.Net.Mime.MediaTypeNames;
-using System.Windows.Automation.Peers;
 
-namespace DrawingIdentifierGui;
+namespace DrawingIdentifierGui.Utilities;
 
 internal static class BitmapCustomExtender
 {
@@ -25,7 +15,7 @@ internal static class BitmapCustomExtender
         int height = (int)inkCanvas.ActualHeight - margin;
         //render ink to bitmap
         RenderTargetBitmap renderBitmap =
-        new RenderTargetBitmap(width, height, 96d, 96d, PixelFormats.Default);
+        new RenderTargetBitmap(width, height, 96d, 96d, SystemMedia.PixelFormats.Default);
         renderBitmap.Render(inkCanvas);
 
         //save the ink to a memory stream
@@ -40,21 +30,46 @@ internal static class BitmapCustomExtender
         }
     }
 
-    public static Bitmap CropByColor(this Bitmap bitmap, System.Drawing.Color cropColor)
+    public static Bitmap ToBlackWhite(this Bitmap bitmap, int whiteThreshold = 250, bool reverse = false)
+    {
+        Bitmap image = new Bitmap(bitmap);
+
+        for (int y = 0; y < image.Height; y++)
+        {
+            for (int x = 0; x < image.Width; x++)
+            {
+                Color c = image.GetPixel(x, y);
+                int luma = (int)(c.R * 0.3 + c.G * 0.59 + c.B * 0.11);
+
+                luma = luma >= whiteThreshold ? 255 : luma;
+
+                if (reverse)
+                {
+                    luma = 255 - luma;
+                }
+                
+                image.SetPixel(x, y, Color.FromArgb(luma, luma, luma));
+            }
+        }
+
+        return image;
+    }
+
+    public static Bitmap CropWhite(this Bitmap bitmap, int margin = 20, int whiteThreshold = 250)
     {
         int? left = null, right = null, bottom = null, top = null;
 
-        int[,] holder = new int[bitmap.Width, bitmap.Height];
 
         for (int i = 0; i < bitmap.Width; i++)
         {
             for (int j = 0; j < bitmap.Height; j++)
             {
-                var tmp = bitmap.GetPixel(i, j);
-                holder[i, j] = tmp.ToArgb();
-                if (!(tmp.A == cropColor.A && tmp.B == cropColor.B && tmp.R == cropColor.R)) continue;
+                var pixel = bitmap.GetPixel(i, j);
                 
-                if(!bottom.HasValue || j < bottom.Value)
+                bool isWhite = pixel.R >= whiteThreshold && pixel.G >= whiteThreshold && pixel.B >= whiteThreshold;
+                if (isWhite) continue;
+
+                if (!bottom.HasValue || j < bottom.Value)
                 {
                     bottom = j;
                 }
@@ -79,13 +94,17 @@ internal static class BitmapCustomExtender
         if (!left.HasValue || !right.HasValue || !bottom.HasValue || !top.HasValue)
             return bitmap;
 
-        return bitmap.Crop(new Rectangle(left.Value, bottom.Value, right.Value - left.Value, top.Value - bottom.Value));
+        return bitmap.Crop(new Rectangle(
+            left.Value - margin, 
+            bottom.Value - margin, 
+            right.Value - left.Value + 2*margin, 
+            top.Value - bottom.Value + 2*margin));
     }
 
     public static Bitmap Crop(this Bitmap bitmap, Rectangle cropRect)
     {
         Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
-        
+
         using (Graphics g = Graphics.FromImage(target))
         {
             g.DrawImage(bitmap, new Rectangle(0, 0, target.Width, target.Height),
@@ -93,29 +112,44 @@ internal static class BitmapCustomExtender
                 GraphicsUnit.Pixel);
         }
 
-       return target;
+        return target;
+    }
+
+    public static int[] RValueToFlatIntArray(this Bitmap bitmap)
+    {
+        int[] result = new int[bitmap.Width * bitmap.Height];
+        int index = 0;
+        for (int y = 0; y < bitmap.Height; y++)
+        {
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                result[index++] = bitmap.GetPixel(x, y).R;
+            }
+        }
+        return result;
     }
 
     public static Bitmap Resize(this Bitmap bitmap, int width, int height)
     {
         var bmp = new Bitmap(width, height);
-        var graph = Graphics.FromImage(bmp);
+        var graphics = Graphics.FromImage(bmp);
 
         // uncomment for higher quality output
         //graph.InterpolationMode = InterpolationMode.High;
         //graph.CompositingQuality = CompositingQuality.HighQuality;
         //graph.SmoothingMode = SmoothingMode.AntiAlias;
 
-        float scale = Math.Min(width / bitmap.Width, height / bitmap.Height);
+        //float scale = Math.Min(width / bitmap.Width, height / bitmap.Height);
 
-        var scaleWidth = (int)(bitmap.Width * scale);
-        var scaleHeight = (int)(bitmap.Height * scale);
+        //var scaleWidth = (int)(bitmap.Width * scale);
+        //var scaleHeight = (int)(bitmap.Height * scale);
 
         //var brush = new SolidBrush(System.Drawing.Color.Black);
         //graph.FillRectangle(brush, new RectangleF(0, 0, width, height));
 
-        graph.Clear(System.Drawing.Color.White);
-        graph.DrawImage(bitmap, ((int)width - scaleWidth) / 2, ((int)height - scaleHeight) / 2, scaleWidth, scaleHeight);
+        graphics.Clear(System.Drawing.Color.White);
+        graphics.DrawImage(bitmap, 0,0, width, height);
+        graphics.Dispose();
 
         return bmp;
     }
