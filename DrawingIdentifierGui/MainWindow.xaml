@@ -78,16 +78,13 @@
                         Grid.Column="0"
                         Grid.Row="1">
 
-                <StackPanel Margin="0 30 0 0">
-                    <!--<Image Source="/Images/edit.png"/>-->
-
+                <StackPanel Margin="0 0 0 0">
                     <RadioButton Style="{DynamicResource NavigationRadioButton}">
-                        <RadioButton.Background>
-                            <ImageBrush ImageSource="/Images/edit.png"
-                                        Stretch="Uniform"/>
-                        </RadioButton.Background>
+                        <RadioButton.Content>
+                            <Image Source="Images/edit.png" Width="100" Height="20"/>
+                        </RadioButton.Content>
                     </RadioButton>
-                        <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
+                    <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
                     <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
                     <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
                     <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
