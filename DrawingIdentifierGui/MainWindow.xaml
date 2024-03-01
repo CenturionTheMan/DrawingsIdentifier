@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DrawingIdentifierGui" xmlns:controls="clr-namespace:DrawingIdentifierGui.Controls"
+        xmlns:components="clr-namespace:DrawingIdentifierGui.Views.Components" 
+        xmlns:controls="clr-namespace:DrawingIdentifierGui.Views.Controls"
         mc:Ignorable="d"
         Title="MainWindow" 
         Height="504" 
@@ -74,26 +75,9 @@
             </Grid>
             
             <!--Left Navigation-->
-            <Grid x:Name="LeftNawigationGrid"
-                        Grid.Column="0"
-                        Grid.Row="1">
-
-                <StackPanel Margin="0 0 0 0">
-                    <RadioButton Style="{DynamicResource NavigationRadioButton}">
-                        <RadioButton.Content>
-                            <Image Source="Images/edit.png" Width="100" Height="20"/>
-                        </RadioButton.Content>
-                    </RadioButton>
-                    <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
-                    <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
-                    <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
-                    <RadioButton Style="{DynamicResource NavigationRadioButton}"/>
-                </StackPanel>
+            <controls:NavigationBar Grid.Column="0" Grid.Row="1"/>
 
 
-            </Grid>
-            
-            
             <!--Content-->
             <controls:PredictionsCanvas 
                 Grid.Column="1" 

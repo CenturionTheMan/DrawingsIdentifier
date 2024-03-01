@@ -7,32 +7,31 @@ using System.Windows.Media.Imaging;
 using DrawingIdentifierGui.Utilities;
 using static DrawingIdentifierGui.Utilities.BitmapCustomExtender;
 
-namespace DrawingIdentifierGui.Controls
+namespace DrawingIdentifierGui.Views.Controls;
+
+/// <summary>
+/// Interaction logic for PredictionsCanvas.xaml
+/// </summary>
+public partial class PredictionsCanvas : UserControl
 {
-    /// <summary>
-    /// Interaction logic for PredictionsCanvas.xaml
-    /// </summary>
-    public partial class PredictionsCanvas : UserControl
+    public PredictionsCanvas()
     {
-        public PredictionsCanvas()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
 
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            System.Drawing.Color color = System.Drawing.Color.Black;
+    private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        System.Drawing.Color color = System.Drawing.Color.Black;
 
-            var bitmap = drawingCanvas
-                .GetBitmap()
-                .CropWhite()
-                .Resize(28, 28)
-                .ToBlackWhite(reverse: true);
-            bitmap.Save("D:\\GoogleDriveMirror\\Projects\\DrawingsIdentifier\\tmp1.png");
+        var bitmap = drawingCanvas
+            .GetBitmap()
+            .CropWhite()
+            .Resize(28, 28)
+            .ToBlackWhite(reverse: true);
+        bitmap.Save("D:\\GoogleDriveMirror\\Projects\\DrawingsIdentifier\\tmp1.png");
 
-          
-        }
+      
     }
 }
