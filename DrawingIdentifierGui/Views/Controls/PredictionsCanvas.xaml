@@ -17,39 +17,70 @@
 
         <Grid x:Name="DrawingAreaGrid">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.7*"/>
+                <ColumnDefinition Width="0.1*"/>
+                <ColumnDefinition Width="0.2*"/>
             </Grid.ColumnDefinitions>
 
+            
+            
+            <!--Drawing Area-->
             <Grid x:Name="DrawingAreaHolderGrid"
                             Grid.Column="0"
-                            Margin="10">
-
+                            Margin="10 10 0 10">
+                
                 <InkCanvas x:Name="drawingCanvas" Background="{StaticResource white}" 
-                           Cursor="Pen"
-                           
-                           >
+                           Cursor="Pen">
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes x:Name="strokeAtrib"
                                            Color="Black"
                                            Width="20"
                                            Height="20"/>
                     </InkCanvas.DefaultDrawingAttributes>
-                    
                 </InkCanvas>
-
             </Grid>
 
+            <!--Toolkit-->
+            <Border Grid.Column="1" 
+                    Background="{StaticResource light_gray}"
+                    Margin="0 10 0 10"
+                    CornerRadius="0 15 15 0">
+
+                <StackPanel>
+                    <RadioButton x:Name="PenRadioButton" 
+                                 Content="Pen" 
+                                 GroupName="Tool" 
+                                 IsChecked="True"
+                                 Margin="5"/>
+                    <RadioButton x:Name="EraserRadioButton"
+                                 Content="Eraser"
+                                 Margin="5"/>
+
+                </StackPanel>
+                
+            </Border>
+
+            <!--Predictions-->
             <Border x:Name="PredictionsHolderBorder"
-                            Grid.Column="1"
-                            CornerRadius="0 15 15 0"
+                            Grid.Column="3"
+                            CornerRadius="15 15 15 15"
                             Background="{StaticResource dark_gray}"
                             BorderBrush="{StaticResource dark}"
                             BorderThickness="1"
-                            Margin="0 50 10 50">
+                            Margin="15 50 15 50">
 
-                <StackPanel>
+                <StackPanel Name="PredictionsStackPanel">
+                    <Rectangle Height="20"/>
 
+                    <Border Background="{StaticResource dark}"
+                            Height="40"
+                            CornerRadius="5"
+                            Margin="5">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{StaticResource white}"
+                                   Text="Number 0: __%"/>
+                    </Border>
                 </StackPanel>
 
             </Border>

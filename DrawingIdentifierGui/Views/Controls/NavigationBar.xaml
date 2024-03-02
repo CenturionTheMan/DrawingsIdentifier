@@ -8,12 +8,14 @@
              d:DesignHeight="720" d:DesignWidth="100">
     <Grid>
 
-        <StackPanel Margin="0 0 0 0">
+        <StackPanel>
 
             <components:NavigationRadioButton 
             Style="{DynamicResource NavigationNavigationRadioButton}"
             ImageSource="../../Images/edit.png"
-            ImageMargin="5"/>
+            ImageMargin="5"
+            IsChecked="True"
+            Margin="5 5 5 5"/>
 
             <components:NavigationRadioButton 
             Style="{DynamicResource NavigationNavigationRadioButton}"
