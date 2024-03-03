@@ -79,10 +79,13 @@
 
 
             <!--Content-->
-            <controls:PredictionsCanvas 
+            <ContentControl Grid.Row="1"
+                            Grid.Column="1"/>
+            
+            <!--<controls:PredictionsCanvas 
                 Grid.Column="1" 
                 Grid.Row="1"
-                />
+                />-->
 
         </Grid>
     </Border>
