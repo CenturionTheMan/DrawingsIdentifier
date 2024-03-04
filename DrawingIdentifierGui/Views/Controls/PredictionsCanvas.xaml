@@ -49,12 +49,16 @@
                 <StackPanel>
                     <RadioButton x:Name="PenRadioButton" 
                                  Content="Pen" 
-                                 GroupName="Tool" 
+                                 GroupName="Tools" 
+                                 Margin="5"
                                  IsChecked="True"
-                                 Margin="5"/>
+                                 Command="{Binding PenSelectedCommand}"/>
+                    
                     <RadioButton x:Name="EraserRadioButton"
                                  Content="Eraser"
-                                 Margin="5"/>
+                                 Margin="5"
+                                 GroupName="Tools" 
+                                 Command="{Binding EraserSelectedCommand}"/>
 
                 </StackPanel>
                 
