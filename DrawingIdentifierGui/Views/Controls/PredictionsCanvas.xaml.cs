@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -15,12 +16,23 @@ namespace DrawingIdentifierGui.Views.Controls;
 /// </summary>
 public partial class PredictionsCanvas : UserControl
 {
+    public static PredictionsCanvas Instance;
+
     public PredictionsCanvas()
     {
+        Instance = this;
+
         InitializeComponent();
-        var tmp = new PredictionsCanvasViewModel(this);
+        var tmp = new PredictionsCanvasViewModel();
         DataContext = tmp;
     }
 
+    private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        var tmp = drawingCanvas.GetBitmap().ToBlackWhite().CropWhite().Resize(28, 28).RValueToFlatIntArray();
 
+        double[] input = tmp.Select(x => (double)x).ToArray();
+        var preditions = App.NeuralNetwork.Predict(input);
+        MessageBox.Show($"Predicted number: {Array.IndexOf(preditions, preditions.Max())}");
+    }
 }

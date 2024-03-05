@@ -22,9 +22,9 @@ internal class PredictionsCanvasViewModel : ViewModelBase
     private PredictionsCanvas predictionsCanvas;
 
 
-    public PredictionsCanvasViewModel(PredictionsCanvas predictionsCanvas)
+    public PredictionsCanvasViewModel()
     {
-        this.predictionsCanvas = predictionsCanvas;
+        this.predictionsCanvas = PredictionsCanvas.Instance;
     }
 
     public void PenSelected(object? tmp)

@@ -11,27 +11,19 @@
         <StackPanel>
 
             <components:NavigationRadioButton 
-            Style="{DynamicResource NavigationNavigationRadioButton}"
-            ImageSource="../../Images/edit.png"
-            ImageMargin="5"
-            IsChecked="True"
-            Margin="5 5 5 5"/>
+                Click="Button1_Click"
+                Style="{DynamicResource NavigationNavigationRadioButton}"
+                ImageSource="../../Images/edit.png"
+                ImageMargin="5"
+                IsChecked="True"
+                Margin="5 5 5 5"/>
 
             <components:NavigationRadioButton 
-            Style="{DynamicResource NavigationNavigationRadioButton}"
-            ImageMargin="5"/>
+                Click="Button2_Click"
+                Style="{DynamicResource NavigationNavigationRadioButton}"
+                Command="{Binding Button2Command, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}"
+                ImageMargin="5"/>
 
-            <components:NavigationRadioButton 
-            Style="{DynamicResource NavigationNavigationRadioButton}"
-            ImageMargin="5"/>
-
-            <components:NavigationRadioButton 
-            Style="{DynamicResource NavigationNavigationRadioButton}"
-            ImageMargin="5"/>
-
-            <components:NavigationRadioButton 
-            Style="{DynamicResource NavigationNavigationRadioButton}"
-            ImageMargin="5"/>
 
         </StackPanel>
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawingIdentifierGui.ViewModels.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,8 +21,12 @@ namespace DrawingIdentifierGui.Views.Controls
     /// </summary>
     public partial class NeuralNetworkLearning : UserControl
     {
+        public static NeuralNetworkLearning Instance;
+
         public NeuralNetworkLearning()
         {
+            Instance = this;
+
             InitializeComponent();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using DrawingIdentifierGui.MVVM;
 using DrawingIdentifierGui.ViewModels;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,13 +19,14 @@ namespace DrawingIdentifierGui
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MainWindowViewModel viewModel;
+        public static MainWindow Instance;
 
         public MainWindow()
         {
+            Instance = this;
+
             InitializeComponent();
-            viewModel = new MainWindowViewModel(this);
-            this.DataContext = viewModel;
+            this.DataContext = new MainWindowViewModel();
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -76,7 +76,10 @@
                 <StackPanel Name="PredictionsStackPanel">
                     <Rectangle Height="20"/>
 
-                    <Border Background="{StaticResource dark}"
+
+                    <Button Content="Get Prediction"
+                            Click="Button_Click"/>
+                    <!--<Border Background="{StaticResource dark}"
                             Height="40"
                             CornerRadius="5"
                             Margin="5">
@@ -84,7 +87,7 @@
                                    VerticalAlignment="Center"
                                    Foreground="{StaticResource white}"
                                    Text="Number 0: __%"/>
-                    </Border>
+                    </Border>-->
                 </StackPanel>
 
             </Border>

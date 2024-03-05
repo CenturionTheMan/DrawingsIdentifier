@@ -1,4 +1,6 @@
-﻿namespace NeuralNetworkLibrary;
+﻿using System.Diagnostics;
+
+namespace NeuralNetworkLibrary;
 
 /// <summary>
 /// Represents a Convolutional Neural Network.
@@ -19,8 +21,16 @@ public class ConvolutionalNeuralNetwork
     private ActivationFunction[] activationFunctions;
     private int layersAmount;
 
+    private Action<int, double, double>? onLearningIteration;
 
-#region Constructors
+    public Action<int, double, double>? OnLearningIteration
+    {
+        get { return onLearningIteration; }
+        set { onLearningIteration = value; }
+    }
+
+
+    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvolutionalNeuralNetwork"/> class.
@@ -81,7 +91,7 @@ public class ConvolutionalNeuralNetwork
     /// <param name="expectedMaxError"></param>
     /// <param name="onIteration"></param>
     /// <exception cref="ArgumentException"></exception>
-    public void Train((double[] inputs, double[] outputs)[] data, double learningRate, int epochAmount, int batchSize, double expectedMaxError = 0.001, Action<int, double, double>? onIteration = null)
+    public void Train((double[] inputs, double[] outputs)[] data, double learningRate, int epochAmount, int batchSize, double expectedMaxError = 0.001)
     {
         if (data[0].inputs.Length != layersSizes[0])
         {
@@ -109,7 +119,7 @@ public class ConvolutionalNeuralNetwork
 
                 double batchError = PerformLearningIteration(inputSamples, expectsOutputsSamples);
 
-                onIteration?.Invoke(epoch+1, 100*batchBeginIndex/(double)data.Length, batchError);
+                OnLearningIteration?.Invoke(epoch+1, 100*batchBeginIndex/(double)data.Length, batchError);
 
                 if(batchError < expectedMaxError)
                 {
