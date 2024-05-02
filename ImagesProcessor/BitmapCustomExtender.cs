@@ -1,34 +1,11 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.IO;
-using System.Windows.Controls;
-using SystemMedia = System.Windows.Media;
-using System.Windows.Media.Imaging;
 
-namespace DrawingIdentifierGui.Utilities;
+namespace ImagesProcessor;
 
-internal static class BitmapCustomExtender
+public static class BitmapCustomExtender
 {
-    public static Bitmap GetBitmap(this InkCanvas inkCanvas)
-    {
-        int margin = (int)inkCanvas.Margin.Left;
-        int width = (int)inkCanvas.ActualWidth - margin;
-        int height = (int)inkCanvas.ActualHeight - margin;
-        //render ink to bitmap
-        RenderTargetBitmap renderBitmap =
-        new RenderTargetBitmap(width, height, 96d, 96d, SystemMedia.PixelFormats.Default);
-        renderBitmap.Render(inkCanvas);
-
-        //save the ink to a memory stream
-        BmpBitmapEncoder encoder = new BmpBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
-
-        using (MemoryStream ms = new MemoryStream())
-        {
-            encoder.Save(ms);
-            var bitmap = new Bitmap(ms);
-            return new Bitmap(bitmap);
-        }
-    }
+    
 
     public static Bitmap ToBlackWhite(this Bitmap bitmap, int whiteThreshold = 250, bool reverse = false)
     {
@@ -47,7 +24,7 @@ internal static class BitmapCustomExtender
                 {
                     luma = 255 - luma;
                 }
-                
+
                 image.SetPixel(x, y, Color.FromArgb(luma, luma, luma));
             }
         }
@@ -65,7 +42,7 @@ internal static class BitmapCustomExtender
             for (int j = 0; j < bitmap.Height; j++)
             {
                 var pixel = bitmap.GetPixel(i, j);
-                
+
                 bool isWhite = pixel.R >= whiteThreshold && pixel.G >= whiteThreshold && pixel.B >= whiteThreshold;
                 if (isWhite) continue;
 
@@ -95,10 +72,10 @@ internal static class BitmapCustomExtender
             return bitmap;
 
         return bitmap.Crop(new Rectangle(
-            left.Value - margin, 
-            bottom.Value - margin, 
-            right.Value - left.Value + 2*margin, 
-            top.Value - bottom.Value + 2*margin));
+            left.Value - margin,
+            bottom.Value - margin,
+            right.Value - left.Value + 2 * margin,
+            top.Value - bottom.Value + 2 * margin));
     }
 
     public static Bitmap Crop(this Bitmap bitmap, Rectangle cropRect)
@@ -148,9 +125,10 @@ internal static class BitmapCustomExtender
         //graph.FillRectangle(brush, new RectangleF(0, 0, width, height));
 
         graphics.Clear(System.Drawing.Color.White);
-        graphics.DrawImage(bitmap, 0,0, width, height);
+        graphics.DrawImage(bitmap, 0, 0, width, height);
         graphics.Dispose();
 
         return bmp;
     }
+
 }

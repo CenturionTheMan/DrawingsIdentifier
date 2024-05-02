@@ -30,7 +30,7 @@ public class ConvolutionalNeuralNetwork
     }
 
 
-    #region Constructors
+#region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvolutionalNeuralNetwork"/> class.

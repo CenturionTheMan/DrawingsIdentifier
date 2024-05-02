@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using MyBaseLibrary;
 using NeuralNetworkLibrary;
-
+using ImagesProcessor;
 
 namespace TestConsoleApp;
 
@@ -12,18 +12,21 @@ class Program
     static void Main(string[] args)
     {
         Console.WriteLine("Loading data...");
-        var trainData = GetMnistData(MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
-        var testData = GetMnistData(MnistDataDirPath + "mnist_test_data.csv");
+        var sets = DataReader.LoadAllQuickDrawSamplesFromDirectory("./../../../../ImagesProcessor/Datasets/");
+        (var trainData, var testData) = sets.SplitIntoTrainTest(20);
 
         Console.WriteLine("Training...");
         var nn = new ConvolutionalNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
 
-        nn.Train(trainData, 0.01, 30, 50, 0.01, (epoch, epochPercentFinish, batchError)=>{
+        nn.OnLearningIteration += (epoch, epochPercentFinish, batchError) =>
+        {
             Console.WriteLine(
-                $"Epoch: {epoch+1}\n" +
-                $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
-                $"Batch error: {batchError.ToString("0.000")}\n");
-        });
+                $"Epoch: {epoch}\n" +
+                                $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
+                                                $"Batch error: {batchError.ToString("0.000")}\n");
+        };
+
+        nn.Train(trainData, 0.01, 40, 50, 0.01);
 
         Console.WriteLine("Testing...");
         int guessed = 0;
@@ -36,14 +39,56 @@ class Program
             var expectedMax = item.outputs.Max();
             int indexOfMaxExpected = item.outputs.ToList().IndexOf(expectedMax);
 
-            if(indexOfMaxPrediction == indexOfMaxExpected)
+            if (indexOfMaxPrediction == indexOfMaxExpected)
             {
                 guessed++;
             }
         }
 
-        Console.WriteLine($"Correctness: {(guessed*100.0/(double)testData.Length).ToString("0.00")}%");
+        Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
+
+        Console.WriteLine("DONE");
     }
+
+    private static void TestNN()
+    {
+        Console.WriteLine("Loading data...");
+        var trainData = GetMnistData(MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
+        var testData = GetMnistData(MnistDataDirPath + "mnist_test_data.csv");
+
+        Console.WriteLine("Training...");
+        var nn = new ConvolutionalNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
+
+        nn.OnLearningIteration += (epoch, epochPercentFinish, batchError) =>
+        {
+            Console.WriteLine(
+                               $"Epoch: {epoch + 1}\n" +
+                                              $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
+                                                             $"Batch error: {batchError.ToString("0.000")}\n");
+        };
+
+        nn.Train(trainData, 0.01, 30, 50, 0.01);
+
+        Console.WriteLine("Testing...");
+        int guessed = 0;
+        foreach (var item in testData)
+        {
+            var prediction = nn.Predict(item.inputs);
+            var max = prediction.Max();
+            int indexOfMaxPrediction = prediction.ToList().IndexOf(max);
+
+            var expectedMax = item.outputs.Max();
+            int indexOfMaxExpected = item.outputs.ToList().IndexOf(expectedMax);
+
+            if (indexOfMaxPrediction == indexOfMaxExpected)
+            {
+                guessed++;
+            }
+        }
+
+        Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
+    }
+
 
     private static (double[] inputs, double[] outputs)[] GetMnistData(params string[] paths)
     {
