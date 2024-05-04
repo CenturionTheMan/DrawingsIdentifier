@@ -12,7 +12,7 @@ class Program
     static void Main(string[] args)
     {
         Console.WriteLine("Loading data...");
-        var sets = DataReader.LoadAllQuickDrawSamplesFromDirectory("./../../../../ImagesProcessor/Datasets/");
+        var sets = DataReader.LoadAllQuickDrawSamplesFromDirectory("./../../../../../Datasets/");
         (var trainData, var testData) = sets.SplitIntoTrainTest(20);
 
         Console.WriteLine("Training...");
