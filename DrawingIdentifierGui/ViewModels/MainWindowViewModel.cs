@@ -1,5 +1,5 @@
 ﻿using DrawingIdentifierGui.MVVM;
-using DrawingIdentifierGui.ViewModels.Controls;
+using DrawingIdentifierGui.ViewModels.Windows;
 using DrawingIdentifierGui.Views.Controls;
 using System;
 using System.Collections.Generic;
@@ -18,9 +18,9 @@ namespace DrawingIdentifierGui.ViewModels
         public ViewModelBase SelectedViewModel
         {
             get { return selectedViewModel; }
-            set 
-            { 
-                selectedViewModel = value; 
+            set
+            {
+                selectedViewModel = value;
                 OnPropertyChanged();
             }
         }
@@ -30,7 +30,5 @@ namespace DrawingIdentifierGui.ViewModels
 
         public RelayCommand ExitCommand => new RelayCommand(parameter => MainWindow.Instance.Close());
         public RelayCommand MinimalizeCommand => new RelayCommand(parameter => MainWindow.Instance.WindowState = System.Windows.WindowState.Minimized);
-        
-
     }
 }

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace DrawingIdentifierGui.MVVM;
 
-internal class ViewModelBase : INotifyPropertyChanged
+public class ViewModelBase : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 

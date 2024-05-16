@@ -7,7 +7,7 @@ public static class BitmapCustomExtender
 {
     
 
-    public static Bitmap ToBlackWhite(this Bitmap bitmap, int whiteThreshold = 250, bool reverse = false)
+    public static Bitmap ToBlackWhite(this Bitmap bitmap, int whiteThreshold = 250)
     {
         Bitmap image = new Bitmap(bitmap);
 
@@ -19,11 +19,6 @@ public static class BitmapCustomExtender
                 int luma = (int)(c.R * 0.3 + c.G * 0.59 + c.B * 0.11);
 
                 luma = luma >= whiteThreshold ? 255 : luma;
-
-                if (reverse)
-                {
-                    luma = 255 - luma;
-                }
 
                 image.SetPixel(x, y, Color.FromArgb(luma, luma, luma));
             }
@@ -101,6 +96,24 @@ public static class BitmapCustomExtender
             for (int x = 0; x < bitmap.Width; x++)
             {
                 result[index++] = bitmap.GetPixel(x, y).R;
+            }
+        }
+        return result;
+    }
+
+    public static double[] RValueToFlatDoubleArray(this Bitmap bitmap, bool normalize=true, bool reverse=true)
+    {
+        double[] result = new double[bitmap.Width * bitmap.Height];
+        int index = 0;
+        for (int y = 0; y < bitmap.Height; y++)
+        {
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                int tmp = bitmap.GetPixel(x, y).R;
+                if(normalize)
+                {
+                    result[index++] = reverse? 1.0 - (double)tmp / 255.0 : (double)tmp / 255.0;
+                }
             }
         }
         return result;

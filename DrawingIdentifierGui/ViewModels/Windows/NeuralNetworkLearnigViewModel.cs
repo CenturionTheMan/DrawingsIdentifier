@@ -11,12 +11,13 @@ using NeuralNetworkLibrary;
 using MyBaseLibrary;
 using System.Windows;
 
-namespace DrawingIdentifierGui.ViewModels.Controls;
+namespace DrawingIdentifierGui.ViewModels.Windows;
 
 class NeuralNetworkLearnigViewModel : ViewModelBase
 {
 
-    public RelayCommand StartLearningCommand => new RelayCommand(dd => {
+    public RelayCommand StartLearningCommand => new RelayCommand(dd =>
+    {
 
         Task.Factory.StartNew(InitializeLearning);
     });
@@ -48,7 +49,7 @@ class NeuralNetworkLearnigViewModel : ViewModelBase
     public string BatchError
     {
         get { return batchError; }
-        set { batchError = value; OnPropertyChanged();}
+        set { batchError = value; OnPropertyChanged(); }
     }
 
 
@@ -87,7 +88,7 @@ class NeuralNetworkLearnigViewModel : ViewModelBase
             }
         }
 
-        Status = $"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%";
+        Status = $"Correctness: {(guessed * 100.0 / testData.Length).ToString("0.00")}%";
     }
 
 

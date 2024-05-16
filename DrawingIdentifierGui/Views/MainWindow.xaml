@@ -3,38 +3,39 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:components="clr-namespace:DrawingIdentifierGui.Views.Components" 
-        xmlns:viewModelsControls="clr-namespace:DrawingIdentifierGui.ViewModels.Controls"
+        xmlns:components="clr-namespace:DrawingIdentifierGui.Views.Components"
+        xmlns:viewModelsWindows="clr-namespace:DrawingIdentifierGui.ViewModels.Windows"
         xmlns:viewModels="clr-namespace:DrawingIdentifierGui.ViewModels"
-        xmlns:controls="clr-namespace:DrawingIdentifierGui.Views.Controls" d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
+        xmlns:controls="clr-namespace:DrawingIdentifierGui.Views.Controls"
+        d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" 
-        Height="504" 
-        Width="756" 
-        WindowStyle="None" 
+        Title="MainWindow"
+        Height="720"
+        Width="1080"
+        WindowStyle="None"
         AllowsTransparency="True" WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
     <Window.Background>
-        <SolidColorBrush Opacity="0"/>
+        <SolidColorBrush Opacity="0" />
     </Window.Background>
 
     <Window.Resources>
-        <DataTemplate DataType="{x:Type viewModelsControls:PredictionsCanvasViewModel}">
-            <controls:PredictionsCanvas/>
+        <DataTemplate DataType="{x:Type viewModelsWindows:PredictionsCanvasViewModel}">
+            <controls:PredictionsCanvas />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModelsControls:NeuralNetworkLearnigViewModel}">
-            <controls:NeuralNetworkLearning/>
+        <DataTemplate DataType="{x:Type viewModelsWindows:NeuralNetworkLearnigViewModel}">
+            <controls:NeuralNetworkLearning />
         </DataTemplate>
     </Window.Resources>
 
     <!--<WindowChrome.WindowChrome>
-        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0"/>
+        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" />
     </WindowChrome.WindowChrome>-->
 
     <!--Container-->
-    <Border x:Name="ContainerBorder" 
-            CornerRadius="15" 
+    <Border x:Name="ContainerBorder"
+            CornerRadius="15"
             Background="{StaticResource dark_gray}"
             BorderBrush="{StaticResource dark}"
             BorderThickness="1">
@@ -42,70 +43,62 @@
         <!--Container Grid-->
         <Grid x:Name="ContainerGrid">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="0.9*"/>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="0.9*" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="0.95*"/>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="0.95*" />
             </Grid.RowDefinitions>
 
             <!--Header-->
             <Grid x:Name="Header"
                   Grid.Column="1"
-                  Grid.Row="0"
-                  >
+                  Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.99*"/>
-                    <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="0.01*"/>
+                    <ColumnDefinition Width="0.99*" />
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="0.01*" />
                 </Grid.ColumnDefinitions>
 
                 <Button x:Name="ExitButton"
                         Grid.Column="2"
                         Width="auto"
-                        Height="auto" 
+                        Height="auto"
                         Command="{Binding ExitCommand}"
                         CommandParameter=""
                         Margin="4"
-                        Background="{StaticResource red}"
-                        />
-
+                        Background="{StaticResource red}" />
 
                 <Button x:Name="MinimalizeButton"
                         Grid.Column="1"
                         Width="auto"
-                        Height="auto" 
+                        Height="auto"
                         Margin="4"
-                        Background="{StaticResource gray}" 
-                        Command="{Binding MinimalizeCommand}"
-                        />
-
-
+                        Background="{StaticResource gray}"
+                        Command="{Binding MinimalizeCommand}" />
             </Grid>
-            
+
             <!--Left Navigation-->
-            <controls:NavigationBar 
-                Grid.Column="0" 
+            <controls:NavigationBar
+                Grid.Column="0"
                 Grid.Row="1"
                 Button1Command="{Binding ShowPredictionCanvasCommnad}"
-                Button2Command="{Binding ShowNeuralNetworkLearningCommand}"/>
-
+                Button2Command="{Binding ShowNeuralNetworkLearningCommand}" />
 
             <!--Content-->
             <ContentControl Grid.Row="1"
                             Grid.Column="1"
                             Content="{Binding SelectedViewModel}"
                             HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"/>
-            
-            <!--<controls:PredictionsCanvas 
-                Grid.Column="1" 
+                            VerticalAlignment="Stretch" />
+
+            <!--<controls:PredictionsCanvas
+                Grid.Column="1"
                 Grid.Row="1"
                 />-->
-
         </Grid>
     </Border>
 </Window>

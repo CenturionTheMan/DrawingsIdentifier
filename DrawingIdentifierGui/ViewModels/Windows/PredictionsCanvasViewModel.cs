@@ -2,6 +2,7 @@
 using DrawingIdentifierGui.Views.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Input;
 
-namespace DrawingIdentifierGui.ViewModels.Controls;
+namespace DrawingIdentifierGui.ViewModels.Windows;
 
 internal class PredictionsCanvasViewModel : ViewModelBase
 {
@@ -18,13 +19,12 @@ internal class PredictionsCanvasViewModel : ViewModelBase
     public RelayCommand EraserSelectedCommand => new RelayCommand(EraserSelected);
 
 
-
     private PredictionsCanvas predictionsCanvas;
 
 
     public PredictionsCanvasViewModel()
     {
-        this.predictionsCanvas = PredictionsCanvas.Instance;
+        predictionsCanvas = PredictionsCanvas.Instance;
     }
 
     public void PenSelected(object? tmp)
@@ -39,4 +39,5 @@ internal class PredictionsCanvasViewModel : ViewModelBase
         predictionsCanvas.Cursor = Cursors.Cross;
         predictionsCanvas.drawingCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
     }
+
 }

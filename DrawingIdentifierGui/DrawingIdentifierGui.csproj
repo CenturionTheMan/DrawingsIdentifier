@@ -32,4 +32,8 @@
     <Resource Include="Images\edit.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\Controls\" />
+  </ItemGroup>
+
 </Project>
