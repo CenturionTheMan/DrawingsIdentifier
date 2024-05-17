@@ -14,7 +14,7 @@
                 BorderBrush="{StaticResource dark}"
                 BorderThickness="1">
 
-        <Grid>
+        <Grid Name="HolderGrid" MinHeight="550">
             <Grid.RowDefinitions>
                 <RowDefinition Height=".1*" />
                 <RowDefinition Height=".1*" />
@@ -31,34 +31,45 @@
 
             <TextBlock x:Name="Header"
                        Grid.Row="0"
-                       Text="{Binding HeaderText}"
-                       Foreground="{StaticResource blue}"
-                       FontSize="14"
+                       Text="{Binding Path=HeaderText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Foreground="{StaticResource white}"
+                       FontSize="13"
                        VerticalAlignment="Center"
                        Margin="2 0 2 0"
                        TextAlignment="Center"
                        TextWrapping="Wrap" />
 
+            <!--bidibg errors...-->
             <local:SingleNNOutput Grid.Row="1"
-                                  Text="AXE" />
+                                  Text="AXE"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="2"
-                                  Text="CACTUS" />
+                                  Text="CACTUS"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="3"
-                                  Text="CAT" />
+                                  Text="CAT"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="4"
-                                  Text="DIAMOND" />
+                                  Text="DIAMOND"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="5"
-                                  Text="FENCE" />
+                                  Text="FENCE"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="6"
-                                  Text="MOUSTACHE" />
+                                  Text="MOUSTACHE"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="7"
-                                  Text="PANTS" />
+                                  Text="PANTS"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="8"
-                                  Text="SNOWMAN" />
+                                  Text="SNOWMAN"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="9"
-                                  Text="STAIRS" />
+                                  Text="STAIRS"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="10"
-                                  Text="SWORD" />
+                                  Text="SWORD"
+                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         </Grid>
     </Border>
 </UserControl>

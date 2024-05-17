@@ -4,12 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:DrawingIdentifierGui.Views.Controls"
+             xmlns:windows="clr-namespace:DrawingIdentifierGui.ViewModels.Windows"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="450">
 
-    <Border Background="{StaticResource gray}"
-            CornerRadius="5"
-            Margin="2">
+    <Border Background ="{Binding Path=CustomBackground, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        CornerRadius="5"
+        Margin="2">
 
         <Grid>
             <Grid.RowDefinitions>
@@ -17,10 +18,10 @@
                 <RowDefinition Height="0.5*" />
             </Grid.RowDefinitions>
 
-            <Label Content="{Binding Text}"
-                   Grid.Row="0"
-                   HorizontalContentAlignment="Center"
-                   VerticalContentAlignment="Center" />
+            <Label Content="{Binding Path=Text, RelativeSource={RelativeSource AncestorType=UserControl}}"
+               Grid.Row="0"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center" FontSize="12" />
 
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -29,11 +30,13 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Content="prob:" Grid.Column="0"
-                       HorizontalContentAlignment="Center"
-                       VerticalContentAlignment="Top" />
-                <Label Content="100%" Grid.Column="1"
-                       HorizontalContentAlignment="Center"
-                       VerticalContentAlignment="Top" />
+                   HorizontalContentAlignment="Center"
+                   VerticalContentAlignment="Top" />
+                <Label Name="PercentLabel"
+                   Content="{Binding Path=Probability, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Grid.Column="1"
+                   HorizontalContentAlignment="Center"
+                   VerticalContentAlignment="Top" />
             </Grid>
         </Grid>
     </Border>

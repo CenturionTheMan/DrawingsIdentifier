@@ -17,9 +17,9 @@
         <Grid x:Name="DrawingAreaGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.7*" />
-                <ColumnDefinition Width="0.1*" />
-                <ColumnDefinition Width="0.1*" />
-                <ColumnDefinition Width="0.1*" />
+                <ColumnDefinition Width="0.1*" MinWidth="70" />
+                <ColumnDefinition Width="0.1*" MinWidth="100" />
+                <ColumnDefinition Width="0.1*" MinWidth="100" />
             </Grid.ColumnDefinitions>
 
             <!--Drawing Area-->
@@ -65,12 +65,16 @@
                                           NeuralNetworkType="0"
                                           HeaderText="Neural Network"
                                           Grid.Column="2"
-                                          Margin="10 30 5 30" />
+                                          Margin="5 30 2.5 30"
+                                          DefaultNodeBg="{StaticResource gray}"
+                                          ActiveNodeBg="{StaticResource gold}" />
             <controls:NeuralNetworkOutput x:Name="ConvolutionalNNOutput"
                                           NeuralNetworkType="1"
                                           HeaderText="Convolutional Neural Network"
                                           Grid.Column="4"
-                                          Margin="5 30 10 30" />
+                                          Margin="5 30 2.5 30"
+                                          DefaultNodeBg="{StaticResource gray}"
+                                          ActiveNodeBg="{StaticResource gold}" />
             <!--Predictions-->
         </Grid>
     </Border>
