@@ -36,7 +36,7 @@
     <Style x:Key="NavigationNavigationRadioButton" TargetType="{x:Type customComponents:NavigationRadioButton}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="{DynamicResource dark}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource colorDark1}" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
         <Setter Property="BorderThickness" Value="4" />
         <Setter Property="Margin" Value="5 5 5 5" />
@@ -67,7 +67,7 @@
                         </Trigger>-->
                         <Trigger Property="IsMouseOver" Value="true">
                             <!--<Setter Property="Background" TargetName="NavigationRadioButtonBorder" Value="Green" />-->
-                            <Setter Property="BorderBrush" TargetName="NavigationRadioButtonBorder" Value="{DynamicResource gray}" />
+                            <Setter Property="BorderBrush" TargetName="NavigationRadioButtonBorder" Value="{DynamicResource colorLight2}" />
                             <!--<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource NavigationRadioButton.MouseOver.Glyph}" />-->
                         </Trigger>
                         <!--<Trigger Property="IsEnabled" Value="false">
@@ -81,7 +81,7 @@
                             <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource NavigationRadioButton.Pressed.Glyph}" />
                         </Trigger>-->
                         <Trigger Property="IsChecked" Value="true">
-                            <Setter Property="BorderBrush" TargetName="NavigationRadioButtonBorder" Value="{DynamicResource blue}" />
+                            <Setter Property="BorderBrush" TargetName="NavigationRadioButtonBorder" Value="{DynamicResource colorHighlight2}" />
                         </Trigger>
                         <!--<Trigger Property="IsChecked" Value="{x:Null}">
                             <Setter Property="BorderBrush" TargetName="NavigationRadioButtonBorder" Value="" />

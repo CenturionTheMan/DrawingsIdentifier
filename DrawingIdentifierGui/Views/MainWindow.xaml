@@ -36,8 +36,8 @@
     <!--Container-->
     <Border x:Name="ContainerBorder"
             CornerRadius="15"
-            Background="{StaticResource dark_gray}"
-            BorderBrush="{StaticResource dark}"
+            Background="{StaticResource colorDark2}"
+            BorderBrush="{StaticResource colorDark1}"
             BorderThickness="1">
 
         <!--Container Grid-->
@@ -70,14 +70,14 @@
                         Command="{Binding ExitCommand}"
                         CommandParameter=""
                         Margin="4"
-                        Background="{StaticResource red}" />
+                        Background="{StaticResource colorRed}" />
 
                 <Button x:Name="MinimalizeButton"
                         Grid.Column="1"
                         Width="auto"
                         Height="auto"
                         Margin="4"
-                        Background="{StaticResource gray}"
+                        Background="{StaticResource colorLight2}"
                         Command="{Binding MinimalizeCommand}" />
             </Grid>
 

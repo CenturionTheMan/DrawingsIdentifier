@@ -58,7 +58,7 @@ namespace DrawingIdentifierGui.Views.Controls
         public void SetPredictionValue(double probability, Brush defaultBg)
         {
             this.CustomBackground = defaultBg;
-            this.Probability = $"{Math.Round((100 * probability), 2)}%";
+            this.Probability = $"{Math.Round((100 * probability), 2).ToString(".00")}%";
         }
 
         public void ActivateBest(Brush background)

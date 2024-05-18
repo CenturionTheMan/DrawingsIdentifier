@@ -10,20 +10,20 @@
                 <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <SolidColorBrush x:Key="dark" Color="#202020" />
-            <SolidColorBrush x:Key="dark_gray" Color="#2D3142" />
-            <SolidColorBrush x:Key="gray" Color="#4F5D75" />
-            <SolidColorBrush x:Key="light_gray" Color="#BFC0C0" />
-            <SolidColorBrush x:Key="red" Color="#c81d25" />
-            <SolidColorBrush x:Key="gold" Color="#FFD100" />
-            <!--<SolidColorBrush x:Key="white" Color="#fefcfb"/>-->
+            <SolidColorBrush x:Key="colorDark1" Color="#202020" />
+            <SolidColorBrush x:Key="colorDark2" Color="#2D3142" />
+            <SolidColorBrush x:Key="colorLight2" Color="#4F5D75" />
+            <SolidColorBrush x:Key="colorLight1" Color="#BFC0C0" />
+            
+            <SolidColorBrush x:Key="colorRed" Color="#c81d25" />
+            <SolidColorBrush x:Key="colorHighlight1" Color="#FFD100" />
 
-            <SolidColorBrush x:Key="white">
+            <SolidColorBrush x:Key="colorWhite">
                 <SolidColorBrush.Color>
                     <Color A="255" R="254" G="254" B="251"/>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
-            <SolidColorBrush x:Key="blue" Color="#1985a1" />
+            <SolidColorBrush x:Key="colorHighlight2" Color="#1985a1" />
         </ResourceDictionary>
 
     </Application.Resources>
