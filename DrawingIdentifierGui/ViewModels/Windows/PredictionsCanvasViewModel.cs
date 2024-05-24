@@ -1,5 +1,5 @@
 ﻿using DrawingIdentifierGui.MVVM;
-using DrawingIdentifierGui.Views.Controls;
+using DrawingIdentifierGui.Views.Windows;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,9 +18,7 @@ internal class PredictionsCanvasViewModel : ViewModelBase
     public RelayCommand PenSelectedCommand => new RelayCommand(PenSelected);
     public RelayCommand EraserSelectedCommand => new RelayCommand(EraserSelected);
 
-
     private PredictionsCanvas predictionsCanvas;
-
 
     public PredictionsCanvasViewModel()
     {
@@ -39,5 +37,4 @@ internal class PredictionsCanvasViewModel : ViewModelBase
         predictionsCanvas.Cursor = Cursors.Cross;
         predictionsCanvas.drawingCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
     }
-
 }

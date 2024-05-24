@@ -51,6 +51,7 @@
                    FontSize="12"
                    VerticalContentAlignment="Bottom"
                    Foreground="{StaticResource colorWhite}" />
+
                 <ProgressBar Grid.Row="1"
                          Value="{Binding EpochPercentFinish}"
                          Maximum="100"
@@ -60,13 +61,6 @@
                          BorderThickness="0"
                          BorderBrush="{StaticResource colorDark1}">
                 </ProgressBar>
-                <!--<Label Grid.Row="1"
-                       Content="{Binding EpochPercentFinish}"
-                       FontSize="20"
-                       VerticalContentAlignment="Center"
-                       HorizontalContentAlignment="Center"
-                       Foreground="{StaticResource colorWhite}"
-                       Margin="1 0 1 10" />-->
 
                 <Label Grid.Row="2"
                     Content="Finished Epochs:"

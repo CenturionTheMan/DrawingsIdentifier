@@ -12,7 +12,7 @@ using System.Diagnostics;
 using DrawingIdentifierGui.ViewModels.Windows;
 using System.Reflection;
 
-namespace DrawingIdentifierGui.Views.Controls;
+namespace DrawingIdentifierGui.Views.Windows;
 
 /// <summary>
 /// Interaction logic for PredictionsCanvas.xaml

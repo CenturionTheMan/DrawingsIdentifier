@@ -16,18 +16,13 @@ using System.Windows.Shapes;
 namespace DrawingIdentifierGui.Views.Windows
 {
     /// <summary>
-    /// Interaction logic for NeuralNetworkLearning.xaml
+    /// Interaction logic for FeedForwardConfig.xaml
     /// </summary>
-    public partial class NeuralNetworkLearning : UserControl
+    public partial class FeedForwardConfig : UserControl
     {
-        public NeuralNetworkLearning()
+        public FeedForwardConfig()
         {
             InitializeComponent();
-            DataContext = null;
-        }
-
-        private void Convolutional_Neural_Network_Loaded(object sender, RoutedEventArgs e)
-        {
         }
     }
 }

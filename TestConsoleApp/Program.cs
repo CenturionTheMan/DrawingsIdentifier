@@ -5,18 +5,18 @@ using ImagesProcessor;
 
 namespace TestConsoleApp;
 
-class Program
+internal class Program
 {
-    const string MnistDataDirPath = "D:\\GoogleDriveMirror\\Projects\\NeuralNetworkProject\\mnist_data\\";
+    private const string MnistDataDirPath = "D:\\GoogleDriveMirror\\Projects\\NeuralNetworkProject\\mnist_data\\";
 
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         Console.WriteLine("Loading data...");
-        var sets = DataReader.LoadAllQuickDrawSamplesFromDirectory("./../../../../../Datasets/");
+        var sets = DataReader.LoadQuickDrawSamplesFromDirectory("./../../../../../Datasets/");
         (var trainData, var testData) = sets.SplitIntoTrainTest(20);
 
         Console.WriteLine("Training...");
-        var nn = new ConvolutionalNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
+        var nn = new FeedForwardNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
 
         nn.OnLearningIteration += (epoch, epochPercentFinish, batchError) =>
         {
@@ -57,7 +57,7 @@ class Program
         var testData = GetMnistData(MnistDataDirPath + "mnist_test_data.csv");
 
         Console.WriteLine("Training...");
-        var nn = new ConvolutionalNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
+        var nn = new FeedForwardNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
 
         nn.OnLearningIteration += (epoch, epochPercentFinish, batchError) =>
         {
@@ -89,7 +89,6 @@ class Program
         Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
     }
 
-
     private static (double[] inputs, double[] outputs)[] GetMnistData(params string[] paths)
     {
         var result = new List<(double[] inputs, double[] outputs)>();
@@ -106,7 +105,7 @@ class Program
                 int numer = int.Parse(item[0]);
                 expected[numer] = 1;
 
-                inputs = item.Skip(1).Select(x => double.Parse(x)/255.0).ToArray();
+                inputs = item.Skip(1).Select(x => double.Parse(x) / 255.0).ToArray();
 
                 result.Add((inputs, expected));
             }

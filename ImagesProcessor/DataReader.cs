@@ -16,6 +16,8 @@ namespace ImagesProcessor;
 
 public class DataReader
 {
+    private static Random random = new Random();
+
     public static QuickDrawSet LoadQuickDrawSamplesFromFiles(string[] filePaths, int amountToLoadFromEachFile = 2000, bool colorReverse = true, double maxValue = 255.0)
     {
         List<QuickDrawSet> result = new();
@@ -46,7 +48,7 @@ public class DataReader
         return LoadQuickDrawSamplesFromFiles(files, amountToLoadFromEachFile, colorReverse, maxValue);
     }
 
-    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad = 2000, bool colorReverse = true, double maxValue = 255.0)
+    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad, bool colorReverse = true, double maxValue = 255.0)
     {
         NDArray npArray = np.load(path);
         double[,] array = (double[,])npArray.ToMuliDimArray<double>();
@@ -57,10 +59,11 @@ public class DataReader
         int upperBound = amountToLoad > array.GetLength(0) ? array.GetLength(0) : amountToLoad;
         Parallel.For(0, upperBound, i =>
         {
+            int sampleIndex = random.Next(array.GetLength(0));
             double[] row = new double[array.GetLength(1)];
             for (int j = 0; j < array.GetLength(1); j++)
             {
-                row[j] = colorReverse ? 1 - array[i, j] / maxValue : array[i, j] / maxValue;
+                row[j] = colorReverse ? 1 - array[sampleIndex, j] / maxValue : array[sampleIndex, j] / maxValue;
             }
             result.Add(new QuickDrawSample(categoryName, row));
         });

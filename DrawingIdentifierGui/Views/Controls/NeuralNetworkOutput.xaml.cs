@@ -76,7 +76,7 @@ public partial class NeuralNetworkOutput : UserControl
         {
             case 0:
                 {
-                    preditions = App.NeuralNetwork.Predict(nnInput);
+                    preditions = App.FeedForwardNN.Predict(nnInput);
                     //ImagesProcessor.DataReader.SaveToImage(nnInput, "D:\\GoogleDriveMirror\\Studia\\Inzynierka\\text.png");
 
                     Debug.WriteLine($"[BASE-NN PREDICTION]: {Array.IndexOf(preditions, preditions.Max())}");

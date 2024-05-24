@@ -9,7 +9,7 @@ namespace NeuralNetworkLibrary;
 /// This class provides functionality for training and predicting using a Convolutional Neural Network.
 /// It supports various activation functions and implements backpropagation for learning.
 /// </remarks>
-public class ConvolutionalNeuralNetwork : INeuralNetwork
+public class FeedForwardNeuralNetwork : INeuralNetwork
 {
     private static Random random = new Random();
 
@@ -27,12 +27,12 @@ public class ConvolutionalNeuralNetwork : INeuralNetwork
     #region Constructors
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConvolutionalNeuralNetwork"/> class.
+    /// Initializes a new instance of the <see cref="FeedForwardNeuralNetwork"/> class.
     /// </summary>
     /// <param name="layersSizes"></param>
     /// <param name="activationFunctions"></param>
     /// <exception cref="ArgumentException"></exception>
-    public ConvolutionalNeuralNetwork(int[] layersSizes, ActivationFunction[] activationFunctions)
+    public FeedForwardNeuralNetwork(int[] layersSizes, ActivationFunction[] activationFunctions)
     {
         if (layersSizes.Length != activationFunctions.Length + 1)
         {

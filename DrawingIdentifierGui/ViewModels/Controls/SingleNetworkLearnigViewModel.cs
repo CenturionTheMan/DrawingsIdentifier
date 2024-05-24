@@ -60,7 +60,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             set { corectness = value; OnPropertyChanged(); }
         }
 
-        public int EpochAmount { get => App.LearningConfigNN.EpochAmount; }
+        public int EpochAmount { get => App.FeedForwardNNConfig.EpochAmount; }
 
         private void InitializeLearning()
         {
@@ -75,7 +75,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
             Task.Factory.StartNew(() =>
             {
-                var quickDrawData = ImagesProcessor.DataReader.LoadQuickDrawSamplesFromFiles(files);
+                var quickDrawData = ImagesProcessor.DataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig!.SamplesAmountToLoadPerFile);
                 if (quickDrawData == null)
                 {
                     return;
@@ -108,10 +108,6 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                     });
                 }
             });
-
-            //neuralNetwork!.Train();
-            //FinishedEpochs = i;
-            //FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
         }
 
         private INeuralNetwork? neuralNetwork;
@@ -124,36 +120,36 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
             learningConfig = TypeOfNN switch
             {
-                0 => App.LearningConfigNN,
-                1 => App.LearningConfigNNConvolutional,
+                0 => App.FeedForwardNNConfig,
+                1 => App.ConvolutionalNNConfig,
                 _ => null
             };
 
             neuralNetwork = TypeOfNN switch
             {
-                0 => App.NeuralNetwork,
+                0 => App.FeedForwardNN,
                 1 => null, //here assign convolutional neural network
                 _ => null
             };
 
             FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
 
-            OnInit();
-        }
-
-        private void OnInit()
-        {
+            if (neuralNetwork == null)
+            {
+                return;
+            }
             double batchErr = double.MaxValue;
 
-            App.NeuralNetwork.OnLearningIteration = (epoch, epochPercentFinish, batchError) =>
+            neuralNetwork!.OnLearningIteration = (epoch, epochPercentFinish, batchError) =>
             {
-                finishedEpochs = epoch;
+                FinishedEpochs = epoch;
                 EpochPercentFinish = epochPercentFinish;
                 if (batchError < batchErr)
                 {
                     batchErr = batchError;
                     BatchError = $"Min Batch error: {batchError.ToString("0.00")}";
                 }
+                FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
             };
         }
 
