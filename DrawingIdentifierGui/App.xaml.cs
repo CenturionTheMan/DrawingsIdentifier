@@ -25,10 +25,10 @@ namespace DrawingIdentifierGui
             ExpectedMaxError = 0.01,
             NeuralNetworkLayers = new()
             {
-                new NNLayerConfig { LayerName="Input Layer", Size=784, ActivationFunction=ActivationFunction.ReLU },
+                new NNLayerConfig { LayerName="Input Layer", Size=784, ActivationFunction=ActivationFunction.ReLU, IsSizeEnable=false },
                 new NNLayerConfig { LayerName="Hidden Layer", Size=16, ActivationFunction=ActivationFunction.ReLU },
-                new NNLayerConfig { LayerName="Hidden Layer", Size=16, ActivationFunction=ActivationFunction.Softmax },
-                new NNLayerConfig { LayerName="Output Layer", Size=10, ActivationFunction=null },
+                new NNLayerConfig { LayerName="Hidden Layer", Size=16, ActivationFunction=ActivationFunction.Softmax, IsActivationFunctionEnable=false },
+                new NNLayerConfig { LayerName="Output Layer", Size=10, ActivationFunction=null, IsSizeEnable=false, IsActivationFunctionEnable=false },
             }
         };
 

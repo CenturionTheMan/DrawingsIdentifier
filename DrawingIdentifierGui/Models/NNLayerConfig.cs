@@ -26,6 +26,33 @@ public class NNLayerConfig : ViewModelBase
 
     private int size;
 
-    public ActivationFunction? ActivationFunction { get; set; }
+    public bool IsSizeEnable { get; set; } = true;
+
+    public ActivationFunction? ActivationFunction
+    {
+        get => activationFunction;
+        set
+        {
+            activationFunction = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ActivationFunction? activationFunction;
+
+    public bool IsActivationFunctionEnable { get; set; } = true;
+
     public string LayerName { get; set; } = "Hidden Layer";
+
+    public IEnumerable<ActivationFunction> ActivationFunctions
+    {
+        get
+        {
+            yield return NeuralNetworkLibrary.ActivationFunction.ReLU;
+            yield return NeuralNetworkLibrary.ActivationFunction.Sigmoid;
+
+            if (!IsActivationFunctionEnable)
+                yield return NeuralNetworkLibrary.ActivationFunction.Softmax;
+        }
+    }
 }

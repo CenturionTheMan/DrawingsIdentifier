@@ -36,7 +36,8 @@
                         <RowDefinition Height="0.2*" />
                     </Grid.RowDefinitions>
 
-                    <ListView ItemsSource="{Binding Path=NetworkLayers}"
+                    <ListView Name="LayersListView"
+                              ItemsSource="{Binding Path=NetworkLayers}"
                               Grid.Row="1"
                               Background="{StaticResource colorLight1}"
                               VerticalContentAlignment="Top"
@@ -65,7 +66,7 @@
                                                Grid.Row="0"
                                                Grid.ColumnSpan="4"
                                                Content="{Binding Path=LayerName}"
-                                               Foreground="{StaticResource colorWhite}"
+                                               Foreground="{StaticResource colorHighlight1}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center" />
 
@@ -78,8 +79,24 @@
                                                  Grid.Column="1"
                                                  Background="{StaticResource colorLight1}"
                                                  Text="{Binding Path=Size, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEnabled="{Binding Path=IsSizeEnable}"
                                                  HorizontalContentAlignment="Center"
                                                  VerticalContentAlignment="Center" />
+
+                                        <Label Grid.Column="2"
+                                               Grid.Row="1"
+                                               Foreground="{StaticResource colorWhite}"
+                                               Content="Activation function:"
+                                               HorizontalContentAlignment="Right" />
+                                        <ComboBox Name="ActivationFunctionComboBox"
+                                                  Grid.Row="1"
+                                                  Grid.Column="3"
+                                                  Background="{StaticResource colorLight1}"
+                                                  ItemsSource="{Binding ActivationFunctions}"
+                                                  SelectedItem="{Binding Path=ActivationFunction, UpdateSourceTrigger=PropertyChanged}"
+                                                  IsEnabled="{Binding Path=IsActivationFunctionEnable}"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
