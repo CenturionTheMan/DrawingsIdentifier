@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+
 using System;
+
 using System.Drawing;
 using NumSharp;
+
 using System.Collections.Generic;
+
 using System.Diagnostics;
 
 namespace ImagesProcessor;
 
 public class DataReader
 {
-    public static QuickDrawSet LoadAllQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool colorReverse = true, double maxValue = 255.0)
+    public static QuickDrawSet LoadQuickDrawSamplesFromFiles(string[] filePaths, int amountToLoadFromEachFile = 2000, bool colorReverse = true, double maxValue = 255.0)
     {
         List<QuickDrawSet> result = new();
 
-        var files = Directory.GetFiles(directoryPath, "*.npy");
+        var files = filePaths;
 
         Debug.WriteLine($"[LOADING SETS] Found {files.Length} files");
 
@@ -25,7 +29,6 @@ public class DataReader
         int count = 0;
         foreach (var filePath in files)
         {
-
             var quickDrawSet = LoadDataFromNpyFile(filePath, amountToLoadFromEachFile, colorReverse, maxValue);
             samples.AddRange(quickDrawSet);
 
@@ -36,8 +39,14 @@ public class DataReader
         return new QuickDrawSet(samples);
     }
 
+    public static QuickDrawSet LoadQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool colorReverse = true, double maxValue = 255.0)
+    {
+        var files = Directory.GetFiles(directoryPath, "*.npy");
 
-    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad=2000, bool colorReverse= true, double maxValue=255.0)
+        return LoadQuickDrawSamplesFromFiles(files, amountToLoadFromEachFile, colorReverse, maxValue);
+    }
+
+    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad = 2000, bool colorReverse = true, double maxValue = 255.0)
     {
         NDArray npArray = np.load(path);
         double[,] array = (double[,])npArray.ToMuliDimArray<double>();
@@ -51,7 +60,7 @@ public class DataReader
             double[] row = new double[array.GetLength(1)];
             for (int j = 0; j < array.GetLength(1); j++)
             {
-                row[j] = colorReverse? 1 - array[i, j] / maxValue : array[i, j] / maxValue;
+                row[j] = colorReverse ? 1 - array[i, j] / maxValue : array[i, j] / maxValue;
             }
             result.Add(new QuickDrawSample(categoryName, row));
         });
@@ -59,7 +68,7 @@ public class DataReader
         return result;
     }
 
-    public static void SaveToImage(double[] data, string path, int width=28, int height = 28)
+    public static void SaveToImage(double[] data, string path, int width = 28, int height = 28)
     {
         var bitmap = new Bitmap(width, height);
 

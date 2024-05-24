@@ -1,0 +1,145 @@
+﻿<UserControl x:Class="DrawingIdentifierGui.Views.Controls.SingleLearningComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:DrawingIdentifierGui.Views.Controls"
+             xmlns:controls="clr-namespace:DrawingIdentifierGui.ViewModels.Controls"
+             d:DataContext="{d:DesignInstance Type=controls:SingleNetworkLearnigViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="720" d:DesignWidth="500" Loaded="UserControl_Loaded">
+    <Border Margin="10"
+        CornerRadius="15"
+        Background="{StaticResource colorDark2}"
+        Grid.Column="0"
+        Padding="20">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*" />
+                <RowDefinition Height="0.3*" />
+                <RowDefinition Height="0.4*" />
+                <RowDefinition Height="0.2*" />
+            </Grid.RowDefinitions>
+
+            <!--TITLE-->
+            <Label Content="{Binding TitleName}"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontSize="30"
+               Foreground="{StaticResource colorHighlight2}"
+               Grid.Row="0" />
+
+            <!--LOADED NETWORK INFO-->
+            <Label Grid.Row="1"
+               Content="{Binding Correctness}"
+               Foreground="{StaticResource colorWhite}"
+                   FontSize="20" />
+
+            <!--LEARNING INFO-->
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.1*" />
+                    <RowDefinition Height="0.2*" />
+                    <RowDefinition Height="0.1*" />
+                    <RowDefinition Height="0.2*" />
+                    <RowDefinition Height="0.2*" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0"
+                   Content="Epoch percent finish:"
+                   FontSize="12"
+                   VerticalContentAlignment="Bottom"
+                   Foreground="{StaticResource colorWhite}" />
+                <ProgressBar Grid.Row="1"
+                         Value="{Binding EpochPercentFinish}"
+                         Maximum="100"
+                         Margin="1 0 1 10"
+                         Background="{StaticResource colorLight2}"
+                         Foreground="{StaticResource colorHighlight2}"
+                         BorderThickness="0"
+                         BorderBrush="{StaticResource colorDark1}">
+                </ProgressBar>
+                <!--<Label Grid.Row="1"
+                       Content="{Binding EpochPercentFinish}"
+                       FontSize="20"
+                       VerticalContentAlignment="Center"
+                       HorizontalContentAlignment="Center"
+                       Foreground="{StaticResource colorWhite}"
+                       Margin="1 0 1 10" />-->
+
+                <Label Grid.Row="2"
+                    Content="Finished Epochs:"
+                    FontSize="12"
+                    VerticalContentAlignment="Bottom"
+                    Foreground="{StaticResource colorWhite}" />
+
+                <ProgressBar Grid.Row="3"
+                         Value="{Binding FinishedEpochs}"
+                         Maximum="{Binding EpochAmount}"
+                         Margin="1 0 1 10"
+                         Background="{StaticResource colorLight2}"
+                         Foreground="{StaticResource colorHighlight2}"
+                         BorderThickness="0"
+                         BorderBrush="{StaticResource colorDark1}" />
+                <Label Grid.Row="3"
+                       Content="{Binding FinishedEpochText}"
+                       FontSize="20"
+                       VerticalContentAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource colorWhite}"
+                       Margin="1 0 1 10" />
+
+                <Label Grid.Row="4"
+                       Content="{Binding BatchError}"
+                       FontSize="24"
+                       VerticalContentAlignment="Center"
+                       Foreground="{StaticResource colorWhite}" />
+            </Grid>
+
+            <!--BUTTONS-->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Column="0"
+                        Content="Load Network"
+                        Command=""
+                        Background="{StaticResource colorLight2}"
+                        Foreground="{StaticResource colorWhite}"
+                        BorderBrush="{StaticResource colorDark1}"
+                        BorderThickness="1"
+                        Margin="1"
+                        FontSize="20" />
+
+                <Button Grid.Column="1"
+                        Content="Save Network"
+                        Command=""
+                        Background="{StaticResource colorLight2}"
+                        Foreground="{StaticResource colorWhite}"
+                        BorderBrush="{StaticResource colorDark1}"
+                        BorderThickness="1"
+                        Margin="1"
+                        FontSize="20" />
+
+                <Button Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Grid.Row="1"
+                        Content="Initialize Network Learning"
+                        Command="{Binding StartLearningCommand}"
+                        Background="{StaticResource colorHighlight2}"
+                        Foreground="{StaticResource colorWhite}"
+                        BorderBrush="{StaticResource colorDark1}"
+                        BorderThickness="1"
+                        Margin="1"
+                        FontSize="20" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

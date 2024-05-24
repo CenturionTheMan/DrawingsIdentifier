@@ -12,8 +12,6 @@ using System.Diagnostics;
 using DrawingIdentifierGui.ViewModels.Windows;
 using System.Reflection;
 
-using System.Diagnostics;
-
 namespace DrawingIdentifierGui.Views.Controls;
 
 /// <summary>

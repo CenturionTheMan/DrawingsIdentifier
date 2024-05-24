@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DrawingIdentifierGui.ViewModels.Controls;
+using DrawingIdentifierGui.ViewModels.Windows;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,18 +18,21 @@ using System.Windows.Shapes;
 namespace DrawingIdentifierGui.Views.Controls
 {
     /// <summary>
-    /// Interaction logic for NeuralNetworkLearning.xaml
+    /// Interaction logic for SingleLearningComponent.xaml
     /// </summary>
-    public partial class NeuralNetworkLearning : UserControl
+    public partial class SingleLearningComponent : UserControl
     {
-        public NeuralNetworkLearning()
+        private SingleNetworkLearnigViewModel? viewModel;
+
+        public SingleLearningComponent()
         {
             InitializeComponent();
-            DataContext = null;
         }
 
-        private void Convolutional_Neural_Network_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            viewModel = new SingleNetworkLearnigViewModel(this.Name);
+            DataContext = viewModel;
         }
     }
 }

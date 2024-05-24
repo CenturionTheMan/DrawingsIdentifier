@@ -9,7 +9,7 @@ namespace NeuralNetworkLibrary;
 /// This class provides functionality for training and predicting using a Convolutional Neural Network.
 /// It supports various activation functions and implements backpropagation for learning.
 /// </remarks>
-public class ConvolutionalNeuralNetwork
+public class ConvolutionalNeuralNetwork : INeuralNetwork
 {
     private static Random random = new Random();
 
@@ -22,15 +22,9 @@ public class ConvolutionalNeuralNetwork
     private int layersAmount;
 
     private Action<int, double, double>? onLearningIteration;
+    public Action<int, double, double>? OnLearningIteration { get => onLearningIteration; set => onLearningIteration = value; }
 
-    public Action<int, double, double>? OnLearningIteration
-    {
-        get { return onLearningIteration; }
-        set { onLearningIteration = value; }
-    }
-
-
-#region Constructors
+    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvolutionalNeuralNetwork"/> class.
@@ -40,7 +34,7 @@ public class ConvolutionalNeuralNetwork
     /// <exception cref="ArgumentException"></exception>
     public ConvolutionalNeuralNetwork(int[] layersSizes, ActivationFunction[] activationFunctions)
     {
-        if(layersSizes.Length != activationFunctions.Length + 1)
+        if (layersSizes.Length != activationFunctions.Length + 1)
         {
             throw new ArgumentException("Activation functions amount must be equal to layers amount - 1");
         }
@@ -53,7 +47,6 @@ public class ConvolutionalNeuralNetwork
         this.layersBeforeActivation = new Matrix[layersAmount];
         this.biasesForLayers = new Matrix[layersAmount - 1];
         this.weightsForLayers = new Matrix[layersAmount - 1];
-
 
         for (int i = 0; i < layersAmount; i++)
         {
@@ -71,15 +64,7 @@ public class ConvolutionalNeuralNetwork
 
     #endregion Constructors
 
-
-#region Save and Load
-    
-
-
-#endregion Save and Load
-
-
-#region Training and Predicting
+    #region Training and Predicting
 
     /// <summary>
     /// Trains the network using the given data.
@@ -119,9 +104,9 @@ public class ConvolutionalNeuralNetwork
 
                 double batchError = PerformLearningIteration(inputSamples, expectsOutputsSamples);
 
-                OnLearningIteration?.Invoke(epoch+1, 100*batchBeginIndex/(double)data.Length, batchError);
+                onLearningIteration?.Invoke(epoch + 1, 100 * batchBeginIndex / (double)data.Length, batchError);
 
-                if(batchError < expectedMaxError)
+                if (batchError < expectedMaxError)
                 {
                     return;
                 }
@@ -139,15 +124,15 @@ public class ConvolutionalNeuralNetwork
     /// <exception cref="ArgumentException"></exception>
     public double[] Predict(double[] inputs)
     {
-        if(inputs.Length != layersSizes[0])
+        if (inputs.Length != layersSizes[0])
         {
             throw new ArgumentException("Inputs length must be equal to the first layer size");
         }
-        
+
         var result = Feedforward(new Matrix(inputs));
 
         List<double> resultList = new List<double>();
-        
+
         for (int i = 0; i < result.RowsAmount; i++)
         {
             resultList.Add(result.Values[i, 0]);
@@ -156,10 +141,9 @@ public class ConvolutionalNeuralNetwork
         return resultList.ToArray();
     }
 
-#endregion Training and Predicting
+    #endregion Training and Predicting
 
-
-#region Base Methods
+    #region Base Methods
 
     /// <summary>
     /// Performs a learning iteration using the given data samples (mini batch) and expected results.
@@ -179,12 +163,13 @@ public class ConvolutionalNeuralNetwork
 
         double errorSum = 0.0;
 
-        Parallel.For(0, dataSamples.Length, i =>{
+        Parallel.For(0, dataSamples.Length, i =>
+        {
             Matrix prediction = Feedforward(dataSamples[i]);
 
             var changes = Backpropagation(expectedResults[i], prediction);
 
-            errorSum += activationFunctions[^1] == ActivationFunction.Softmax? CalculateCrossEntropyCost(expectedResults[i], prediction) : CalculateMeanSquaredError(expectedResults[i], prediction);
+            errorSum += activationFunctions[^1] == ActivationFunction.Softmax ? CalculateCrossEntropyCost(expectedResults[i], prediction) : CalculateMeanSquaredError(expectedResults[i], prediction);
 
             for (int j = 0; j < layersAmount - 1; j++)
             {
@@ -193,7 +178,8 @@ public class ConvolutionalNeuralNetwork
             }
         });
 
-        Parallel.For(0, layersAmount - 1, i =>{
+        Parallel.For(0, layersAmount - 1, i =>
+        {
             weightsForLayers[i] = weightsForLayers[i].ElementwiseAdd(changesForWeightsSum[i].ApplyFunction(x => x / dataSamples.Length));
             biasesForLayers[i] = biasesForLayers[i].ElementwiseAdd(changesForBiasesSum[i].ApplyFunction(x => x / dataSamples.Length));
         });
@@ -217,7 +203,7 @@ public class ConvolutionalNeuralNetwork
             Matrix multipliedByWeightsLayer = Matrix.DotProductMatrices(weightsForLayers[i], currentLayer);
 
             Matrix layerWithAddedBiases = multipliedByWeightsLayer.ElementwiseAdd(biasesForLayers[i]);
-            
+
             Matrix activatedLayer = activationFunctions[i] switch
             {
                 ActivationFunction.ReLU => ReLU(layerWithAddedBiases),
@@ -245,14 +231,12 @@ public class ConvolutionalNeuralNetwork
         Matrix[] changeForWeights = new Matrix[layersAmount - 1];
         Matrix[] changeForBiases = new Matrix[layersAmount - 1];
 
-
         Matrix errorMatrix = expectedResults.ElementwiseSubtract(predictions);
-
 
         for (int i = layersAmount - 2; i >= 0; i--)
         {
             Matrix activationDerivativeLayer = activationFunctions[i] switch
-            { 
+            {
                 ActivationFunction.ReLU => DerivativeReLU(layersBeforeActivation[i + 1]),
                 ActivationFunction.Sigmoid => DerivativeSigmoid(layersBeforeActivation[i + 1]),
                 ActivationFunction.Softmax => DerivativeSoftmax(layersBeforeActivation[i + 1]),
@@ -272,10 +256,9 @@ public class ConvolutionalNeuralNetwork
         return (changeForWeights, changeForBiases);
     }
 
-#endregion Base Methods
+    #endregion Base Methods
 
-
-#region Activation Functions and Error
+    #region Activation Functions and Error
 
     /// <summary>
     /// Calculates the mean squared error between the expected and predicted results.
@@ -286,7 +269,7 @@ public class ConvolutionalNeuralNetwork
     /// <exception cref="ArgumentException"></exception>
     private double CalculateMeanSquaredError(Matrix expected, Matrix predictions)
     {
-        if(predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
+        if (predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
         {
             throw new ArgumentException("Predictions and expected results matrices must have the same dimensions");
         }
@@ -313,7 +296,7 @@ public class ConvolutionalNeuralNetwork
     /// <exception cref="ArgumentException"></exception>
     private double CalculateCrossEntropyCost(Matrix expected, Matrix predictions)
     {
-        if(predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
+        if (predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
         {
             throw new ArgumentException("Predictions and expected results matrices must have the same dimensions");
         }
@@ -348,7 +331,7 @@ public class ConvolutionalNeuralNetwork
     /// <returns></returns>
     private Matrix DerivativeReLU(Matrix mat)
     {
-        return mat.ApplyFunction(x => { return x >= 0 ? 1.0 : 0.0; }); 
+        return mat.ApplyFunction(x => { return x >= 0 ? 1.0 : 0.0; });
     }
 
     /// <summary>
@@ -358,7 +341,7 @@ public class ConvolutionalNeuralNetwork
     /// <returns></returns>
     private Matrix Sigmoid(Matrix mat)
     {
-        return mat.ApplyFunction(x => 1 / (1 + Math.Exp(-x)) );
+        return mat.ApplyFunction(x => 1 / (1 + Math.Exp(-x)));
     }
 
     /// <summary>
@@ -368,7 +351,8 @@ public class ConvolutionalNeuralNetwork
     /// <returns></returns>
     private Matrix DerivativeSigmoid(Matrix mat)
     {
-        return mat.ApplyFunction(x => {
+        return mat.ApplyFunction(x =>
+        {
             var sig = 1 / (1 + Math.Exp(-x));
             return sig * (1 - sig);
         });
@@ -396,10 +380,8 @@ public class ConvolutionalNeuralNetwork
         return Softmax(mat).ApplyFunction(x => x * (1 - x));
     }
 
-#endregion Activation Functions and Error
-
+    #endregion Activation Functions and Error
 }
-
 
 public enum ActivationFunction
 {
