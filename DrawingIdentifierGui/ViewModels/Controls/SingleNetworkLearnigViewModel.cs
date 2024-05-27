@@ -14,7 +14,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             Task.Factory.StartNew(InitializeLearning);
         });
 
-        private LearningConfig? learningConfig;
+        private NeuralNetworkConfig? learningConfig;
 
         private string titleName = "Unknown";
 
@@ -52,7 +52,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         public string BatchError
         { get => batchError; set { batchError = value; OnPropertyChanged(); } }
 
-        private string corectness = $"Achieved predictions correctness: ???.??%";
+        private string corectness = $"Achieved correctness: ???.??%";
 
         public string Correctness
         {
@@ -114,7 +114,9 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
         public SingleNetworkLearnigViewModel(string name)
         {
-            TitleName = name.Replace("_", " ");
+            string tmp = name.Replace("Neural_Network", "");
+
+            TitleName = tmp.Replace("_", " ").Trim() + Environment.NewLine + "Neural Network";
 
             TypeOfNN = name.Contains("Convo") ? 1 : 0;
 

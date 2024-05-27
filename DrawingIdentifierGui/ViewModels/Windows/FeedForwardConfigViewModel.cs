@@ -17,16 +17,15 @@ public class FeedForwardConfigViewModel : ViewModelBase
     public RelayCommand AddLayerCommand => new RelayCommand((obj) =>
     {
         NNLayerConfig layer = new NNLayerConfig();
-        App.FeedForwardNNConfig.NeuralNetworkLayers!.Insert(App.FeedForwardNNConfig.NeuralNetworkLayers.Count()-1, layer);
+        App.FeedForwardNNConfig.NeuralNetworkLayers!.Insert(App.FeedForwardNNConfig.NeuralNetworkLayers.Count() - 1, layer);
     });
 
     public RelayCommand RemoveLayerCommand => new RelayCommand((obj) =>
     {
-        if(SelectedLayer == null || SelectedLayer.IsSizeEnable == false || App.FeedForwardNNConfig.NeuralNetworkLayers!.Count <=3) return;
+        if (SelectedLayer == null || SelectedLayer.IsSizeEnable == false || App.FeedForwardNNConfig.NeuralNetworkLayers!.Count <= 3) return;
 
         App.FeedForwardNNConfig.NeuralNetworkLayers!.Remove(SelectedLayer);
     });
-
 
     public NNLayerConfig SelectedLayer
     {
@@ -40,6 +39,7 @@ public class FeedForwardConfigViewModel : ViewModelBase
             OnPropertyChanged();
         }
     }
+
     private NNLayerConfig selectedLayer;
 
     public ObservableCollection<NNLayerConfig> NetworkLayers
@@ -51,6 +51,19 @@ public class FeedForwardConfigViewModel : ViewModelBase
         set
         {
             App.FeedForwardNNConfig.NeuralNetworkLayers = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public NeuralNetworkConfig NeuralNetworkConfig
+    {
+        get
+        {
+            return App.FeedForwardNNConfig;
+        }
+        set
+        {
+            App.FeedForwardNNConfig = value;
             OnPropertyChanged();
         }
     }

@@ -16,19 +16,21 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.1*" />
-                <RowDefinition Height="0.3*" />
+                <RowDefinition Height="0.2*" />
+                <RowDefinition Height="0.2*" />
                 <RowDefinition Height="0.4*" />
                 <RowDefinition Height="0.2*" />
             </Grid.RowDefinitions>
 
             <!--TITLE-->
-            <Label Content="{Binding TitleName}"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               FontSize="30"
-               Foreground="{StaticResource colorHighlight2}"
-               Grid.Row="0" />
+            <TextBlock Text="{Binding TitleName}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="30"
+                       FontWeight="Bold"
+                       TextAlignment="Center"
+                       Foreground="{StaticResource colorHighlight2}"
+                       Grid.Row="0" />
 
             <!--LOADED NETWORK INFO-->
             <Label Grid.Row="1"

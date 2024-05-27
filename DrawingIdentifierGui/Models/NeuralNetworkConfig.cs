@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DrawingIdentifierGui.Models;
 
-public class LearningConfig
+public class NeuralNetworkConfig
 {
     public (double[] inputs, double[] outputs)[]? Data { get; set; }
     public int SamplesAmountToLoadPerFile { get; set; }

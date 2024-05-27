@@ -24,24 +24,25 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.3*"/>
-                <RowDefinition Height="0.7*"/>
+                <RowDefinition Height="0.3*" />
+                <RowDefinition Height="0.7*" />
             </Grid.RowDefinitions>
-            
+
             <!--Main Header-->
             <Border Grid.Column="0"
                     Grid.Row="0"
                     CornerRadius="15"
                     Background="{StaticResource colorDark2}"
                     Margin="10 10 5 5">
-                <TextBlock Text="Feed - Forward Neural Network"
-                           Foreground="{StaticResource colorHighlight2}"
-                           FontSize="60"
+                <TextBlock Foreground="{StaticResource colorHighlight2}"
+                           FontSize="40"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           TextWrapping="Wrap"
                            TextAlignment="Center"
-                           FontWeight="Heavy"/>
+                           FontWeight="Heavy">
+                    Feed - Forward <LineBreak />
+                    Neural Network
+                </TextBlock>
             </Border>
 
             <!--Learning Config-->
@@ -49,13 +50,119 @@
                     Grid.Column="0"
                     CornerRadius="15"
                     Background="{StaticResource colorDark2}"
-                    Margin="10 5 5 10">
-
+                    Margin="10 5 5 10"
+                    Padding="0 15 0 15">
                 <Grid>
-                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.59*" />
+                        <ColumnDefinition Width="0.45*" />
+                        <ColumnDefinition Width="0.01*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.15*" />
+                        <RowDefinition Height="0.2*" />
+                        <RowDefinition Height="0.2*" />
+                        <RowDefinition Height="0.2*" />
+                        <RowDefinition Height="0.2*" />
+                        <RowDefinition Height="0.05*" />
+                    </Grid.RowDefinitions>
+
+                    <!--section Title-->
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="0"
+                               Grid.ColumnSpan="3"
+                               Foreground="{StaticResource colorHighlight2}"
+                               FontSize="28"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Top"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center">
+                        Learning Configuration
+                    </TextBlock>
+
+                    <!--Learning Rate-->
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="1"
+                               Foreground="{StaticResource colorWhite}"
+                               FontSize="20"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center">
+                        Learning Rate:
+                    </TextBlock>
+                    <TextBox Grid.Column="1"
+                             Grid.Row="1"
+                             Background="{StaticResource colorLight1}"
+                             Text="{Binding Path=NeuralNetworkConfig.LearningRate, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             FontSize="25"
+
+                             Margin="15" />
+
+                    <!--Epochs-->
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="2"
+                               Foreground="{StaticResource colorWhite}"
+                               FontSize="20"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center">
+                        Epochs Amount:
+                    </TextBlock>
+
+                    <TextBox Grid.Column="1"
+                             Grid.Row="2"
+                             Background="{StaticResource colorLight1}"
+                             Text="{Binding Path=NeuralNetworkConfig.EpochAmount, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             FontSize="25"
+
+                             Margin="15" />
+
+                    <!--Batch Size-->
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="3"
+                               Foreground="{StaticResource colorWhite}"
+                               FontSize="20"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center">
+                        Batch Size:
+                    </TextBlock>
+
+                    <TextBox Grid.Column="1"
+                             Grid.Row="3"
+                             Background="{StaticResource colorLight1}"
+                             Text="{Binding Path=NeuralNetworkConfig.BatchSize, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             FontSize="25"
+
+                             Margin="15" />
+
+                    <!--ExpectedMaxError-->
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="4"
+                               Foreground="{StaticResource colorWhite}"
+                               FontSize="20"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center">
+                        Expected Max Error:
+                    </TextBlock>
+
+                    <TextBox Grid.Column="1"
+                             Grid.Row="4"
+                             Background="{StaticResource colorLight1}"
+                             Text="{Binding Path=NeuralNetworkConfig.ExpectedMaxError, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             FontSize="25"
+                             Margin="15" />
                 </Grid>
             </Border>
-            
 
             <!--Layers Config-->
             <Border Grid.Column="1"
@@ -73,8 +180,8 @@
                         <RowDefinition Height="0.15*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*"/>
-                        <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.5*" />
                     </Grid.ColumnDefinitions>
 
                     <!--Title-->
@@ -85,7 +192,7 @@
                            Foreground="{StaticResource colorHighlight2}"
                            FontSize="40"
                            HorizontalContentAlignment="Center"
-                           VerticalContentAlignment="Top"/>
+                           VerticalContentAlignment="Top" />
 
                     <!--Layers List-->
                     <ListView Name="LayersListView"
@@ -128,25 +235,25 @@
                                                Grid.Row="1"
                                                Foreground="{StaticResource colorWhite}"
                                                Content="Layer size:"
-                                               HorizontalContentAlignment="Left" 
+                                               HorizontalContentAlignment="Left"
                                                Margin="5 0 0 0"
-                                               FontSize="15"/>
+                                               FontSize="15" />
                                         <TextBox Grid.Row="2"
                                                  Grid.Column="0"
                                                  Background="{StaticResource colorLight1}"
                                                  Text="{Binding Path=Size, UpdateSourceTrigger=PropertyChanged}"
                                                  IsEnabled="{Binding Path=IsSizeEnable}"
                                                  HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center" 
-                                                 Margin="10 0 10 0"/>
+                                                 VerticalContentAlignment="Center"
+                                                 Margin="10 0 10 0" />
 
                                         <Label Grid.Column="1"
                                                Grid.Row="1"
                                                Foreground="{StaticResource colorWhite}"
                                                Content="Activation function:"
-                                               HorizontalContentAlignment="Left" 
+                                               HorizontalContentAlignment="Left"
                                                Margin="5 0 0 0"
-                                               FontSize="15"/>
+                                               FontSize="15" />
                                         <ComboBox Name="ActivationFunctionComboBox"
                                                   Grid.Row="2"
                                                   Grid.Column="1"
@@ -155,14 +262,14 @@
                                                   SelectedItem="{Binding Path=ActivationFunction, UpdateSourceTrigger=PropertyChanged}"
                                                   IsEnabled="{Binding Path=IsActivationFunctionEnable}"
                                                   HorizontalContentAlignment="Center"
-                                                  VerticalContentAlignment="Center" 
-                                                  Margin="10 0 10 0"/>
+                                                  VerticalContentAlignment="Center"
+                                                  Margin="10 0 10 0" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                
+
                     <!--Buttons-->
                     <Button Grid.Column="0"
                             Grid.Row="3"
@@ -172,18 +279,17 @@
                             FontSize="30"
                             Background="{StaticResource colorHighlight2}"
                             Foreground="{StaticResource colorWhite}"
-                            Command="{Binding Path=AddLayerCommand}"/>
+                            Command="{Binding Path=AddLayerCommand}" />
 
                     <Button Grid.Column="1"
                             Grid.Row="3"
                             Margin="5 10 0 10"
                             Padding="0"
                             Content="Remove Layer"
-                            FontSize="30"
+                            FontSize="25"
                             Background="{StaticResource colorRed}"
                             Foreground="{StaticResource colorWhite}"
-                            Command="{Binding Path=RemoveLayerCommand}"/>
-
+                            Command="{Binding Path=RemoveLayerCommand}" />
                 </Grid>
             </Border>
         </Grid>

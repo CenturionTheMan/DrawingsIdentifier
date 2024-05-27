@@ -15,7 +15,7 @@ namespace DrawingIdentifierGui
     {
         public static FeedForwardNeuralNetwork FeedForwardNN = new FeedForwardNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
 
-        public static LearningConfig FeedForwardNNConfig = new LearningConfig()
+        public static NeuralNetworkConfig FeedForwardNNConfig = new NeuralNetworkConfig()
         {
             Data = null,
             SamplesAmountToLoadPerFile = 5000,
@@ -32,7 +32,7 @@ namespace DrawingIdentifierGui
             }
         };
 
-        public static LearningConfig ConvolutionalNNConfig = new LearningConfig()
+        public static NeuralNetworkConfig ConvolutionalNNConfig = new NeuralNetworkConfig()
         {
             Data = null,
             LearningRate = 0.01,
