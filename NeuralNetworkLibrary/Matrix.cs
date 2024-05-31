@@ -5,10 +5,9 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace NeuralNetworkLibrary;
 
-internal class Matrix
+public class Matrix
 {
     private static Random random = new();
 
@@ -18,7 +17,7 @@ internal class Matrix
 
     internal Matrix(double[] singleColumnValues)
     {
-        this.Values = new double[singleColumnValues.Length,1];
+        this.Values = new double[singleColumnValues.Length, 1];
 
         for (int i = 0; i < singleColumnValues.Length; i++)
         {
@@ -29,7 +28,7 @@ internal class Matrix
         ColumnsAmount = 1;
     }
 
-    internal Matrix(double[,] values)
+    public Matrix(double[,] values)
     {
         this.Values = values;
         RowsAmount = values.GetLength(0);
@@ -48,7 +47,7 @@ internal class Matrix
         Values = new double[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
         ColumnsAmount = columnsAmount;
-        
+
         for (int i = 0; i < RowsAmount; i++)
         {
             for (int j = 0; j < ColumnsAmount; j++)
@@ -57,7 +56,6 @@ internal class Matrix
             }
         }
     }
-
 
     internal static Matrix DotProductMatrices(Matrix a, Matrix b)
     {
@@ -78,7 +76,6 @@ internal class Matrix
     {
         return EachElementAssignment(a, b, (i, j) => a.Values[i, j] - b.Values[i, j]);
     }
-
 
     internal static Matrix EachElementAssignment(Matrix a, Matrix b, Func<int, int, double> mathOperation)
     {
@@ -113,6 +110,19 @@ internal static class MatrixExtender
         return sum;
     }
 
+    internal static double Max(this Matrix a)
+    {
+        double max = double.MinValue;
+        foreach (var item in a.Values)
+        {
+            if (item > max)
+            {
+                max = item;
+            }
+        }
+        return max;
+    }
+
     internal static Matrix Transpose(this Matrix a)
     {
         Matrix result = new Matrix(a.ColumnsAmount, a.RowsAmount);
@@ -121,7 +131,7 @@ internal static class MatrixExtender
         {
             for (int j = 0; j < a.RowsAmount; j++)
             {
-                result.Values[i,j] = a.Values[j,i];
+                result.Values[i, j] = a.Values[j, i];
             }
         }
 

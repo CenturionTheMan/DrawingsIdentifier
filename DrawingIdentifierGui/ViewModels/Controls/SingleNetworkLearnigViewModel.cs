@@ -146,7 +146,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
                 Debug.WriteLine("Finished learning");
 
-                Console.WriteLine("Testing...");
+                Debug.WriteLine("Testing...");
                 int guessed = 0;
                 foreach (var item in testData)
                 {
@@ -172,6 +172,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 {
                     Correctness = $"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%";
                 });
+
+                Debug.WriteLine($"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%");
             });
         }
 
