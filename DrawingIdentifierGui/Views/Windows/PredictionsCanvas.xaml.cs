@@ -65,7 +65,10 @@ public partial class PredictionsCanvas : UserControl
         var bitmap = drawingCanvas.GetBitmap();
         var imageTask = new Task(() =>
         {
-            var input = bitmap.ToBlackWhite().CropWhite(100).Resize(28, 28).RValueToFlatDoubleArray();
+            var input = bitmap.ToBlackWhite().CropWhite(50).Resize(28, 28).RValueToFlatDoubleArray(reverse: false);
+
+            //to remove
+            //ImagesProcessor.DataReader.SaveToImage(input, "./../../../../UserDrawing.png", 28, 28);
 
             RunMethodOnCurrentThread(() =>
             {

@@ -64,6 +64,7 @@
                         <RowDefinition Height="0.2*" />
                         <RowDefinition Height="0.2*" />
                         <RowDefinition Height="0.2*" />
+                        <RowDefinition Height="0.2*" />
                         <RowDefinition Height="0.05*" />
                     </Grid.RowDefinitions>
 
@@ -80,9 +81,29 @@
                         Learning Configuration
                     </TextBlock>
 
-                    <!--Learning Rate-->
+                    <!--Samples per file-->
                     <TextBlock Grid.Column="0"
                                Grid.Row="1"
+                               Foreground="{StaticResource colorWhite}"
+                               FontSize="20"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center">
+                        Samples per file:
+                    </TextBlock>
+                    <TextBox Grid.Column="1"
+                             Grid.Row="1"
+                             Background="{StaticResource colorLight1}"
+                             Text="{Binding Path=NeuralNetworkConfig.SamplesAmountToLoadPerFile, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             FontSize="25"
+
+                             Margin="15" />
+
+                    <!--Learning Rate-->
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="2"
                                Foreground="{StaticResource colorWhite}"
                                FontSize="20"
                                HorizontalAlignment="Right"
@@ -91,7 +112,7 @@
                         Learning Rate:
                     </TextBlock>
                     <TextBox Grid.Column="1"
-                             Grid.Row="1"
+                             Grid.Row="2"
                              Background="{StaticResource colorLight1}"
                              Text="{Binding Path=NeuralNetworkConfig.LearningRate, UpdateSourceTrigger=PropertyChanged}"
                              HorizontalContentAlignment="Center"
@@ -102,7 +123,7 @@
 
                     <!--Epochs-->
                     <TextBlock Grid.Column="0"
-                               Grid.Row="2"
+                               Grid.Row="3"
                                Foreground="{StaticResource colorWhite}"
                                FontSize="20"
                                HorizontalAlignment="Right"
@@ -112,7 +133,7 @@
                     </TextBlock>
 
                     <TextBox Grid.Column="1"
-                             Grid.Row="2"
+                             Grid.Row="3"
                              Background="{StaticResource colorLight1}"
                              Text="{Binding Path=NeuralNetworkConfig.EpochAmount, UpdateSourceTrigger=PropertyChanged}"
                              HorizontalContentAlignment="Center"
@@ -123,7 +144,7 @@
 
                     <!--Batch Size-->
                     <TextBlock Grid.Column="0"
-                               Grid.Row="3"
+                               Grid.Row="4"
                                Foreground="{StaticResource colorWhite}"
                                FontSize="20"
                                HorizontalAlignment="Right"
@@ -133,7 +154,7 @@
                     </TextBlock>
 
                     <TextBox Grid.Column="1"
-                             Grid.Row="3"
+                             Grid.Row="4"
                              Background="{StaticResource colorLight1}"
                              Text="{Binding Path=NeuralNetworkConfig.BatchSize, UpdateSourceTrigger=PropertyChanged}"
                              HorizontalContentAlignment="Center"
@@ -144,7 +165,7 @@
 
                     <!--ExpectedMaxError-->
                     <TextBlock Grid.Column="0"
-                               Grid.Row="4"
+                               Grid.Row="5"
                                Foreground="{StaticResource colorWhite}"
                                FontSize="20"
                                HorizontalAlignment="Right"
@@ -154,7 +175,7 @@
                     </TextBlock>
 
                     <TextBox Grid.Column="1"
-                             Grid.Row="4"
+                             Grid.Row="5"
                              Background="{StaticResource colorLight1}"
                              Text="{Binding Path=NeuralNetworkConfig.ExpectedMaxError, UpdateSourceTrigger=PropertyChanged}"
                              HorizontalContentAlignment="Center"

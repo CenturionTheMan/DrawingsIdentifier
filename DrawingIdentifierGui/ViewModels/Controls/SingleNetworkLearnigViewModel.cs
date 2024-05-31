@@ -17,17 +17,14 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         private NeuralNetworkConfig? learningConfig;
 
         private string titleName = "Unknown";
-
         public string TitleName
         { get { return titleName; } set { titleName = value; OnPropertyChanged(); } }
 
         private int typeOfNN = -2;
-
         public int TypeOfNN
         { get { return typeOfNN; } set { typeOfNN = value; OnPropertyChanged(); } }
 
         private double epochPercentFinish = 0.0;
-
         public double EpochPercentFinish
         {
             get { return epochPercentFinish; }
@@ -35,7 +32,6 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         }
 
         private int finishedEpochs = 0;
-
         public int FinishedEpochs
         {
             get { return finishedEpochs; }
@@ -43,17 +39,14 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         }
 
         private string finishedEpochText = $"0/?";
-
         public string FinishedEpochText
         { get { return finishedEpochText; } set { finishedEpochText = value; OnPropertyChanged(); } }
 
         private string batchError = "Min Batch error: ???";
-
         public string BatchError
         { get => batchError; set { batchError = value; OnPropertyChanged(); } }
 
         private string corectness = $"Achieved correctness: ???.??%";
-
         public string Correctness
         {
             get { return corectness; }
@@ -62,17 +55,83 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
         public int EpochAmount { get => App.FeedForwardNNConfig.EpochAmount; }
 
-        private void InitializeLearning()
+        private INeuralNetwork? neuralNetwork;
+
+        public SingleNetworkLearnigViewModel(string name)
+        {
+            string tmp = name.Replace("Neural_Network", "");
+            TitleName = tmp.Replace("_", " ").Trim() + Environment.NewLine + "Neural Network";
+            TypeOfNN = name.Contains("Convo") ? 1 : 0;
+
+            RefreshNN(TypeOfNN, false);
+
+            FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
+        }
+
+        private void RefreshNN(int nnType, bool createNewInstance)
+        {
+            learningConfig = nnType switch
+            {
+                0 => App.FeedForwardNNConfig,
+                1 => App.ConvolutionalNNConfig,
+                _ => throw new Exception("Unknown neural network type")
+            };
+
+            switch (nnType)
+            {
+                case 0:
+                    {
+                        if (createNewInstance)
+                        {
+                            var ctorData = learningConfig!.GetLayersAsCtorData();
+                            App.FeedForwardNN = new FeedForwardNeuralNetwork(ctorData.layersSize, ctorData.activationFunctions);
+                        }
+                        neuralNetwork = App.FeedForwardNN;
+                        break;
+                    }
+                case 1:
+                    {
+                        neuralNetwork = null; //here assign convolutional neural network
+                        break;
+                    }
+                default:
+                    throw new NotImplementedException("Unknown nn type");
+            }
+
+            if (neuralNetwork == null)
+            {
+                return;
+            }
+
+            double batchErr = double.MaxValue;
+            neuralNetwork!.OnLearningIteration = (epoch, epochPercentFinish, batchError) =>
+            {
+                FinishedEpochs = epoch;
+                EpochPercentFinish = epochPercentFinish;
+                if (batchError < batchErr)
+                {
+                    batchErr = batchError;
+                    BatchError = $"Min Batch error: {batchError.ToString("0.00")}";
+                }
+                FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
+            };
+        }
+
+        private string[]? GetFilesForLearning()
         {
             var folderDialog = new OpenFileDialog() { Filter = "Numpy files (*.npy)|*.npy", DefaultExt = ".npy", Multiselect = true };
 
             bool? isFile = folderDialog.ShowDialog();
             if (isFile is null || isFile == false)
             {
-                return;
+                return null;
             }
             var files = folderDialog.FileNames;
+            return files;
+        }
 
+        private void RunLearning(string[] files)
+        {
             Task.Factory.StartNew(() =>
             {
                 var quickDrawData = ImagesProcessor.DataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig!.SamplesAmountToLoadPerFile);
@@ -82,6 +141,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 }
 
                 (var trainData, var testData) = quickDrawData.SplitIntoTrainTest();
+
                 neuralNetwork!.Train(trainData, learningConfig!.LearningRate, learningConfig.EpochAmount, learningConfig.BatchSize, learningConfig.ExpectedMaxError);
 
                 Debug.WriteLine("Finished learning");
@@ -107,52 +167,28 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                         Correctness = $"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%";
                     });
                 }
+
+                ForceMainThread(() =>
+                {
+                    Correctness = $"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%";
+                });
             });
         }
 
-        private INeuralNetwork? neuralNetwork;
-
-        public SingleNetworkLearnigViewModel(string name)
+        private void InitializeLearning()
         {
-            string tmp = name.Replace("Neural_Network", "");
-
-            TitleName = tmp.Replace("_", " ").Trim() + Environment.NewLine + "Neural Network";
-
-            TypeOfNN = name.Contains("Convo") ? 1 : 0;
-
-            learningConfig = TypeOfNN switch
-            {
-                0 => App.FeedForwardNNConfig,
-                1 => App.ConvolutionalNNConfig,
-                _ => null
-            };
-
-            neuralNetwork = TypeOfNN switch
-            {
-                0 => App.FeedForwardNN,
-                1 => null, //here assign convolutional neural network
-                _ => null
-            };
-
-            FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
-
-            if (neuralNetwork == null)
+            // get files
+            var files = GetFilesForLearning();
+            if (files == null)
             {
                 return;
             }
-            double batchErr = double.MaxValue;
 
-            neuralNetwork!.OnLearningIteration = (epoch, epochPercentFinish, batchError) =>
-            {
-                FinishedEpochs = epoch;
-                EpochPercentFinish = epochPercentFinish;
-                if (batchError < batchErr)
-                {
-                    batchErr = batchError;
-                    BatchError = $"Min Batch error: {batchError.ToString("0.00")}";
-                }
-                FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
-            };
+            // refresh neural network config
+            RefreshNN(this.TypeOfNN, true);
+
+            // run learing
+            RunLearning(files);
         }
 
         private void ForceMainThread(Action action)

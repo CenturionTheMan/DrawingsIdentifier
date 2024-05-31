@@ -381,6 +381,36 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
     }
 
     #endregion Activation Functions and Error
+
+    #region Helper Methods
+
+    public bool IsStructureEqual(int[] layersSize, ActivationFunction[] activationFunctions)
+    {
+        if (layersSize.Length != layersSizes.Length || activationFunctions.Length != this.activationFunctions.Length)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < layersSize.Length; i++)
+        {
+            if (layersSize[i] != layersSizes[i])
+            {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < activationFunctions.Length; i++)
+        {
+            if (activationFunctions[i] != this.activationFunctions[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    #endregion Helper Methods
 }
 
 public enum ActivationFunction

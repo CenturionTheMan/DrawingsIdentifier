@@ -13,4 +13,9 @@ public interface INeuralNetwork
     public Action<int, double, double>? OnLearningIteration { get; set; }
 
     public double[] Predict(double[] inputs);
+
+    //public void Save(string filePath);
+    //public void Load(string filePath);
+
+    public bool IsStructureEqual(int[] layersSize, ActivationFunction[] activationFunctions);
 }

@@ -11,6 +11,9 @@ namespace DrawingIdentifierGui.Models;
 
 public class NNLayerConfig : ViewModelBase
 {
+    public bool IsSizeEnable { get; set; } = true;
+
+    private int size;
     public int Size
     {
         get
@@ -24,10 +27,7 @@ public class NNLayerConfig : ViewModelBase
         }
     }
 
-    private int size;
-
-    public bool IsSizeEnable { get; set; } = true;
-
+    private ActivationFunction? activationFunction;
     public ActivationFunction? ActivationFunction
     {
         get => activationFunction;
@@ -37,8 +37,6 @@ public class NNLayerConfig : ViewModelBase
             OnPropertyChanged();
         }
     }
-
-    private ActivationFunction? activationFunction;
 
     public bool IsActivationFunctionEnable { get; set; } = true;
 
