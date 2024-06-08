@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,12 +11,16 @@ namespace NeuralNetworkLibrary;
 public class Matrix
 {
     private static Random random = new();
+    private double[,] Values { get; set; }
 
-    internal double[,] Values { get; set; }
-    internal readonly int RowsAmount;
-    internal readonly int ColumnsAmount;
+    public readonly int RowsAmount;
+    public readonly int ColumnsAmount;
 
-    internal Matrix(double[] singleColumnValues)
+    /// <summary>
+    /// Creates a new Matrix filled with zeros of dimensions rows: singleColumnValues, columns: 1
+    /// </summary>
+    /// <param name="singleColumnValues">Rows amount</param>
+    public Matrix(double[] singleColumnValues)
     {
         this.Values = new double[singleColumnValues.Length, 1];
 
@@ -28,6 +33,10 @@ public class Matrix
         ColumnsAmount = 1;
     }
 
+    /// <summary>
+    /// Creates a new Matrix based on the given values
+    /// </summary>
+    /// <param name="values">Values to be assigned to the matrix</param>
     public Matrix(double[,] values)
     {
         this.Values = values;
@@ -35,14 +44,26 @@ public class Matrix
         ColumnsAmount = values.GetLength(1);
     }
 
-    internal Matrix(int rowsAmount, int columnsAmount)
+    /// <summary>
+    /// Creates a new Matrix filled with zeros of dimensions rows: rowsAmount, columns: columnsAmount
+    /// </summary>
+    /// <param name="rowsAmount">Rows amount</param>
+    /// <param name="columnsAmount">Columns amount</param>
+    public Matrix(int rowsAmount, int columnsAmount)
     {
         Values = new double[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
         ColumnsAmount = columnsAmount;
     }
 
-    internal Matrix(int rowsAmount, int columnsAmount, double min, double max)
+    /// <summary>
+    /// Creates a new Matrix filled with random values of dimensions rows: rowsAmount, columns: columnsAmount
+    /// </summary>
+    /// <param name="rowsAmount">Rows amount</param>
+    /// <param name="columnsAmount">Columns amount</param>
+    /// <param name="min">Minimum value</param>
+    /// <param name="max">Maximum value</param>
+    public Matrix(int rowsAmount, int columnsAmount, double min, double max)
     {
         Values = new double[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
@@ -57,33 +78,118 @@ public class Matrix
         }
     }
 
-    internal static Matrix DotProductMatrices(Matrix a, Matrix b)
+    /// <summary>
+    /// Gives access to the value at the given indexes
+    /// </summary>
+    /// <param name="i">Row index</param>
+    /// <param name="j">Column index</param>
+    /// <returns>Value at the given indexes</returns>
+    /// <exception cref="IndexOutOfRangeException">Thrown when given indexes are out of range</exception>
+    public double this[int i, int j]
+    {
+        get 
+        {
+            if (i < 0 || i >= RowsAmount || j < 0 || j >= ColumnsAmount)
+            {
+                throw new IndexOutOfRangeException($"Given indexes ([{i},{j}]) are out of range for Matrix of size: {RowsAmount}x{ColumnsAmount}.");
+            }
+            return Values[i, j];
+        }
+        set 
+        {
+            if (i < 0 || i >= RowsAmount || j < 0 || j >= ColumnsAmount)
+            {
+                throw new IndexOutOfRangeException($"Given indexes ([{i},{j}]) are out of range for Matrix of size: {RowsAmount}x{ColumnsAmount}.");
+            }
+            Values[i, j] = value;
+        }
+    }
+
+    public IEnumerator<double> GetEnumerator()
+    {
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                yield return Values[i, j];
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates new matrix which is result of dot product of two matrices
+    /// </summary>
+    /// <param name="a">First matrix</param>
+    /// <param name="b">Second matrix</param>
+    /// <returns>Result of dot product of two matrices</returns>
+    public static Matrix DotProductMatrices(Matrix a, Matrix b)
     {
         return new Matrix(Accord.Math.Matrix.Dot(a.Values, b.Values));
     }
 
-    internal static Matrix ElementwiseMultiplyMatrices(Matrix a, Matrix b)
+    /// <summary>
+    /// Creates new matrix which is result of element-wise multiplication of two matrices
+    /// </summary>
+    /// <param name="a">First matrix</param>
+    /// <param name="b">Second matrix</param>
+    /// <returns>Result of element-wise multiplication of two matrices</returns>
+    public static Matrix ElementWiseMultiplyMatrices(Matrix a, Matrix b)
     {
-        return EachElementAssignment(a, b, (i, j) => a.Values[i, j] * b.Values[i, j]);
-    }
-
-    internal static Matrix ElementwiseAddMatrices(Matrix a, Matrix b)
-    {
-        return EachElementAssignment(a, b, (i, j) => a.Values[i, j] + b.Values[i, j]);
-    }
-
-    internal static Matrix ElementwiseSubtractMatrices(Matrix a, Matrix b)
-    {
-        return EachElementAssignment(a, b, (i, j) => a.Values[i, j] - b.Values[i, j]);
-    }
-
-    internal static Matrix EachElementAssignment(Matrix a, Matrix b, Func<int, int, double> mathOperation)
-    {
-        if (a.RowsAmount != b.RowsAmount || a.ColumnsAmount != b.ColumnsAmount)
+        if(CheckIfDimensionsAreEqual(a, b) == false)
         {
             throw new Exception("Matrices must have the same dimensions");
         }
+        return EachElementAssignment(a, (i, j) => a.Values[i, j] * b.Values[i, j]);
+    }
 
+    /// <summary>
+    /// Creates new matrix which is result of element-wise addition of two matrices
+    /// </summary>
+    /// <param name="a">First matrix</param>
+    /// <param name="b">Second matrix</param>
+    /// <returns>Result of element-wise addition of two matrices</returns>
+    public static Matrix ElementWiseAddMatrices(Matrix a, Matrix b)
+    {
+        if(CheckIfDimensionsAreEqual(a, b) == false)
+        {
+            throw new Exception("Matrices must have the same dimensions");
+        }
+        return EachElementAssignment(a, (i, j) => a.Values[i, j] + b.Values[i, j]);
+    }
+
+    /// <summary>
+    /// Creates new matrix which is result of element-wise subtraction of two matrices
+    /// </summary>
+    /// <param name="a">First matrix</param>
+    /// <param name="b">Second matrix</param>
+    /// <returns>Result of element-wise subtraction of two matrices</returns>
+    public static Matrix ElementWiseSubtractMatrices(Matrix a, Matrix b)
+    {
+        if(CheckIfDimensionsAreEqual(a, b) == false)
+        {
+            throw new Exception("Matrices must have the same dimensions");
+        }
+        return EachElementAssignment(a, (i, j) => a.Values[i, j] - b.Values[i, j]);
+    }
+
+    public static Matrix operator *(Matrix a, double b)
+    {
+        return EachElementAssignment(a, (i, j) => a.Values[i, j] * b);
+    }
+
+    public static Matrix operator +(Matrix a, double b)
+    {
+        return EachElementAssignment(a, (i, j) => a.Values[i, j] + b);
+    }
+
+    /// <summary>
+    /// Creates new matrix which is result of applying given function to each element of the a matrix.
+    /// </summary>
+    /// <param name="a">Matrix to apply function to</param>
+    /// <param name="b">Second matrix. Method will use if only for checking dimensions</param>
+    /// <param name="mathOperation">Function to apply</param>
+    private static Matrix EachElementAssignment(Matrix a, Func<int, int, double> mathOperation)
+    {
         Matrix result = new Matrix(a.RowsAmount, a.ColumnsAmount);
 
         for (int i = 0; i < a.RowsAmount; i++)
@@ -96,24 +202,63 @@ public class Matrix
 
         return result;
     }
+
+    /// <summary>
+    /// Checks if given matrices have the same dimensions
+    /// </summary>
+    /// <param name="a">First matrix</param>
+    /// <param name="b">Second matrix</param>
+    /// <returns>True if dimensions are the same, false otherwise</returns>
+    private static bool CheckIfDimensionsAreEqual(Matrix a, Matrix b)
+    {
+        return a.RowsAmount == b.RowsAmount && a.ColumnsAmount == b.ColumnsAmount;
+    }
 }
 
-internal static class MatrixExtender
+public static class MatrixExtender
 {
-    internal static double Sum(this Matrix a)
+    public static int IndexOfMax(this Matrix matrix)
+    {
+        if(matrix.ColumnsAmount != 1)
+            throw new Exception("Matrix must have only one column");
+
+        double max = double.MinValue;
+        int index = 0;
+        for (int i = 0; i < matrix.RowsAmount; i++)
+        {
+            if (matrix[i, 0] > max)
+            {
+                max = matrix[i, 0];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Sums all elements of the matrix
+    /// </summary>
+    /// <param name="a">Matrix to sum</param>
+    /// <returns>Sum of all elements</returns>
+    public static double Sum(this Matrix a)
     {
         double sum = 0;
-        foreach (var item in a.Values)
+        foreach (var item in a)
         {
             sum += item;
         }
         return sum;
     }
 
-    internal static double Max(this Matrix a)
+    /// <summary>
+    /// Finds the maximum value in the matrix
+    /// </summary>
+    /// <param name="a">Matrix to search</param>
+    /// <returns>Maximum value in the matrix</returns>
+    public static double Max(this Matrix a)
     {
         double max = double.MinValue;
-        foreach (var item in a.Values)
+        foreach (var item in a)
         {
             if (item > max)
             {
@@ -123,7 +268,12 @@ internal static class MatrixExtender
         return max;
     }
 
-    internal static Matrix Transpose(this Matrix a)
+    /// <summary>
+    /// Transposes the matrix
+    /// </summary>
+    /// <param name="a">Matrix to transpose</param>
+    /// <returns>Transposed matrix</returns>
+    public static Matrix Transpose(this Matrix a)
     {
         Matrix result = new Matrix(a.ColumnsAmount, a.RowsAmount);
 
@@ -131,14 +281,20 @@ internal static class MatrixExtender
         {
             for (int j = 0; j < a.RowsAmount; j++)
             {
-                result.Values[i, j] = a.Values[j, i];
+                result[i, j] = a[j, i];
             }
         }
 
         return result;
     }
 
-    internal static Matrix ApplyFunction(this Matrix a, Func<double, double> function)
+    /// <summary>
+    /// Applies the given function to each element of the matrix
+    /// </summary>
+    /// <param name="a">Matrix to apply function to</param>
+    /// <param name="function">Function to apply</param>
+    /// <returns>Matrix with applied function</returns>
+    public static Matrix ApplyFunction(this Matrix a, Func<double, double> function)
     {
         Matrix result = new Matrix(a.RowsAmount, a.ColumnsAmount);
 
@@ -146,29 +302,31 @@ internal static class MatrixExtender
         {
             for (int j = 0; j < a.ColumnsAmount; j++)
             {
-                result.Values[i, j] = function(a.Values[i, j]);
+                result[i, j] = function(a[i, j]);
             }
         }
         return result;
     }
 
-    internal static Matrix DotProduct(this Matrix a, Matrix b)
+    public static Matrix DotProduct(this Matrix a, Matrix b)
     {
         return Matrix.DotProductMatrices(a, b);
     }
 
-    internal static Matrix ElementwiseMultiply(this Matrix a, Matrix b)
+    public static Matrix ElementWiseMultiply(this Matrix a, Matrix b)
     {
-        return Matrix.ElementwiseMultiplyMatrices(a, b);
+        return Matrix.ElementWiseMultiplyMatrices(a, b);
     }
 
-    internal static Matrix ElementwiseAdd(this Matrix a, Matrix b)
+    public static Matrix ElementWiseAdd(this Matrix a, Matrix b)
     {
-        return Matrix.ElementwiseAddMatrices(a, b);
+        return Matrix.ElementWiseAddMatrices(a, b);
     }
 
-    internal static Matrix ElementwiseSubtract(this Matrix a, Matrix b)
+    public static Matrix ElementWiseSubtract(this Matrix a, Matrix b)
     {
-        return Matrix.ElementwiseSubtractMatrices(a, b);
+        return Matrix.ElementWiseSubtractMatrices(a, b);
     }
+
+    
 }

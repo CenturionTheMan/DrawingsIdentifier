@@ -136,7 +136,7 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
 
         for (int i = 0; i < result.RowsAmount; i++)
         {
-            resultList.Add(result.Values[i, 0]);
+            resultList.Add(result[i, 0]);
         }
 
         return resultList.ToArray();
@@ -174,15 +174,15 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
 
             for (int j = 0; j < layersAmount - 1; j++)
             {
-                changesForWeightsSum[j] = changesForWeightsSum[j].ElementwiseAdd(changes.changeForWeights[j]);
-                changesForBiasesSum[j] = changesForBiasesSum[j].ElementwiseAdd(changes.changeForBiases[j]);
+                changesForWeightsSum[j] = changesForWeightsSum[j].ElementWiseAdd(changes.changeForWeights[j]);
+                changesForBiasesSum[j] = changesForBiasesSum[j].ElementWiseAdd(changes.changeForBiases[j]);
             }
         });
 
         Parallel.For(0, layersAmount - 1, i =>
         {
-            weightsForLayers[i] = weightsForLayers[i].ElementwiseAdd(changesForWeightsSum[i].ApplyFunction(x => x / dataSamples.Length));
-            biasesForLayers[i] = biasesForLayers[i].ElementwiseAdd(changesForBiasesSum[i].ApplyFunction(x => x / dataSamples.Length));
+            weightsForLayers[i] = weightsForLayers[i].ElementWiseAdd(changesForWeightsSum[i].ApplyFunction(x => x / dataSamples.Length));
+            biasesForLayers[i] = biasesForLayers[i].ElementWiseAdd(changesForBiasesSum[i].ApplyFunction(x => x / dataSamples.Length));
         });
 
         return errorSum / (double)dataSamples.Length;
@@ -203,7 +203,7 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
         {
             Matrix multipliedByWeightsLayer = Matrix.DotProductMatrices(weightsForLayers[i], currentLayer);
 
-            Matrix layerWithAddedBiases = multipliedByWeightsLayer.ElementwiseAdd(biasesForLayers[i]);
+            Matrix layerWithAddedBiases = multipliedByWeightsLayer.ElementWiseAdd(biasesForLayers[i]);
 
             Matrix activatedLayer = activationFunctions[i] switch
             {
@@ -232,7 +232,7 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
         Matrix[] changeForWeights = new Matrix[layersAmount - 1];
         Matrix[] changeForBiases = new Matrix[layersAmount - 1];
 
-        Matrix errorMatrix = expectedResults.ElementwiseSubtract(predictions);
+        Matrix errorMatrix = expectedResults.ElementWiseSubtract(predictions);
 
         for (int i = layersAmount - 2; i >= 0; i--)
         {
@@ -244,7 +244,7 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
                 _ => throw new NotImplementedException()
             };
 
-            Matrix gradientMatrix = activationDerivativeLayer.ElementwiseMultiply(errorMatrix).ApplyFunction(x => x * learningRate);
+            Matrix gradientMatrix = activationDerivativeLayer.ElementWiseMultiply(errorMatrix).ApplyFunction(x => x * learningRate);
 
             Matrix deltaWeightsMatrix = Matrix.DotProductMatrices(gradientMatrix, layersBeforeActivation[i].Transpose());
 

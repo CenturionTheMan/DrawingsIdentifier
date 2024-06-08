@@ -8,43 +8,48 @@ namespace NeuralNetworkLibrary;
 
 internal static class Utilities
 {
-    /// <summary>
-    /// Takes selected slice from the original matrix
-    /// </summary>
-    /// <param name="original">Original matrix</param>
-    /// <param name="startX">start pos X</param>
-    /// <param name="startY">Start pos Y</param>
-    /// <param name="sliceSizeX">Slice to cut x</param>
-    /// <param name="sliceSizeY">Slice to cut Y</param>
-    /// <returns>Slice from original matrix</returns>
-    public static Matrix GetSlice(Matrix original, int startX, int startY, int sliceSizeX, int sliceSizeY)
+    public static (Matrix flattened, IEnumerable<(int, int)> dimensions) FlattenMatrices(Matrix[] matrices)
     {
-        return GetSlice(original.Values, startX, startY, sliceSizeX, sliceSizeY);
-    }
+        List<(int, int)> dimensions = new List<(int, int)>();
+        List<double> values = new List<double>();
 
-    /// <summary>
-    /// Takes selected slice from the original matrix
-    /// </summary>
-    /// <param name="original">Original values</param>
-    /// <param name="startX">start pos X</param>
-    /// <param name="startY">Start pos Y</param>
-    /// <param name="sliceSizeX">Slice to cut x</param>
-    /// <param name="sliceSizeY">Slice to cut Y</param>
-    /// <returns>Slice from original matrix</returns>
-    public static Matrix GetSlice(double[,] original, int startX, int startY, int sliceSizeX, int sliceSizeY)
-    {
-        double[,] slice = new double[sliceSizeX, sliceSizeY];
-
-        for (int i = 0; i < sliceSizeX; i++)
+        foreach (var matrix in matrices)
         {
-            for (int j = 0; j < sliceSizeY; j++)
+            dimensions.Add((matrix.RowsAmount, matrix.ColumnsAmount));
+            foreach (var value in matrix)
             {
-                slice[i, j] = original[startX + i, startY + j];
+                values.Add(value);
             }
         }
 
-        return new Matrix(slice);
+        Matrix flattenedMatrix = new Matrix(values.ToArray());
+        return (flattenedMatrix, dimensions);
     }
+
+    public static Matrix[] RecreateMatrices(Matrix flattenedMatrix, IEnumerable<(int, int)> dimensions)
+    {
+        List<Matrix> matrices = new List<Matrix>();
+        int currentRow = 0;
+
+        foreach (var (rowCount, columnCount) in dimensions)
+        {
+            double[,] matrixValues = new double[rowCount, columnCount];
+            for (int i = 0; i < rowCount; i++)
+            {
+                for (int j = 0; j < columnCount; j++)
+                {
+                    matrixValues[i, j] = flattenedMatrix[currentRow, 0];
+                    currentRow++;
+                }
+            }
+
+            Matrix matrix = new Matrix(matrixValues);
+            matrices.Add(matrix);
+        }
+
+        return matrices.ToArray();
+    }
+
 
     #region Activation Functions and Error
 
@@ -68,7 +73,7 @@ internal static class Utilities
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += Math.Pow(expected.Values[i, j] - predictions.Values[i, j], 2);
+                sum += Math.Pow(expected[i, j] - predictions[i, j], 2);
             }
         }
 
@@ -95,7 +100,7 @@ internal static class Utilities
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += expected.Values[i, j] * Math.Log(predictions.Values[i, j]);
+                sum += expected[i, j] * Math.Log(predictions[i, j]);
             }
         }
 
