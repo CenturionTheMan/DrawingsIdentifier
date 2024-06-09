@@ -11,193 +11,122 @@ public class ConvolutionLayer : IFeatureExtractionLayer
 {
     private static readonly Random random = new Random();
 
-    private Matrix[] kernels;
-    private double[] biases;
-    private int stride;
+    private int depth;
+    private int kernelSize;
+
     private ActivationFunction activationFunction;
-    private int padding;
 
-    private Matrix[] changeForKernels;
-    // private double[] changeForBiases;
+    private Matrix[,] kernels;
+    private Matrix[] biases;
+    //private ActivationFunction activationFunction;
 
-    public ConvolutionLayer(int kernelsAmount, int kernelRows, int kernelColumns, ActivationFunction activationFunction, int stride = 1, int padding = 1, double minInitValue = -0.1, double maxInitValue = 0.1)
+    private Matrix[,] changeForKernels;
+    private Matrix[] changeForBiases;
+
+    private int inputDepth;
+    private int inputWidth;
+    private int inputHeight;
+
+    public ConvolutionLayer((int inputDepth, int inputWidth, int inputHeight) inputShape, int kernelSize, int kernelsDepth, ActivationFunction activationFunction, double minInitValue = -0.1, double maxInitValue = 0.1)
     {
-        this.padding = padding;
+        this.inputDepth = inputShape.inputDepth;
+        this.inputWidth = inputShape.inputWidth;
+        this.inputHeight = inputShape.inputHeight;
+
+        this.depth = kernelsDepth;
+        this.kernelSize = kernelSize;
+
         this.activationFunction = activationFunction;
-        kernels = new Matrix[kernelsAmount];
-        biases = new double[kernelsAmount];
-        changeForKernels = new Matrix[kernelsAmount];
-        // changeForBiases = new double[kernelsAmount];
 
-        for (int i = 0; i < kernelsAmount; i++)
-        {
-            kernels[i] = new Matrix(kernelRows, kernelColumns, minInitValue, maxInitValue);
-            biases[i] = random.NextDouble() * (maxInitValue - minInitValue) + minInitValue;
-            changeForKernels[i] = new Matrix(kernelRows, kernelColumns);
-        }
+        kernels = new Matrix[kernelsDepth, inputShape.inputDepth];
+        biases = new Matrix[kernelsDepth];
 
-        this.stride = stride;
-    }
+        changeForKernels = new Matrix[kernelsDepth, inputShape.inputDepth];
+        changeForBiases = new Matrix[kernelsDepth];
 
-    Matrix[] IFeatureExtractionLayer.Forward(Matrix[] inputs)
-    {
-        List<Matrix> results = new List<Matrix>(kernels.Length);
-        
-        List<Matrix> paddedInputs = new List<Matrix>(inputs.Length);
-        foreach (var input in inputs)
+        for (int i = 0; i < kernelsDepth; i++)
         {
-            paddedInputs.Add(PadInput(input, padding));
-        }
-        
-        foreach (var kernel in kernels)
-        {
-            Matrix sumOfConvolution = new Matrix(inputs[0].RowsAmount, inputs[0].ColumnsAmount);
-            foreach (var paddedInput in paddedInputs)
+            for (int j = 0; j < inputShape.inputDepth; j++)
             {
-                Matrix result = Convolve(paddedInput, kernel, stride);
-                sumOfConvolution = sumOfConvolution.ElementWiseAdd(result);
+                kernels[i, j] = new Matrix(kernelSize, kernelSize, minInitValue, maxInitValue);
+                changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
-
-            results.Add(ApplyActivationFunction(sumOfConvolution));
+            biases[i] = new Matrix(inputShape.inputHeight - kernelSize + 1, inputShape.inputWidth - kernelSize + 1, minInitValue, maxInitValue);
+            changeForBiases[i] = new Matrix(inputShape.inputHeight - kernelSize + 1, inputShape.inputWidth - kernelSize + 1);
         }
-        return results.ToArray();
     }
 
-    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] errors, Matrix[] previousLayerOutputs, double learningRate)
+    (Matrix[] output, Matrix[] outputsBeforeActivation) IFeatureExtractionLayer.Forward(Matrix[] inputs)
     {
-        List<Matrix> changesFor = new List<Matrix>(kernels.Length);
-        List<Matrix> gradients = new List<Matrix>(kernels.Length);
+        Matrix[] outputs = new Matrix[depth];
+        Matrix[] outputsBeforeActivation = new Matrix[depth];
+
+        for (int i = 0; i < depth; i++)
+        {
+            outputs[i] = Matrix.Copy(biases[i]);
             
-
-        List<Matrix> paddedInputs = new List<Matrix>(previousLayerOutputs.Length);
-        foreach (var prev in previousLayerOutputs)
-        {
-            paddedInputs.Add(PadInput(prev, padding));
-        }
-
-        for (int i = 0; i < kernels.Length; i++)
-        {
-            Matrix dout = new Matrix(errors[0].RowsAmount, errors[0].ColumnsAmount);
-            for (int j = 0; j < errors.Length; j++)
+            for (int j = 0; j < inputs.Length; j++)
             {
-                var err = DerivativeActivationFunction(errors[i]);
-                var tmp = Convolve(paddedInputs[i], Rotate180(err), stride);
-
-                changeForKernels[i] = changeForKernels[i].ElementWiseSubtract(Matrix.ElementWiseMultiplyMatrices(err, tmp) * learningRate);
-
-                dout = dout.ElementWiseAdd(Matrix.ElementWiseMultiplyMatrices(err, kernels[i]));
+                var single = inputs[j].CrossCorrelationValid(kernels[i, j], stride: 1);
+                outputs[i] = outputs[i].ElementWiseAdd(single);
             }
 
-            gradients.Add(dout);
+            outputsBeforeActivation[i] = Matrix.Copy(outputs[i]);
+            outputs[i] = outputs[i].ApplyActivationFunction(activationFunction);
         }
 
-        return gradients.ToArray();
+        return (outputs, outputsBeforeActivation);
+    }
+
+    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] inputGradient, Matrix[] previousLayerOutputs, double learningRate)
+    {
+        Matrix[,] kernelsGradient = new Matrix[this.depth, previousLayerOutputs.Length];
+        for (int i = 0; i < kernelsGradient.GetLength(0); i++)
+        {
+            for (int j = 0; j < kernelsGradient.GetLength(1); j++)
+            {
+                kernelsGradient[i, j] = new Matrix(kernelSize, kernelSize);
+            }
+        }
+
+        Matrix[] outputGradient = new Matrix[inputDepth];
+        for (int i = 0; i < previousLayerOutputs.Length; i++)
+        {
+            outputGradient[i] = new Matrix(inputHeight, inputWidth);
+        }
+
+        inputGradient = inputGradient.Select(x => x = x.DerivativeActivationFunction(activationFunction)).ToArray();
+
+        for (int i = 0; i < depth; i++)
+        {
+            for (int j = 0; j < previousLayerOutputs.Length; j++)
+            {
+                Matrix kernelGradient = previousLayerOutputs[j].CrossCorrelationValid(inputGradient[i], stride: 1);
+                changeForKernels[i, j] = changeForKernels[i, j].ElementWiseSubtract(kernelGradient * learningRate);
+
+                var inputGradientSingle =inputGradient[i].ConvolutionFull(kernels[i, j], stride: 1);
+                outputGradient[j] = outputGradient[j].ElementWiseAdd(inputGradientSingle);
+            }
+
+            changeForBiases[i] = changeForBiases[i].ElementWiseSubtract(inputGradient[i]  * learningRate);
+        }
+
+        return outputGradient;
     }
 
     public void UpdateWeightsAndBiases(double batchSize)
     {
-        for (int i = 0; i < kernels.Length; i++)
+        for(int i = 0; i < depth; i++)
         {
-            kernels[i] = kernels[i].ElementWiseAdd(changeForKernels[i].ApplyFunction(x => x / batchSize));
-            //biases[i] += changeForBiases[i] / batchSize;
-
-            changeForKernels[i] = new Matrix(kernels[i].RowsAmount, kernels[i].ColumnsAmount);
-            //changeForBiases[i] = 0;
-        }
-    }
-
-
-    private Matrix PadInput(Matrix input, int padding)
-    {
-        Matrix paddedInput = new Matrix(input.RowsAmount + 2 * padding, input.ColumnsAmount + 2 * padding);
-        for (int i = 0; i < input.RowsAmount; i++)
-        {
-            for (int j = 0; j < input.ColumnsAmount; j++)
+            for(int j = 0; j < kernels.GetLength(1); j++)
             {
-                paddedInput[i + padding, j + padding] = input[i, j];
+                kernels[i, j] = kernels[i, j].ElementWiseAdd(changeForKernels[i, j] * (1.0 / batchSize));
+                changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
-        }
-        return paddedInput;
-    }
-
-    private Matrix Convolve(Matrix input, Matrix kernel, int stride)
-    {
-        int outputRows = ((input.RowsAmount - kernel.RowsAmount) / stride) + 1;
-        int outputColumns = ((input.ColumnsAmount - kernel.ColumnsAmount) / stride) + 1;
-        Matrix output = new Matrix(outputRows, outputColumns);
-
-        for (int i = 0; i < outputRows; i++)
-        {
-            for (int j = 0; j < outputColumns; j++)
-            {
-                double sum = 0;
-
-                for (int m = 0; m < kernel.RowsAmount; m++)
-                {
-                    for (int n = 0; n < kernel.ColumnsAmount; n++)
-                    {
-                        int x = i * stride + m;
-                        int y = j * stride + n;
-
-                        if (x >= 0 && x < input.RowsAmount && y >= 0 && y < input.ColumnsAmount)
-                        {
-                            sum += input[x, y] * kernel[m, n];
-                        }
-                    }
-                }
-
-                output[i, j] = sum;
-            }
-        }
-        return output;
-    }
-
-    //TODO TEST
-    /// <summary>
-    /// Rotates the matrix by 180 degrees
-    /// </summary>
-    /// <returns>New matrix after rotation</returns>
-     private Matrix Rotate180(Matrix matrix)
-    {
-        Matrix result = new Matrix(matrix.RowsAmount, matrix.ColumnsAmount);
-        for (int i = 0; i < matrix.RowsAmount; i++)
-        {
-            for (int j = 0; j < matrix.ColumnsAmount; j++)
-            {
-                result[i, j] = matrix[matrix.RowsAmount - i - 1, matrix.ColumnsAmount - j - 1];
-            }
-        }
-        return result;
-    }
-
-    private Matrix ApplyActivationFunction(Matrix input)
-    {
-        switch (activationFunction)
-        {
-            case ActivationFunction.ReLU:
-                return Utilities.ReLU(input);
-            case ActivationFunction.Sigmoid:
-                return Utilities.Sigmoid(input);
-            case ActivationFunction.Softmax:
-                return Utilities.Softmax(input);
-            default:
-                throw new ArgumentException("Invalid activation function");
+            biases[i] = biases[i].ElementWiseAdd(changeForBiases[i] * (1.0 / batchSize));
+            changeForBiases[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
         }
     }
-
-    private Matrix DerivativeActivationFunction(Matrix input)
-    {
-        switch (activationFunction)
-        {
-            case ActivationFunction.ReLU:
-                return Utilities.DerivativeReLU(input);
-            case ActivationFunction.Sigmoid:
-                return Utilities.DerivativeSigmoid(input);
-            case ActivationFunction.Softmax:
-                return Utilities.DerivativeSoftmax(input);
-            default:
-                throw new ArgumentException("Invalid activation function");
-        }
-    }
+   
 
 }

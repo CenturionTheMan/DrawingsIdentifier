@@ -5,9 +5,6 @@ public class FullyConnectedLayer
     public readonly int LayerSize;
     public readonly ActivationFunction ActivationFunction;
 
-    internal bool IsInitialized {get => isInitialized; }
-
-    private bool isInitialized = false;
     private Matrix weights;
     private Matrix biases;
 
@@ -17,35 +14,28 @@ public class FullyConnectedLayer
     private Matrix weightsGradientSum;
     private Matrix biasesGradientSum;
 
-    public FullyConnectedLayer(int layerSize, ActivationFunction ActivationFunction) 
+    private int previousLayerSize;
+
+    public FullyConnectedLayer(int layerSize, ActivationFunction ActivationFunction, int previousLayerSize, double minWeight = -0.2, double maxWeight = 0.2) 
     {
+        this.previousLayerSize = previousLayerSize;
+
         this.LayerSize = layerSize;
         this.ActivationFunction = ActivationFunction;
 
         this.weights = new Matrix(0,0);
         this.biases = new Matrix(0,0);
-        // this.layerOutputBeforeActivation = new Matrix(0,0);
-        // this.prevLayerOutputBeforeActivation = new Matrix(0,0);
-
-        this.isInitialized = false;
-    }
-    
-    internal void InitializeWeightsAndBiases(int previousLayerSize, double minWeight, double maxWeight)
-    {
+        
         this.weights = new Matrix(LayerSize, previousLayerSize, minWeight, maxWeight);
         this.biases = new Matrix(LayerSize, 1, minWeight, maxWeight);
 
         this.weightsGradientSum = new Matrix(LayerSize, previousLayerSize);
         this.biasesGradientSum = new Matrix(LayerSize, 1);
-
-        this.isInitialized = true;
     }
+ 
 
     internal (Matrix activatedOutput, Matrix outputBeforeActivation) Forward(Matrix input, Matrix prevLayerOutputBeforeActivation)
     {
-        if(!isInitialized)
-            throw new Exception("Layer is not initialized");
-
         //this.prevLayerOutputBeforeActivation = prevLayerOutputBeforeActivation;
 
         Matrix currentLayer = input;
@@ -67,9 +57,6 @@ public class FullyConnectedLayer
 
     internal Matrix Backward(Matrix errorMatrix, Matrix prevLayerOutputBeforeActivation, Matrix thisLayerOutputBeforeActivation, double learningRate)
     {
-        if(!isInitialized)
-            throw new Exception("Layer is not initialized");
-
         Matrix activationDerivativeLayer = ActivationFunction switch
         {
             ActivationFunction.ReLU => Utilities.DerivativeReLU(thisLayerOutputBeforeActivation),
@@ -89,9 +76,6 @@ public class FullyConnectedLayer
 
     internal void UpdateWeightsAndBiases(int batchSize)
     {
-        if(!isInitialized)
-            throw new Exception("Layer is not initialized");
-
         weights = weights.ElementWiseAdd(weightsGradientSum.ApplyFunction(x => x / batchSize));
         biases = biases.ElementWiseAdd(biasesGradientSum.ApplyFunction(x => x / batchSize));
 

@@ -13,12 +13,12 @@ internal class Program
     {
         var cnn = new ConvolutionalNeuralNetwork(
         [
-            new ConvolutionLayer(3, 3, 3, ActivationFunction.ReLU),
-            new ConvolutionLayer(2, 3, 3, ActivationFunction.ReLU),
+            new ConvolutionLayer((1, 28, 28), 3, 3, ActivationFunction.Sigmoid),
+            new ConvolutionLayer((3, 26, 26), 3, 2, ActivationFunction.Sigmoid),
         ],
         [
-            new FullyConnectedLayer(16, ActivationFunction.ReLU),
-            new FullyConnectedLayer(10, ActivationFunction.Softmax)
+            new FullyConnectedLayer(30, ActivationFunction.ReLU, 24*24*2),
+            new FullyConnectedLayer(10, ActivationFunction.Softmax, 30)
         ]);
         
 
@@ -27,7 +27,7 @@ internal class Program
         var testData = GetMnistDataMatrix(MnistDataDirPath + "mnist_test_data.csv");
 
         Console.WriteLine("Training...");
-        cnn.Train(trainData, 0.01, 30, 50, 0.01);
+        cnn.Train(trainData, 0.1, 30, 50, 0.01);
 
         Console.WriteLine("Testing...");
         int guessed = 0;

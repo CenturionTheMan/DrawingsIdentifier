@@ -8,12 +8,17 @@ namespace NeuralNetworkLibrary;
 
 public class ConvolutionalNeuralNetwork
 {
+    private const bool multiThreaded = true;
+
     private static Random random = new Random();
 
 
     private IFeatureExtractionLayer[] featureLayers;
     private FullyConnectedLayer[] fullyConnectedLayers;
     private double learningRate;
+
+    //TODO: Change this to be dynamic
+    private int kernelSize = 24;
 
     public ConvolutionalNeuralNetwork(IFeatureExtractionLayer[] featureExtractionLayers, FullyConnectedLayer[] fullyConnectedLayers)
     {
@@ -23,7 +28,6 @@ public class ConvolutionalNeuralNetwork
 
 
 
-    //TODO REDESIGN: stop averaging errors, calculate change for each biases from each sample and then average that change
     public void Train((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, double expectedMaxError = 0.001)
     {
         this.learningRate = learningRate;
@@ -33,6 +37,8 @@ public class ConvolutionalNeuralNetwork
             data = data.OrderBy(x => random.Next()).ToArray();
             int batchBeginIndex = 0;
 
+            double epochErrorSum = 0.0;
+
             while (batchBeginIndex < data.Length)
             {
                 var batchSamples = batchBeginIndex + batchSize < data.Length ? data.Skip(batchBeginIndex).Take(batchSize) : data[batchBeginIndex..];
@@ -41,16 +47,29 @@ public class ConvolutionalNeuralNetwork
                 Matrix[] expectsOutputs= batchSamples.Select(x => x.output).ToArray()!;
 
                 double batchErrorSum = 0.0;
-
-
-                Parallel.ForEach(batchSamples, (sample) =>
-                {
-                    (Matrix prediction, Matrix[][] featureLayersOutputs,Matrix[] fullyConnectedLayersOutputBeforeActivation, IEnumerable<(int, int)> dimensions) = Feedforward(sample.input);
-                    Backpropagation(sample.output, prediction, featureLayersOutputs, fullyConnectedLayersOutputBeforeActivation, dimensions);
-
-                    batchErrorSum += Utilities.CalculateCrossEntropyCost(sample.output, prediction);
-                });
                 
+
+                if(multiThreaded)
+                {
+                    Parallel.ForEach(batchSamples, (sample) =>
+                    {
+                        (Matrix prediction, Matrix[][] featureLayersOutputs,Matrix[] fullyConnectedLayersOutputBeforeActivation) = Feedforward(sample.input);
+                        Backpropagation(sample.output, prediction, featureLayersOutputs, fullyConnectedLayersOutputBeforeActivation);
+
+                        batchErrorSum += Utilities.CalculateCrossEntropyCost(sample.output, prediction);
+                    });
+                }
+                else
+                {
+                    foreach (var sample in batchSamples)
+                    {
+                        (Matrix prediction, Matrix[][] featureLayersOutputs,Matrix[] fullyConnectedLayersOutputBeforeActivation) = Feedforward(sample.input);
+                        Backpropagation(sample.output, prediction, featureLayersOutputs, fullyConnectedLayersOutputBeforeActivation);
+
+                        batchErrorSum += Utilities.CalculateCrossEntropyCost(sample.output, prediction);
+                    }
+                }
+
                 foreach (var layer in fullyConnectedLayers)
                 {
                     layer.UpdateWeightsAndBiases(batchSize);
@@ -60,21 +79,12 @@ public class ConvolutionalNeuralNetwork
                     layer.UpdateWeightsAndBiases(batchSize);
                 }
 
-                // Parallel.ForEach(fullyConnectedLayers, (layer) =>
-                // {
-                //     layer.UpdateWeightsAndBiases(batchSize);
-                // });
-
-                // Parallel.ForEach(featureLayers, (layer) =>
-                // {
-                //     layer.UpdateWeightsAndBiases(batchSize);
-                // });
-                    
                 double epochPercentFinish = 100 * batchBeginIndex / (double)data.Length;
-                 Console.WriteLine( $"Epoch: {epoch + 1}\n" +
+                Console.WriteLine( $"Epoch: {epoch + 1}\n" +
                                     $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
                                     $"Batch error: {batchErrorSum / batchSize}\n");
 
+                epochErrorSum += batchErrorSum;
                 // onLearningIteration?.Invoke(epoch + 1, 100 * batchBeginIndex / (double)data.Length, batchError);
                 // if (batchError < expectedMaxError)
                 // {
@@ -84,16 +94,20 @@ public class ConvolutionalNeuralNetwork
 
                 batchBeginIndex += batchSize;
             }
+
+            Console.WriteLine($"\n========================================================\n");
+            Console.WriteLine($" [Epoch {epoch + 1} error mean: {epochErrorSum / data.Length}]");
+            Console.WriteLine($"\n========================================================\n");
         }
     }
 
     public Matrix Predict(Matrix input)
     {
-        (Matrix prediction, _, _, _) = Feedforward(input);
+        (Matrix prediction, _, _) = Feedforward(input);
         return prediction;
     }
 
-    public (Matrix output, Matrix[][] featureLayersOutputs, Matrix[] fullyConnectedLayersOutputBeforeActivation, IEnumerable<(int, int)> convolutionMatricesDimensions) Feedforward(Matrix input)
+    public (Matrix output, Matrix[][] featureLayersOutputs, Matrix[] fullyConnectedLayersOutputBeforeActivation) Feedforward(Matrix input)
     {
         List<Matrix> fullyConnectedLayersOutputBeforeActivation = new List<Matrix>(this.fullyConnectedLayers.Length + 1);
         List<Matrix[]> featureLayersOutputs = new (this.featureLayers.Length + 1);
@@ -103,46 +117,43 @@ public class ConvolutionalNeuralNetwork
 
         for (int i = 0; i < featureLayers.Length; i++)
         {
-            currentInput = featureLayers[i].Forward(currentInput);
-            featureLayersOutputs.Add(currentInput);
+            (currentInput, var featureOutputBeforeActivation) = featureLayers[i].Forward(currentInput);
+            featureLayersOutputs.Add(featureOutputBeforeActivation);
         }
 
-        (var flattenedMatrix, var dimensions) = Utilities.FlattenMatrices(currentInput);
+        //TODO uncomment this
+        var flattenedMatrix =  Utilities.FlattenMatrix(currentInput);
         fullyConnectedLayersOutputBeforeActivation.Add(flattenedMatrix);
 
 
-        if(fullyConnectedLayers[0].IsInitialized == false)
-            fullyConnectedLayers[0].InitializeWeightsAndBiases(flattenedMatrix.RowsAmount, -0.2, 0.2);
         (Matrix activatedOutput, Matrix outputBeforeActivation) = fullyConnectedLayers[0].Forward(flattenedMatrix, flattenedMatrix);
         fullyConnectedLayersOutputBeforeActivation.Add(outputBeforeActivation);
 
 
         for (int i = 1; i < fullyConnectedLayers.Length; i++)
         {
-            if(fullyConnectedLayers[i].IsInitialized == false)
-                fullyConnectedLayers[i].InitializeWeightsAndBiases(fullyConnectedLayers[i - 1].LayerSize, -0.2, 0.2);
-            
             (activatedOutput, outputBeforeActivation) = fullyConnectedLayers[i].Forward(activatedOutput, outputBeforeActivation);
             fullyConnectedLayersOutputBeforeActivation.Add(outputBeforeActivation);
         }
 
-        return (activatedOutput, featureLayersOutputs.ToArray(), fullyConnectedLayersOutputBeforeActivation.ToArray(), dimensions);
+        return (activatedOutput, featureLayersOutputs.ToArray(), fullyConnectedLayersOutputBeforeActivation.ToArray());
     }
 
-    public void Backpropagation(Matrix expectedResult, Matrix prediction, Matrix[][] featureLayersOutputs, Matrix[] fullyConnectedLayersOutputBeforeActivation, IEnumerable<(int, int)> convolutionMatricesDimensions)
+    public void Backpropagation(Matrix expectedResult, Matrix prediction, Matrix[][] featureLayersOutputs, Matrix[] fullyConnectedLayersOutputBeforeActivation)
     {
         var error = expectedResult.ElementWiseSubtract(prediction);
-        
+
         for (int i = fullyConnectedLayers.Length - 1; i >= 0; i--)
         {
             error = fullyConnectedLayers[i].Backward(error, fullyConnectedLayersOutputBeforeActivation[i], fullyConnectedLayersOutputBeforeActivation[i + 1], learningRate);
         }
 
-        Matrix[] errorMatrices = Utilities.RecreateMatrices(error, convolutionMatricesDimensions);
+        Matrix[] errorMatrices = Utilities.UnflattenMatrix(error, kernelSize);
 
         for (int i = featureLayers.Length - 1; i >= 0; i--)
         {
-            errorMatrices = featureLayers[i].Backward(errorMatrices, featureLayersOutputs[i+1], learningRate);
+            var prevLayer = featureLayersOutputs[i];
+            errorMatrices = featureLayers[i].Backward(errorMatrices, prevLayer, learningRate);
         }
     }
 

@@ -8,46 +8,76 @@ namespace NeuralNetworkLibrary;
 
 internal static class Utilities
 {
-    public static (Matrix flattened, IEnumerable<(int, int)> dimensions) FlattenMatrices(Matrix[] matrices)
+    public static Matrix FlattenMatrix(Matrix[] matrices)
     {
-        List<(int, int)> dimensions = new List<(int, int)>();
-        List<double> values = new List<double>();
-
+        List<double> flattenedList = new();
         foreach (var matrix in matrices)
         {
-            dimensions.Add((matrix.RowsAmount, matrix.ColumnsAmount));
-            foreach (var value in matrix)
+           for (int i = 0; i < matrix.RowsAmount; i++)
             {
-                values.Add(value);
+                for (int j = 0; j < matrix.ColumnsAmount; j++)
+                {
+                    flattenedList.Add(matrix[i, j]);
+                }
             }
         }
 
-        Matrix flattenedMatrix = new Matrix(values.ToArray());
-        return (flattenedMatrix, dimensions);
+        return new Matrix(flattenedList.ToArray());
     }
 
-    public static Matrix[] RecreateMatrices(Matrix flattenedMatrix, IEnumerable<(int, int)> dimensions)
+    public static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int matrixSize)
     {
-        List<Matrix> matrices = new List<Matrix>();
-        int currentRow = 0;
+        if(flattenedMatrix.RowsAmount % (matrixSize * matrixSize) != 0)
+            throw new ArgumentException("Invalid matrix size");
 
-        foreach (var (rowCount, columnCount) in dimensions)
+        List<Matrix> matrices = new List<Matrix>();
+
+        int index = 0;
+        for(int i = 0; i < flattenedMatrix.RowsAmount; i+= matrixSize * matrixSize)
         {
-            double[,] matrixValues = new double[rowCount, columnCount];
-            for (int i = 0; i < rowCount; i++)
+            Matrix matrix = new Matrix(matrixSize, matrixSize);
+            for (int j = 0; j < matrixSize; j++)
             {
-                for (int j = 0; j < columnCount; j++)
+                for (int k = 0; k < matrixSize; k++)
                 {
-                    matrixValues[i, j] = flattenedMatrix[currentRow, 0];
-                    currentRow++;
+                    matrix[j, k] = flattenedMatrix[index++, 0];
                 }
             }
-
-            Matrix matrix = new Matrix(matrixValues);
             matrices.Add(matrix);
         }
 
+
         return matrices.ToArray();
+    }
+
+    public static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
+    {
+        switch (activationFunction)
+        {
+            case ActivationFunction.ReLU:
+                return Utilities.ReLU(input);
+            case ActivationFunction.Sigmoid:
+                return Utilities.Sigmoid(input);
+            case ActivationFunction.Softmax:
+                return Utilities.Softmax(input);
+            default:
+                throw new ArgumentException("Invalid activation function");
+        }
+    }
+
+    public static Matrix DerivativeActivationFunction(this Matrix input, ActivationFunction activationFunction)
+    {
+        switch (activationFunction)
+        {
+            case ActivationFunction.ReLU:
+                return Utilities.DerivativeReLU(input);
+            case ActivationFunction.Sigmoid:
+                return Utilities.DerivativeSigmoid(input);
+            case ActivationFunction.Softmax:
+                return Utilities.DerivativeSoftmax(input);
+            default:
+                throw new ArgumentException("Invalid activation function");
+        }
     }
 
 

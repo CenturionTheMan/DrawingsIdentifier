@@ -24,7 +24,7 @@ public class PoolingLayer : IFeatureExtractionLayer
         // this.previousLayerOutputs = new Matrix[0];
     }
 
-    Matrix[] IFeatureExtractionLayer.Forward(Matrix[] inputs)
+    (Matrix[] output, Matrix[] outputsBeforeActivation) IFeatureExtractionLayer.Forward(Matrix[] inputs)
     {
         // this.previousLayerOutputs = inputs;
 
@@ -34,7 +34,7 @@ public class PoolingLayer : IFeatureExtractionLayer
         {
             (result[i], maxIndices[i]) = MaxPooling(inputs[i], poolSize, stride);
         }
-        return result;
+        return (result, result);
     }
 
     Matrix[] IFeatureExtractionLayer.Backward(Matrix[] deltas, Matrix[] previousLayerOutputs, double learningRate)

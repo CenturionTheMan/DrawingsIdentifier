@@ -172,6 +172,11 @@ public class Matrix
         return EachElementAssignment(a, (i, j) => a.Values[i, j] - b.Values[i, j]);
     }
 
+    internal static Matrix Copy(Matrix matrix)
+    {
+        return new Matrix((double[,])matrix.Values.Clone());
+    }   
+
     public static Matrix operator *(Matrix a, double b)
     {
         return EachElementAssignment(a, (i, j) => a.Values[i, j] * b);
@@ -181,6 +186,7 @@ public class Matrix
     {
         return EachElementAssignment(a, (i, j) => a.Values[i, j] + b);
     }
+
 
     /// <summary>
     /// Creates new matrix which is result of applying given function to each element of the a matrix.
@@ -217,6 +223,99 @@ public class Matrix
 
 public static class MatrixExtender
 {
+    internal static Matrix ConvolutionFull(this Matrix input, Matrix kernel, int stride)
+    {
+        Matrix kernelRotated = kernel.Rotate180();
+        return input.CrossCorrelationFull(kernelRotated, stride);
+    }
+
+    internal static Matrix ConvolutionValid(this Matrix input, Matrix kernel, int stride)
+    {
+        return input.CrossCorrelationValid(kernel, stride);
+    }
+
+    internal static Matrix CrossCorrelationFull(this Matrix input, Matrix kernel, int stride)
+    {
+        int outputRows = input.RowsAmount + kernel.RowsAmount - 1;
+        int outputColumns = input.ColumnsAmount + kernel.ColumnsAmount - 1;
+        Matrix output = new Matrix(outputRows, outputColumns);
+
+        for (int i = 0; i < outputRows; i++)
+        {
+            for (int j = 0; j < outputColumns; j++)
+            {
+                double sum = 0;
+
+                for (int m = 0; m < kernel.RowsAmount; m++)
+                {
+                    for (int n = 0; n < kernel.ColumnsAmount; n++)
+                    {
+                        int x = i * stride - m;
+                        int y = j * stride - n;
+
+                        if (x >= 0 && x < input.RowsAmount && y >= 0 && y < input.ColumnsAmount)
+                        {
+                            sum += input[x, y] * kernel[m, n];
+                        }
+                    }
+                }
+
+                output[i, j] = sum;
+            }
+        }
+        return output;
+    }
+
+    internal static Matrix CrossCorrelationValid(this Matrix input, Matrix kernel, int stride)
+    {
+        int outputRows = (input.RowsAmount - kernel.RowsAmount) / stride + 1;
+        int outputColumns = (input.ColumnsAmount - kernel.ColumnsAmount) / stride + 1;
+        Matrix output = new Matrix(outputRows, outputColumns);
+
+        for (int i = 0; i < outputRows; i++)
+        {
+            for (int j = 0; j < outputColumns; j++)
+            {
+                double sum = 0;
+
+                for (int m = 0; m < kernel.RowsAmount; m++)
+                {
+                    for (int n = 0; n < kernel.ColumnsAmount; n++)
+                    {
+                        int x = i * stride + m;
+                        int y = j * stride + n;
+
+                        if (x >= 0 && x < input.RowsAmount && y >= 0 && y < input.ColumnsAmount)
+                        {
+                            sum += input[x, y] * kernel[m, n];
+                        }
+                    }
+                }
+
+                output[i, j] = sum;
+            }
+        }
+        return output;
+    }
+
+    //TODO TEST
+    /// <summary>
+    /// Rotates the matrix by 180 degrees
+    /// </summary>
+    /// <returns>New matrix after rotation</returns>
+    internal static Matrix Rotate180(this Matrix matrix)
+    {
+        Matrix result = new Matrix(matrix.RowsAmount, matrix.ColumnsAmount);
+        for (int i = 0; i < matrix.RowsAmount; i++)
+        {
+            for (int j = 0; j < matrix.ColumnsAmount; j++)
+            {
+                result[i, j] = matrix[matrix.RowsAmount - i - 1, matrix.ColumnsAmount - j - 1];
+            }
+        }
+        return result;
+    }
+
     public static int IndexOfMax(this Matrix matrix)
     {
         if(matrix.ColumnsAmount != 1)
