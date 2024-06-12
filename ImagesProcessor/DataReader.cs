@@ -71,6 +71,36 @@ public class DataReader
         return result;
     }
 
+    public static void SaveToImage(double[,] data, string path)
+    {
+        var bitmap = new Bitmap(data.GetLength(1), data.GetLength(0));
+
+        for (int y = 0; y < data.GetLength(0); y++)
+        {
+            for (int x = 0; x < data.GetLength(1); x++)
+            {
+                double value = data[y, x];
+
+                int colorValue = (int)(value * 255);
+
+                colorValue = Math.Clamp(colorValue, 0, 255);
+
+                Color color = Color.FromArgb(colorValue, colorValue, colorValue);
+
+                bitmap.SetPixel(x, y, color);
+            }
+        }
+
+        try
+        {
+            bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+            
+        }
+        catch (System.Exception)
+        {
+        }
+    }
+
     public static void SaveToImage(double[] data, string path, int width = 28, int height = 28)
     {
         var bitmap = new Bitmap(width, height);
@@ -84,6 +114,8 @@ public class DataReader
                 double value = data[dataIndex];
 
                 int colorValue = (int)(value * 255);
+
+                colorValue = Math.Clamp(colorValue, 0, 255);
 
                 Color color = Color.FromArgb(colorValue, colorValue, colorValue);
 

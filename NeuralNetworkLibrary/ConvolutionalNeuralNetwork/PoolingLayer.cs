@@ -13,6 +13,22 @@ public class PoolingLayer : IFeatureExtractionLayer
     private int stride;
     private int[][]? maxIndices;
 
+    public int Depth => throw new NotImplementedException();
+
+    public int KernelSize => throw new NotImplementedException();
+
+    public ActivationFunction ActivationFunction => throw new NotImplementedException();
+
+    public int Stride => throw new NotImplementedException();
+
+    int IFeatureExtractionLayer.Depth => throw new NotImplementedException();
+
+    int IFeatureExtractionLayer.KernelSize => throw new NotImplementedException();
+
+    ActivationFunction IFeatureExtractionLayer.ActivationFunction => throw new NotImplementedException();
+
+    int IFeatureExtractionLayer.Stride => throw new NotImplementedException();
+
     // private Matrix[] previousLayerOutputs;
 
     public PoolingLayer(int poolSize, int stride)
@@ -39,7 +55,7 @@ public class PoolingLayer : IFeatureExtractionLayer
 
     Matrix[] IFeatureExtractionLayer.Backward(Matrix[] deltas, Matrix[] previousLayerOutputs, double learningRate)
     {
-        if(maxIndices == null)
+        if (maxIndices == null)
         {
             throw new InvalidOperationException("Forward method must be called before calling Backward method");
         }
@@ -94,6 +110,11 @@ public class PoolingLayer : IFeatureExtractionLayer
 
     void IFeatureExtractionLayer.UpdateWeightsAndBiases(double batchSize)
     {
-        
+        throw new NotImplementedException();
+    }
+
+    void IFeatureExtractionLayer.Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape)
+    {
+        throw new NotImplementedException();
     }
 }

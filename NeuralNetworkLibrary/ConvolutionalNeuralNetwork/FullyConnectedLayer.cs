@@ -8,31 +8,38 @@ public class FullyConnectedLayer
     private Matrix weights;
     private Matrix biases;
 
-    // private Matrix prevLayerOutputBeforeActivation;
-    // private Matrix layerOutputBeforeActivation;
-
     private Matrix weightsGradientSum;
     private Matrix biasesGradientSum;
 
     private int previousLayerSize;
 
-    public FullyConnectedLayer(int layerSize, ActivationFunction ActivationFunction, int previousLayerSize, double minWeight = -0.2, double maxWeight = 0.2) 
+    private double minWeight;
+    private double maxWeight;
+
+    public FullyConnectedLayer(int layerSize, ActivationFunction ActivationFunction, double minWeight = -0.2, double maxWeight = 0.2)
+    {
+        this.LayerSize = layerSize;
+        this.ActivationFunction = ActivationFunction;
+        this.minWeight = minWeight;
+        this.maxWeight = maxWeight;
+
+        this.previousLayerSize = -1;
+        this.weights = new Matrix(0, 0);
+        this.biases = new Matrix(0, 0);
+        this.weightsGradientSum = new Matrix(0, 0);
+        this.biasesGradientSum = new Matrix(0, 0);
+    }
+
+    internal void Initialize(int previousLayerSize)
     {
         this.previousLayerSize = previousLayerSize;
 
-        this.LayerSize = layerSize;
-        this.ActivationFunction = ActivationFunction;
-
-        this.weights = new Matrix(0,0);
-        this.biases = new Matrix(0,0);
-        
         this.weights = new Matrix(LayerSize, previousLayerSize, minWeight, maxWeight);
         this.biases = new Matrix(LayerSize, 1, minWeight, maxWeight);
 
         this.weightsGradientSum = new Matrix(LayerSize, previousLayerSize);
         this.biasesGradientSum = new Matrix(LayerSize, 1);
     }
- 
 
     internal (Matrix activatedOutput, Matrix outputBeforeActivation) Forward(Matrix input, Matrix prevLayerOutputBeforeActivation)
     {

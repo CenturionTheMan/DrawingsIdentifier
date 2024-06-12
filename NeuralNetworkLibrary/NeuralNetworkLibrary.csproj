@@ -10,4 +10,8 @@
     <PackageReference Include="Accord.Math" Version="3.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ImagesProcessor\ImagesProcessor.csproj" />
+  </ItemGroup>
+
 </Project>

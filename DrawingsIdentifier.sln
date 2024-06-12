@@ -12,7 +12,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsoleApp", "TestConso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawingIdentifierGui", "DrawingIdentifierGui\DrawingIdentifierGui.csproj", "{7A54F010-27C2-43BD-8168-6F9252E10532}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagesProcessor", "ImagesProcessor\ImagesProcessor.csproj", "{78515ED2-B69C-49D2-8C55-DCA7448BDA15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImagesProcessor", "ImagesProcessor\ImagesProcessor.csproj", "{78515ED2-B69C-49D2-8C55-DCA7448BDA15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetworkUnitTest", "NeuralNetworkUnitTest\NeuralNetworkUnitTest.csproj", "{4B130441-57F6-45DB-B177-7ACEEDEF04C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{78515ED2-B69C-49D2-8C55-DCA7448BDA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78515ED2-B69C-49D2-8C55-DCA7448BDA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78515ED2-B69C-49D2-8C55-DCA7448BDA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

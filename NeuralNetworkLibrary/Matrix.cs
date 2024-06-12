@@ -87,7 +87,7 @@ public class Matrix
     /// <exception cref="IndexOutOfRangeException">Thrown when given indexes are out of range</exception>
     public double this[int i, int j]
     {
-        get 
+        get
         {
             if (i < 0 || i >= RowsAmount || j < 0 || j >= ColumnsAmount)
             {
@@ -95,7 +95,7 @@ public class Matrix
             }
             return Values[i, j];
         }
-        set 
+        set
         {
             if (i < 0 || i >= RowsAmount || j < 0 || j >= ColumnsAmount)
             {
@@ -116,6 +116,37 @@ public class Matrix
         }
     }
 
+    public bool Equals(Matrix matrix)
+    {
+        if (matrix.RowsAmount != RowsAmount || matrix.ColumnsAmount != ColumnsAmount)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                if (Values[i, j] != matrix.Values[i, j])
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public Matrix Copy()
+    {
+        return new Matrix((double[,])this.Values.Clone());
+    }
+
+    public double[,] ToArray()
+    {
+        return (double[,])Values.Clone();
+    }
+
     /// <summary>
     /// Creates new matrix which is result of dot product of two matrices
     /// </summary>
@@ -124,6 +155,11 @@ public class Matrix
     /// <returns>Result of dot product of two matrices</returns>
     public static Matrix DotProductMatrices(Matrix a, Matrix b)
     {
+        if (a.ColumnsAmount != b.RowsAmount)
+        {
+            throw new ArgumentException("Number of columns in the first matrix must be equal to the number of rows in the second matrix");
+        }
+
         return new Matrix(Accord.Math.Matrix.Dot(a.Values, b.Values));
     }
 
@@ -135,9 +171,9 @@ public class Matrix
     /// <returns>Result of element-wise multiplication of two matrices</returns>
     public static Matrix ElementWiseMultiplyMatrices(Matrix a, Matrix b)
     {
-        if(CheckIfDimensionsAreEqual(a, b) == false)
+        if (CheckIfDimensionsAreEqual(a, b) == false)
         {
-            throw new Exception("Matrices must have the same dimensions");
+            throw new ArgumentException("Matrices must have the same dimensions");
         }
         return EachElementAssignment(a, (i, j) => a.Values[i, j] * b.Values[i, j]);
     }
@@ -150,9 +186,9 @@ public class Matrix
     /// <returns>Result of element-wise addition of two matrices</returns>
     public static Matrix ElementWiseAddMatrices(Matrix a, Matrix b)
     {
-        if(CheckIfDimensionsAreEqual(a, b) == false)
+        if (CheckIfDimensionsAreEqual(a, b) == false)
         {
-            throw new Exception("Matrices must have the same dimensions");
+            throw new ArgumentException("Matrices must have the same dimensions");
         }
         return EachElementAssignment(a, (i, j) => a.Values[i, j] + b.Values[i, j]);
     }
@@ -165,17 +201,12 @@ public class Matrix
     /// <returns>Result of element-wise subtraction of two matrices</returns>
     public static Matrix ElementWiseSubtractMatrices(Matrix a, Matrix b)
     {
-        if(CheckIfDimensionsAreEqual(a, b) == false)
+        if (CheckIfDimensionsAreEqual(a, b) == false)
         {
-            throw new Exception("Matrices must have the same dimensions");
+            throw new ArgumentException("Matrices must have the same dimensions");
         }
         return EachElementAssignment(a, (i, j) => a.Values[i, j] - b.Values[i, j]);
     }
-
-    internal static Matrix Copy(Matrix matrix)
-    {
-        return new Matrix((double[,])matrix.Values.Clone());
-    }   
 
     public static Matrix operator *(Matrix a, double b)
     {
@@ -186,7 +217,6 @@ public class Matrix
     {
         return EachElementAssignment(a, (i, j) => a.Values[i, j] + b);
     }
-
 
     /// <summary>
     /// Creates new matrix which is result of applying given function to each element of the a matrix.
@@ -223,18 +253,7 @@ public class Matrix
 
 public static class MatrixExtender
 {
-    internal static Matrix ConvolutionFull(this Matrix input, Matrix kernel, int stride)
-    {
-        Matrix kernelRotated = kernel.Rotate180();
-        return input.CrossCorrelationFull(kernelRotated, stride);
-    }
-
-    internal static Matrix ConvolutionValid(this Matrix input, Matrix kernel, int stride)
-    {
-        return input.CrossCorrelationValid(kernel, stride);
-    }
-
-    internal static Matrix CrossCorrelationFull(this Matrix input, Matrix kernel, int stride)
+    public static Matrix ConvolutionFull(this Matrix input, Matrix kernel, int stride)
     {
         int outputRows = input.RowsAmount + kernel.RowsAmount - 1;
         int outputColumns = input.ColumnsAmount + kernel.ColumnsAmount - 1;
@@ -266,7 +285,19 @@ public static class MatrixExtender
         return output;
     }
 
-    internal static Matrix CrossCorrelationValid(this Matrix input, Matrix kernel, int stride)
+    public static Matrix ConvolutionValid(this Matrix input, Matrix kernel, int stride)
+    {
+        var rot = kernel.Rotate180();
+        return input.CrossCorrelationValid(rot, stride);
+    }
+
+    public static Matrix CrossCorrelationFull(this Matrix input, Matrix kernel, int stride)
+    {
+        var rot = kernel.Rotate180();
+        return input.ConvolutionFull(rot, stride);
+    }
+
+    public static Matrix CrossCorrelationValid(this Matrix input, Matrix kernel, int stride)
     {
         int outputRows = (input.RowsAmount - kernel.RowsAmount) / stride + 1;
         int outputColumns = (input.ColumnsAmount - kernel.ColumnsAmount) / stride + 1;
@@ -298,12 +329,26 @@ public static class MatrixExtender
         return output;
     }
 
-    //TODO TEST
+    public static Matrix AddPadding(this Matrix input, int padding)
+    {
+        Matrix output = new Matrix(input.RowsAmount + 2 * padding, input.ColumnsAmount + 2 * padding);
+
+        for (int i = 0; i < input.RowsAmount; i++)
+        {
+            for (int j = 0; j < input.ColumnsAmount; j++)
+            {
+                output[i + padding, j + padding] = input[i, j];
+            }
+        }
+
+        return output;
+    }
+
     /// <summary>
     /// Rotates the matrix by 180 degrees
     /// </summary>
     /// <returns>New matrix after rotation</returns>
-    internal static Matrix Rotate180(this Matrix matrix)
+    public static Matrix Rotate180(this Matrix matrix)
     {
         Matrix result = new Matrix(matrix.RowsAmount, matrix.ColumnsAmount);
         for (int i = 0; i < matrix.RowsAmount; i++)
@@ -318,8 +363,8 @@ public static class MatrixExtender
 
     public static int IndexOfMax(this Matrix matrix)
     {
-        if(matrix.ColumnsAmount != 1)
-            throw new Exception("Matrix must have only one column");
+        if (matrix.ColumnsAmount != 1)
+            throw new ArgumentException("Matrix must have only one column");
 
         double max = double.MinValue;
         int index = 0;
@@ -426,6 +471,4 @@ public static class MatrixExtender
     {
         return Matrix.ElementWiseSubtractMatrices(a, b);
     }
-
-    
 }

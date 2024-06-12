@@ -3,35 +3,49 @@ using MyBaseLibrary;
 using NeuralNetworkLibrary;
 using ImagesProcessor;
 using static NeuralNetworkLibrary.MatrixExtender;
+
 namespace TestConsoleApp;
 
 internal class Program
 {
-    private const string MnistDataDirPath = "D:\\GoogleDriveMirror\\Projects\\NeuralNetworkProject\\mnist_data\\";
+    private const string MnistDataDirPath = "C:\\Personal\\mnist_data\\";
 
     private static void Main(string[] args)
     {
-        var cnn = new ConvolutionalNeuralNetwork(
-        [
-            new ConvolutionLayer((1, 28, 28), 3, 3, ActivationFunction.Sigmoid),
-            new ConvolutionLayer((3, 26, 26), 3, 2, ActivationFunction.Sigmoid),
-        ],
-        [
-            new FullyConnectedLayer(30, ActivationFunction.ReLU, 24*24*2),
-            new FullyConnectedLayer(10, ActivationFunction.Softmax, 30)
-        ]);
-        
+        //TestCNN(
+        //    new ConvolutionalNeuralNetwork(
+        //    [
+        //        new ConvolutionLayer((1, 28, 28), 3, 4, ActivationFunction.Sigmoid),
+        //        new ConvolutionLayer((4, 26, 26), 3, 2, ActivationFunction.Sigmoid),
+        //    ],
+        //    [
+        //        new FullyConnectedLayer(16, ActivationFunction.ReLU, 24*24*2),
+        //        new FullyConnectedLayer(16, ActivationFunction.ReLU, 16),
+        //        new FullyConnectedLayer(10, ActivationFunction.Softmax, 16)
+        //    ]), 0.1, 20, 50
+        //);
 
+        TestCNN(new ConvolutionalNeuralNetwork((1, 28, 28),
+            [
+                new ConvolutionLayer(3, 8, ActivationFunction.Sigmoid),
+            ],
+            [
+                new FullyConnectedLayer(10, ActivationFunction.Softmax)
+            ]), 0.01, 2, 50);
+    }
+
+    private static void TestCNN(ConvolutionalNeuralNetwork cnn, double learningRate, int epochAmount, int batchSize)
+    {
         Console.WriteLine("Loading data...");
         var trainData = GetMnistDataMatrix(MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
         var testData = GetMnistDataMatrix(MnistDataDirPath + "mnist_test_data.csv");
 
         Console.WriteLine("Training...");
-        cnn.Train(trainData, 0.1, 30, 50, 0.01);
+        cnn.Train(trainData, learningRate, epochAmount, batchSize, 0.01);
 
         Console.WriteLine("Testing...");
         int guessed = 0;
-        
+
         foreach (var item in testData)
         {
             (Matrix input, Matrix expectedOutput) = item;
@@ -48,6 +62,8 @@ internal class Program
         }
 
         Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
+
+        //FilesCreatorHelper.AddRowToCsvFile([guessed * 100.0 / (double)testData.Length], "D:\\GoogleDriveMirror\\Studia\\Inzynierka\\LearningLogs\\CNNConfLogs.csv");
     }
 
     private static void TestNN()
@@ -117,7 +133,7 @@ internal class Program
     private static (Matrix input, Matrix expectedOutput)[] GetMnistDataMatrix(params string[] paths)
     {
         var results = new List<(Matrix, Matrix)>();
-        
+
         foreach (var path in paths)
         {
             var data = FilesCreatorHelper.ReadInputFromCSV(path, ',').Skip(1);
@@ -131,16 +147,16 @@ internal class Program
                 expected[numer] = 1;
                 Matrix tmpOut = new Matrix(expected);
 
-                
                 for (int i = 0; i < 28; i++)
                 {
-                    for(int j = 0; j < 28; j++)
+                    for (int j = 0; j < 28; j++)
                     {
-                        tmpIn[i,j] = input[i * 28 + j];
+                        tmpIn[i, j] = input[i * 28 + j];
                     }
                 }
-                
-                results.Add((tmpIn, tmpOut));
+
+                if (numer == 0 || numer == 1) //TODO remove after testing
+                    results.Add((tmpIn, tmpOut));
             }
         }
         return results.ToArray();

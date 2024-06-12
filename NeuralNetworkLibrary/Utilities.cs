@@ -1,19 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleTo("NeuralNetworkUnitTest")]
 
 namespace NeuralNetworkLibrary;
 
 internal static class Utilities
 {
-    public static Matrix FlattenMatrix(Matrix[] matrices)
+    internal static (int outputRows, int outputColumns) GetSizeAfterConvolution((int rows, int columns) inputSize, (int rows, int columns) kernel, int stride)
+    {
+        var outputRows = (inputSize.rows - kernel.rows) / stride + 1;
+        var outputColumns = (inputSize.columns - kernel.columns) / stride + 1;
+        return (outputRows, outputColumns);
+    }
+
+    internal static Matrix FlattenMatrix(Matrix[] matrices)
     {
         List<double> flattenedList = new();
         foreach (var matrix in matrices)
         {
-           for (int i = 0; i < matrix.RowsAmount; i++)
+            for (int i = 0; i < matrix.RowsAmount; i++)
             {
                 for (int j = 0; j < matrix.ColumnsAmount; j++)
                 {
@@ -25,20 +35,20 @@ internal static class Utilities
         return new Matrix(flattenedList.ToArray());
     }
 
-    public static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int matrixSize)
+    internal static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int rowsAmount, int columnsAmount)
     {
-        if(flattenedMatrix.RowsAmount % (matrixSize * matrixSize) != 0)
+        if (flattenedMatrix.RowsAmount % rowsAmount * columnsAmount != 0)
             throw new ArgumentException("Invalid matrix size");
 
         List<Matrix> matrices = new List<Matrix>();
 
         int index = 0;
-        for(int i = 0; i < flattenedMatrix.RowsAmount; i+= matrixSize * matrixSize)
+        for (int i = 0; i < flattenedMatrix.RowsAmount; i += rowsAmount * columnsAmount)
         {
-            Matrix matrix = new Matrix(matrixSize, matrixSize);
-            for (int j = 0; j < matrixSize; j++)
+            Matrix matrix = new Matrix(rowsAmount, columnsAmount);
+            for (int j = 0; j < rowsAmount; j++)
             {
-                for (int k = 0; k < matrixSize; k++)
+                for (int k = 0; k < columnsAmount; k++)
                 {
                     matrix[j, k] = flattenedMatrix[index++, 0];
                 }
@@ -46,40 +56,49 @@ internal static class Utilities
             matrices.Add(matrix);
         }
 
-
         return matrices.ToArray();
     }
 
-    public static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
+    internal static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int matrixSize)
+    {
+        return UnflattenMatrix(flattenedMatrix, matrixSize, matrixSize);
+    }
+
+    internal static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
     {
         switch (activationFunction)
         {
             case ActivationFunction.ReLU:
                 return Utilities.ReLU(input);
+
             case ActivationFunction.Sigmoid:
                 return Utilities.Sigmoid(input);
+
             case ActivationFunction.Softmax:
                 return Utilities.Softmax(input);
+
             default:
                 throw new ArgumentException("Invalid activation function");
         }
     }
 
-    public static Matrix DerivativeActivationFunction(this Matrix input, ActivationFunction activationFunction)
+    internal static Matrix DerivativeActivationFunction(this Matrix input, ActivationFunction activationFunction)
     {
         switch (activationFunction)
         {
             case ActivationFunction.ReLU:
                 return Utilities.DerivativeReLU(input);
+
             case ActivationFunction.Sigmoid:
                 return Utilities.DerivativeSigmoid(input);
+
             case ActivationFunction.Softmax:
                 return Utilities.DerivativeSoftmax(input);
+
             default:
                 throw new ArgumentException("Invalid activation function");
         }
     }
-
 
     #region Activation Functions and Error
 

@@ -97,6 +97,43 @@ public static class FilesCreatorHelper
         }    
     }
 
+    public static void AddRowToCsvFile(object[] data, string fileOutputPath, char separator = ';')
+    {
+        if(data.Length < 1)
+        {
+            return;
+        }
+
+        fileOutputPath = fileOutputPath.ChangeFileExtension(".csv");
+        var text = new StringBuilder();
+        
+        foreach (var field in data)
+        {
+            text.Append(field.ToString() + separator);
+        }
+        text.Remove(text.Length - 1, 1);
+        text.Append(Environment.NewLine);
+
+        try
+        {
+            File.AppendAllText(fileOutputPath, text.ToString());
+        }
+        catch
+        {
+            throw new Exception("Something went wrong when CSV file was created, make sure that output file path is correct.");
+        }
+    }
+
+    private static bool RemoveFileIfExists(string filePath)
+    {
+        if (CheckIfFileExists(filePath))
+        {
+            File.Delete(filePath);
+            return true;
+        }
+        return false;
+    }
+
     #endregion
 
 
