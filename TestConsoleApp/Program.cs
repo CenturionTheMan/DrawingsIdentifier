@@ -27,11 +27,12 @@ internal class Program
 
         TestCNN(new ConvolutionalNeuralNetwork((1, 28, 28),
             [
-                new ConvolutionLayer(3, 8, ActivationFunction.Sigmoid),
+                new ConvolutionLayer(3, 6, ActivationFunction.ReLU),
+                new ConvolutionLayer(3, 3, ActivationFunction.ReLU),
             ],
             [
                 new FullyConnectedLayer(10, ActivationFunction.Softmax)
-            ]), 0.01, 2, 50);
+            ]), 0.01, 1, 50);
     }
 
     private static void TestCNN(ConvolutionalNeuralNetwork cnn, double learningRate, int epochAmount, int batchSize)
@@ -60,6 +61,10 @@ internal class Program
                 guessed++;
             }
         }
+
+        cnn.saveFeatureLayersOutputs = true;
+        cnn.Predict(testData[0].input);
+        cnn.saveFeatureLayersOutputs = false;
 
         Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
 

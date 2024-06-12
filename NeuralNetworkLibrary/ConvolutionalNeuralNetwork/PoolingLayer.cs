@@ -53,7 +53,7 @@ public class PoolingLayer : IFeatureExtractionLayer
         return (result, result);
     }
 
-    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] deltas, Matrix[] previousLayerOutputs, double learningRate)
+    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] deltas, Matrix[] layerInputFromForward, Matrix[] previousLayerOutputs, double learningRate)
     {
         if (maxIndices == null)
         {

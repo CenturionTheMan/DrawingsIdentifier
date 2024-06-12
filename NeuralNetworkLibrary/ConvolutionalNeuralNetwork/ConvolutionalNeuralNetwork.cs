@@ -12,7 +12,7 @@ public class ConvolutionalNeuralNetwork
 {
     private const bool multiThreaded = true;
 
-    private bool saveFeatureLayersOutputs = false;
+    public bool saveFeatureLayersOutputs = false;
 
     private const string logFilePath = "D:\\GoogleDriveMirror\\Studia\\Inzynierka\\LearningLogs\\log";
     private const bool logToFile = false;
@@ -246,8 +246,9 @@ public class ConvolutionalNeuralNetwork
 
         for (int i = featureLayers.Length - 1; i >= 0; i--)
         {
-            var prevLayer = featureLayersOutputs[i+1];
-            errorMatrices = featureLayers[i].Backward(errorMatrices, prevLayer, learningRate);
+            var thisLayerOutBeforeActivation = featureLayersOutputs[i+1];
+            var prevLayerOutBeforeActivation = featureLayersOutputs[i];
+            errorMatrices = featureLayers[i].Backward(errorMatrices, prevLayerOutBeforeActivation, thisLayerOutBeforeActivation, learningRate);
         }
     }
 }

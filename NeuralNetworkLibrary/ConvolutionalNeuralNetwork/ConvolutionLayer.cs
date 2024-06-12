@@ -105,7 +105,7 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         return (A, Z);
     }
 
-    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] dAin, Matrix[] layerOutputBeforeActivation, double learningRate)
+    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] dAin, Matrix[] layerInputFromForward, Matrix[] layerOutputBeforeActivation, double learningRate)
     {
         //output gradient
         Matrix[] dA = new Matrix[inputDepth];
@@ -117,26 +117,25 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         Matrix[] dZ = new Matrix[layerOutputBeforeActivation.Length];
         for (int i = 0; i < layerOutputBeforeActivation.Length; i++)
         {
-            dZ[i] = layerOutputBeforeActivation[i].DerivativeActivationFunction(activationFunction);
+            dZ[i] = Matrix.ElementWiseMultiplyMatrices(dAin[i], layerOutputBeforeActivation[i].DerivativeActivationFunction(activationFunction)); 
         }
 
         for (int i = 0; i < depth; i++)
         {
             for (int j = 0; j < inputDepth; j++)
             {
-                //TODO implement dynamic padding to right size
-                Matrix kernelGradient = dZ[j].AddPadding(1).CrossCorrelationValid(dAin[i], stride: 1);
-                changeForKernels[i, j] = changeForKernels[i, j].ElementWiseSubtract(kernelGradient * learningRate);
+                Matrix kernelGradient = layerInputFromForward[j].CrossCorrelationValid(dZ[i], stride: 1);
+                kernelGradient = kernelGradient * learningRate;
+                changeForKernels[i, j] = changeForKernels[i, j].ElementWiseAdd(kernelGradient);
 
                 // var inputGradientSingle = inputGradient[i].ConvolutionFull(kernels[i, j], stride: 1);
                 // outputGradient[j] = outputGradient[j].ElementWiseAdd(inputGradientSingle);
 
-                var dASingle = dZ[i].CrossCorrelationFull(kernels[i, j], stride: 1);
+                var dASingle = dZ[i].ConvolutionFull(kernels[i, j], stride: 1);
                 dA[j] = dA[j].ElementWiseAdd(dASingle);
             }
 
-            // changeForBiases[i] = changeForBiases[i].ElementWiseSubtract(inputGradient[i] * learningRate);
-            changeForBiases[i] = changeForBiases[i].ElementWiseSubtract(dAin[i] * learningRate);
+            changeForBiases[i] = changeForBiases[i].ElementWiseAdd(dZ[i] * learningRate);
         }
 
         return dA;
@@ -148,10 +147,10 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         {
             for (int j = 0; j < kernels.GetLength(1); j++)
             {
-                kernels[i, j] = kernels[i, j].ElementWiseSubtract(changeForKernels[i, j] * (1.0 / batchSize));
+                kernels[i, j] = kernels[i, j].ElementWiseAdd(changeForKernels[i, j] * (1.0 / batchSize));
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
-            biases[i] = biases[i].ElementWiseSubtract(changeForBiases[i] * (1.0 / batchSize));
+            biases[i] = biases[i].ElementWiseAdd(changeForBiases[i] * (1.0 / batchSize));
             changeForBiases[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
         }
     }
