@@ -12,7 +12,6 @@ public class ConvolutionLayer : IFeatureExtractionLayer
 {
     public int Depth => depth;
     public int KernelSize => kernelSize;
-    public ActivationFunction ActivationFunction => activationFunction;
     public int Stride => stride;
 
     private int depth;
@@ -37,6 +36,16 @@ public class ConvolutionLayer : IFeatureExtractionLayer
 
     public ConvolutionLayer(int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction, double minInitValue = -0.1, double maxInitValue = 0.1)
     {
+        if(stride != 1)
+        {
+            throw new NotImplementedException("Stride != 1 is not implemented yet");
+        }
+
+        if(stride < 1)
+        {
+            throw new ArgumentException("Stride must be greater than 0");
+        }
+
         this.depth = kernelsDepth;
         this.kernelSize = kernelSize;
         this.stride = stride;
@@ -67,6 +76,8 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         changeForKernels = new Matrix[depth, inputShape.inputDepth];
         changeForBiases = new Matrix[depth];
 
+
+        (int outputRows, int outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
         for (int i = 0; i < depth; i++)
         {
             for (int j = 0; j < inputShape.inputDepth; j++)
@@ -75,7 +86,6 @@ public class ConvolutionLayer : IFeatureExtractionLayer
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
 
-            (int outputRows, int outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
             biases[i] = new Matrix(outputRows, outputColumns, minInitValue, maxInitValue);
             changeForBiases[i] = new Matrix(outputRows, outputColumns);
         }

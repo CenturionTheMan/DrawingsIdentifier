@@ -4,7 +4,7 @@ public interface IFeatureExtractionLayer
 {
     public int Depth { get; }
     public int KernelSize { get; }
-    public ActivationFunction ActivationFunction { get; }
+    //public ActivationFunction ActivationFunction { get; }
     public int Stride { get; }
 
     internal void Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape);

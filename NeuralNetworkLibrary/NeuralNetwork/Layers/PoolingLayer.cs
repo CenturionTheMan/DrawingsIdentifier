@@ -7,79 +7,60 @@ using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
 namespace NeuralNetworkLibrary;
 
-public class PoolingLayer : IFeatureExtractionLayer
+public class PoolingLayer 
 {
+    public int PoolSize => poolSize;
+    public int Stride => stride;
+
     private int poolSize;
     private int stride;
-    private int[][]? maxIndices;
-
-    public int Depth => throw new NotImplementedException();
-
-    public int KernelSize => throw new NotImplementedException();
-
-    public ActivationFunction ActivationFunction => throw new NotImplementedException();
-
-    public int Stride => throw new NotImplementedException();
-
-    int IFeatureExtractionLayer.Depth => throw new NotImplementedException();
-
-    int IFeatureExtractionLayer.KernelSize => throw new NotImplementedException();
-
-    ActivationFunction IFeatureExtractionLayer.ActivationFunction => throw new NotImplementedException();
-
-    int IFeatureExtractionLayer.Stride => throw new NotImplementedException();
-
-    // private Matrix[] previousLayerOutputs;
 
     public PoolingLayer(int poolSize, int stride)
     {
         this.poolSize = poolSize;
         this.stride = stride;
-        this.maxIndices = null;
-
-        // this.previousLayerOutputs = new Matrix[0];
     }
 
-    (Matrix[] output, Matrix[] outputsBeforeActivation) IFeatureExtractionLayer.Forward(Matrix[] inputs)
+    (Matrix[] output, Matrix[] maxIndexMap) Forward(Matrix[] inputs)
     {
         // this.previousLayerOutputs = inputs;
 
         Matrix[] result = new Matrix[inputs.Length];
-        maxIndices = new int[inputs.Length][];
+        Matrix[] maxIndexMap = new Matrix[inputs.Length];
         for (int i = 0; i < inputs.Length; i++)
         {
-            (result[i], maxIndices[i]) = MaxPooling(inputs[i], poolSize, stride);
+            (result[i], maxIndexMap[i]) = MaxPooling(inputs[i], poolSize, stride);
         }
-        return (result, result);
+        return (result, maxIndexMap);
     }
 
-    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] deltas, Matrix[] layerInputFromForward, Matrix[] previousLayerOutputs, double learningRate)
+    Matrix[] Backward(Matrix[] deltas, Matrix[] maxIndexMap, Matrix[] previousLayerOutputs)
     {
-        if (maxIndices == null)
-        {
-            throw new InvalidOperationException("Forward method must be called before calling Backward method");
-        }
-
         Matrix[] result = new Matrix[deltas.Length];
         for (int i = 0; i < deltas.Length; i++)
         {
             result[i] = new Matrix(previousLayerOutputs[i].RowsAmount, previousLayerOutputs[i].ColumnsAmount);
-            for (int j = 0; j < maxIndices[i].Length; j++)
+
+            for (int j = 0; j < deltas[i].RowsAmount; j++)
             {
-                int row = maxIndices[i][j] / previousLayerOutputs[i].ColumnsAmount;
-                int col = maxIndices[i][j] % previousLayerOutputs[i].ColumnsAmount;
-                result[i][row, col] += deltas[i][j / deltas[i].ColumnsAmount, j % deltas[i].ColumnsAmount];
+                for (int k = 0; k < deltas[i].ColumnsAmount; k++)
+                {
+                    int maxIndex = (int)maxIndexMap[i][j, k];
+                    int rowIndex = maxIndex / previousLayerOutputs[i].ColumnsAmount;
+                    int colIndex = maxIndex % previousLayerOutputs[i].ColumnsAmount;
+                    result[i][rowIndex, colIndex] += deltas[i][j, k];
+                }
             }
         }
         return result;
     }
 
-    private (Matrix, int[]) MaxPooling(Matrix matrix, int poolSize, int stride)
+    private (Matrix, Matrix) MaxPooling(Matrix matrix, int poolSize, int stride)
     {
         int newRows = (matrix.RowsAmount - poolSize) / stride + 1;
         int newColumns = (matrix.ColumnsAmount - poolSize) / stride + 1;
         Matrix result = new Matrix(newRows, newColumns);
-        List<int> indices = new();
+        Matrix maxIndexMap = new Matrix(newRows, newColumns);
 
         for (int i = 0; i < newRows; i++)
         {
@@ -101,20 +82,10 @@ public class PoolingLayer : IFeatureExtractionLayer
                     }
                 }
                 result[i, j] = max;
-                indices.Add(maxIndex);
+                maxIndexMap[i, j] = maxIndex;
             }
         }
 
-        return (result, indices.ToArray());
-    }
-
-    void IFeatureExtractionLayer.UpdateWeightsAndBiases(double batchSize)
-    {
-        throw new NotImplementedException();
-    }
-
-    void IFeatureExtractionLayer.Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape)
-    {
-        throw new NotImplementedException();
+        return (result, maxIndexMap);
     }
 }
