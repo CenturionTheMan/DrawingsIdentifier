@@ -14,9 +14,6 @@ public class ConvolutionalNeuralNetwork
 
     public bool saveFeatureLayersOutputs = false;
 
-    private const string logFilePath = "D:\\GoogleDriveMirror\\Studia\\Inzynierka\\LearningLogs\\log";
-    private const bool logToFile = false;
-
     private static Random random = new Random();
 
     private IFeatureExtractionLayer[] featureLayers;
