@@ -9,73 +9,22 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary;
 
-internal static class Utilities
+internal static class ActivationFunctionsHandler
 {
-    internal static (int outputRows, int outputColumns) GetSizeAfterConvolution((int rows, int columns) inputSize, (int rows, int columns) kernel, int stride)
-    {
-        var outputRows = (inputSize.rows - kernel.rows) / stride + 1;
-        var outputColumns = (inputSize.columns - kernel.columns) / stride + 1;
-        return (outputRows, outputColumns);
-    }
-
-    internal static Matrix FlattenMatrix(Matrix[] matrices)
-    {
-        List<double> flattenedList = new();
-        foreach (var matrix in matrices)
-        {
-            for (int i = 0; i < matrix.RowsAmount; i++)
-            {
-                for (int j = 0; j < matrix.ColumnsAmount; j++)
-                {
-                    flattenedList.Add(matrix[i, j]);
-                }
-            }
-        }
-
-        return new Matrix(flattenedList.ToArray());
-    }
-
-    internal static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int rowsAmount, int columnsAmount)
-    {
-        if (flattenedMatrix.RowsAmount % rowsAmount * columnsAmount != 0)
-            throw new ArgumentException("Invalid matrix size");
-
-        List<Matrix> matrices = new List<Matrix>();
-
-        int index = 0;
-        for (int i = 0; i < flattenedMatrix.RowsAmount; i += rowsAmount * columnsAmount)
-        {
-            Matrix matrix = new Matrix(rowsAmount, columnsAmount);
-            for (int j = 0; j < rowsAmount; j++)
-            {
-                for (int k = 0; k < columnsAmount; k++)
-                {
-                    matrix[j, k] = flattenedMatrix[index++, 0];
-                }
-            }
-            matrices.Add(matrix);
-        }
-
-        return matrices.ToArray();
-    }
-
-    internal static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int matrixSize)
-    {
-        return UnflattenMatrix(flattenedMatrix, matrixSize, matrixSize);
-    }
+    
 
     internal static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
     {
         switch (activationFunction)
         {
             case ActivationFunction.ReLU:
-                return Utilities.ReLU(input);
+                return ActivationFunctionsHandler.ReLU(input);
 
             case ActivationFunction.Sigmoid:
-                return Utilities.Sigmoid(input);
+                return ActivationFunctionsHandler.Sigmoid(input);
 
             case ActivationFunction.Softmax:
-                return Utilities.Softmax(input);
+                return ActivationFunctionsHandler.Softmax(input);
 
             default:
                 throw new ArgumentException("Invalid activation function");
@@ -87,13 +36,13 @@ internal static class Utilities
         switch (activationFunction)
         {
             case ActivationFunction.ReLU:
-                return Utilities.DerivativeReLU(input);
+                return ActivationFunctionsHandler.DerivativeReLU(input);
 
             case ActivationFunction.Sigmoid:
-                return Utilities.DerivativeSigmoid(input);
+                return ActivationFunctionsHandler.DerivativeSigmoid(input);
 
             case ActivationFunction.Softmax:
-                return Utilities.DerivativeSoftmax(input);
+                return ActivationFunctionsHandler.DerivativeSoftmax(input);
 
             default:
                 throw new ArgumentException("Invalid activation function");

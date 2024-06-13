@@ -1,15 +1,9 @@
 ﻿using System.Diagnostics;
-using static NeuralNetworkLibrary.Utilities;
+using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
 namespace NeuralNetworkLibrary;
 
-/// <summary>
-/// Represents a Convolutional Neural Network.
-/// </summary>
-/// <remarks>
-/// This class provides functionality for training and predicting using a Convolutional Neural Network.
-/// It supports various activation functions and implements backpropagation for learning.
-/// </remarks>
+
 public class FeedForwardNeuralNetwork : INeuralNetwork
 {
     private static Random random = new Random();

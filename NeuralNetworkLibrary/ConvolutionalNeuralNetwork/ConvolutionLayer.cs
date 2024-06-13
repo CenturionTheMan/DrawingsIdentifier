@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using static NeuralNetworkLibrary.Utilities;
+using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
 namespace NeuralNetworkLibrary;
 

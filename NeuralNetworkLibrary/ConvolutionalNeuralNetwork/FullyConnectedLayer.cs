@@ -53,9 +53,9 @@ public class FullyConnectedLayer
 
         Matrix activatedLayer = ActivationFunction switch
         {
-            ActivationFunction.ReLU => Utilities.ReLU(layerWithAddedBiases),
-            ActivationFunction.Sigmoid => Utilities.Sigmoid(layerWithAddedBiases),
-            ActivationFunction.Softmax => Utilities.Softmax(layerWithAddedBiases),
+            ActivationFunction.ReLU => ActivationFunctionsHandler.ReLU(layerWithAddedBiases),
+            ActivationFunction.Sigmoid => ActivationFunctionsHandler.Sigmoid(layerWithAddedBiases),
+            ActivationFunction.Softmax => ActivationFunctionsHandler.Softmax(layerWithAddedBiases),
             _ => throw new NotImplementedException()
         };
 
@@ -66,9 +66,9 @@ public class FullyConnectedLayer
     {
         Matrix activationDerivativeLayer = ActivationFunction switch
         {
-            ActivationFunction.ReLU => Utilities.DerivativeReLU(thisLayerOutputBeforeActivation),
-            ActivationFunction.Sigmoid => Utilities.DerivativeSigmoid(thisLayerOutputBeforeActivation),
-            ActivationFunction.Softmax => Utilities.DerivativeSoftmax(thisLayerOutputBeforeActivation),
+            ActivationFunction.ReLU => ActivationFunctionsHandler.DerivativeReLU(thisLayerOutputBeforeActivation),
+            ActivationFunction.Sigmoid => ActivationFunctionsHandler.DerivativeSigmoid(thisLayerOutputBeforeActivation),
+            ActivationFunction.Softmax => ActivationFunctionsHandler.DerivativeSoftmax(thisLayerOutputBeforeActivation),
             _ => throw new NotImplementedException()
         };
 
