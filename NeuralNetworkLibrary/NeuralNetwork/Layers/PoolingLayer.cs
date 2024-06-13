@@ -29,7 +29,7 @@ public class PoolingLayer
         Matrix[] maxIndexMap = new Matrix[inputs.Length];
         for (int i = 0; i < inputs.Length; i++)
         {
-            (result[i], maxIndexMap[i]) = MaxPooling(inputs[i], poolSize, stride);
+            (result[i], maxIndexMap[i]) = MatrixExtender.MaxPooling(inputs[i], poolSize, stride);
         }
         return (result, maxIndexMap);
     }
@@ -55,37 +55,5 @@ public class PoolingLayer
         return result;
     }
 
-    private (Matrix, Matrix) MaxPooling(Matrix matrix, int poolSize, int stride)
-    {
-        int newRows = (matrix.RowsAmount - poolSize) / stride + 1;
-        int newColumns = (matrix.ColumnsAmount - poolSize) / stride + 1;
-        Matrix result = new Matrix(newRows, newColumns);
-        Matrix maxIndexMap = new Matrix(newRows, newColumns);
-
-        for (int i = 0; i < newRows; i++)
-        {
-            for (int j = 0; j < newColumns; j++)
-            {
-                double max = double.MinValue;
-                int maxIndex = -1;
-                for (int x = 0; x < poolSize; x++)
-                {
-                    for (int y = 0; y < poolSize; y++)
-                    {
-                        int rowIndex = i * stride + x;
-                        int colIndex = j * stride + y;
-                        if (rowIndex < matrix.RowsAmount && colIndex < matrix.ColumnsAmount && matrix[rowIndex, colIndex] > max)
-                        {
-                            max = matrix[rowIndex, colIndex];
-                            maxIndex = rowIndex * matrix.ColumnsAmount + colIndex;
-                        }
-                    }
-                }
-                result[i, j] = max;
-                maxIndexMap[i, j] = maxIndex;
-            }
-        }
-
-        return (result, maxIndexMap);
-    }
+    
 }

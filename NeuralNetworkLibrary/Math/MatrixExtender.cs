@@ -5,6 +5,45 @@ public static class MatrixExtender
 {
     #region SHAPE TRANSFORMATIONS
 
+    public static (Matrix result, Matrix maxIndexMap) MaxPooling(this Matrix matrix, int poolSize, int stride)
+    {
+        int newRows = (matrix.RowsAmount - poolSize) / stride + 1;
+        int newColumns = (matrix.ColumnsAmount - poolSize) / stride + 1;
+        Matrix result = new Matrix(newRows, newColumns);
+        Matrix maxIndexMap = new Matrix(newRows, newColumns);
+
+        for (int i = 0; i < newRows; i++)
+        {
+            for (int j = 0; j < newColumns; j++)
+            {
+                double max = double.MinValue;
+                int maxIndex = -1;
+                for (int x = 0; x < poolSize; x++)
+                {
+                    for (int y = 0; y < poolSize; y++)
+                    {
+                        int rowIndex = i * stride + x;
+                        int colIndex = j * stride + y;
+                        if (rowIndex < matrix.RowsAmount && colIndex < matrix.ColumnsAmount && matrix[rowIndex, colIndex] > max)
+                        {
+                            max = matrix[rowIndex, colIndex];
+                            maxIndex = rowIndex * matrix.ColumnsAmount + colIndex;
+                        }
+                    }
+                }
+                result[i, j] = max;
+                maxIndexMap[i, j] = maxIndex;
+            }
+        }
+
+        return (result, maxIndexMap);
+    }
+
+    public static (int outputRows, int outputColumns) GetSizeAfterPooling((int rows, int columns) inputSize, int poolSize, int stride)
+    {
+        return GetSizeAfterConvolution(inputSize, (poolSize, poolSize), stride);
+    }
+
     public static (int outputRows, int outputColumns) GetSizeAfterConvolution((int rows, int columns) inputSize, (int rows, int columns) kernel, int stride)
     {
         var outputRows = (inputSize.rows - kernel.rows) / stride + 1;
