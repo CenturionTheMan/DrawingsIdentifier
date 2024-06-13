@@ -41,15 +41,12 @@ public class FullyConnectedLayer
         this.biasesGradientSum = new Matrix(LayerSize, 1);
     }
 
-    internal (Matrix activatedOutput, Matrix outputBeforeActivation) Forward(Matrix input, Matrix prevLayerOutputBeforeActivation)
+    internal (Matrix activatedOutput, Matrix outputBeforeActivation) Forward(Matrix input)
     {
-        //this.prevLayerOutputBeforeActivation = prevLayerOutputBeforeActivation;
-
         Matrix currentLayer = input;
 
         Matrix multipliedByWeightsLayer = Matrix.DotProductMatrices(weights, currentLayer);
         Matrix layerWithAddedBiases = multipliedByWeightsLayer.ElementWiseAdd(biases);
-        //layerOutputBeforeActivation = layerWithAddedBiases;
 
         Matrix activatedLayer = ActivationFunction switch
         {
@@ -83,8 +80,9 @@ public class FullyConnectedLayer
 
     internal void UpdateWeightsAndBiases(int batchSize)
     {
-        weights = weights.ElementWiseAdd(weightsGradientSum.ApplyFunction(x => x / batchSize));
-        biases = biases.ElementWiseAdd(biasesGradientSum.ApplyFunction(x => x / batchSize));
+        double multiplier = 1.0 / batchSize;
+        weights = weights.ElementWiseAdd(weightsGradientSum.ApplyFunction(x => x * multiplier));
+        biases = biases.ElementWiseAdd(biasesGradientSum.ApplyFunction(x => x * multiplier));
 
         weightsGradientSum = new Matrix(LayerSize, weights.ColumnsAmount);
         biasesGradientSum = new Matrix(LayerSize, 1);

@@ -8,7 +8,7 @@ namespace TestConsoleApp;
 
 internal class Program
 {
-    private const string MnistDataDirPath = "C:\\Personal\\mnist_data\\";
+    private const string MnistDataDirPath = "D:\\GoogleDriveMirror\\Projects\\NeuralNetworkProject\\mnist_data\\";
 
     private static void Main(string[] args)
     {
@@ -27,60 +27,56 @@ internal class Program
 
         TestCNN(new ConvolutionalNeuralNetwork((1, 28, 28),
             [
-                new ConvolutionLayer(3, 6, ActivationFunction.ReLU),
-                new ConvolutionLayer(3, 3, ActivationFunction.ReLU),
+                new ConvolutionLayer(3, 6, 1, ActivationFunction.ReLU),
+                new ConvolutionLayer(3, 3, 1, ActivationFunction.ReLU),
             ],
             [
+                new FullyConnectedLayer(16, ActivationFunction.ReLU),
                 new FullyConnectedLayer(10, ActivationFunction.Softmax)
             ]), 0.01, 1, 50);
+
+        // TestNN();
     }
 
     private static void TestCNN(ConvolutionalNeuralNetwork cnn, double learningRate, int epochAmount, int batchSize)
     {
         Console.WriteLine("Loading data...");
-        var trainData = GetMnistDataMatrix(MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
-        var testData = GetMnistDataMatrix(MnistDataDirPath + "mnist_test_data.csv");
+        var trainData = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
+        var testData = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_test_data.csv");
 
         Console.WriteLine("Training...");
-        cnn.Train(trainData, learningRate, epochAmount, batchSize, 0.01);
+
+        cnn.OnBatchLearningIteration += (epoch, epochPercentFinish, error) =>
+        {
+            Console.WriteLine(
+                            $"Epoch: {epoch + 1}\n" +
+                            $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
+                            $"Batch error: {error.ToString("0.000")}\n");
+        };
+
+        cnn.Train(trainData, learningRate, epochAmount, batchSize);
+
 
         Console.WriteLine("Testing...");
-        int guessed = 0;
-
-        foreach (var item in testData)
-        {
-            (Matrix input, Matrix expectedOutput) = item;
-            var prediction = cnn.Predict(input);
-            var max = prediction.Max();
-
-            int predictedNumber = prediction.IndexOfMax();
-            int expectedNumber = expectedOutput.IndexOfMax();
-
-            if (predictedNumber == expectedNumber)
-            {
-                guessed++;
-            }
-        }
-
-        cnn.saveFeatureLayersOutputs = true;
-        cnn.Predict(testData[0].input);
-        cnn.saveFeatureLayersOutputs = false;
-
-        Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
-
-        //FilesCreatorHelper.AddRowToCsvFile([guessed * 100.0 / (double)testData.Length], "D:\\GoogleDriveMirror\\Studia\\Inzynierka\\LearningLogs\\CNNConfLogs.csv");
+        var correctness = cnn.CalculateCorrectness(testData);
+        Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
     }
 
     private static void TestNN()
     {
         Console.WriteLine("Loading data...");
-        var trainData = GetMnistData(MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
-        var testData = GetMnistData(MnistDataDirPath + "mnist_test_data.csv");
+        var trainData = GetMnistDataMatrix(true, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
+        var testData = GetMnistDataMatrix(true, MnistDataDirPath + "mnist_test_data.csv");
 
         Console.WriteLine("Training...");
-        var nn = new FeedForwardNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
+        var nn = new FeedForwardNeuralNetwork(784, [
+            new FullyConnectedLayer(16, ActivationFunction.ReLU),
+            new FullyConnectedLayer(16, ActivationFunction.ReLU),
+            new FullyConnectedLayer(10, ActivationFunction.Softmax)
+        
+        ]);
 
-        nn.OnLearningIteration += (epoch, epochPercentFinish, batchError) =>
+        nn.OnBatchLearningIteration += (epoch, epochPercentFinish, batchError) =>
         {
             Console.WriteLine(
                             $"Epoch: {epoch + 1}\n" +
@@ -88,54 +84,15 @@ internal class Program
                             $"Batch error: {batchError.ToString("0.000")}\n");
         };
 
-        nn.Train(trainData, 0.01, 30, 50, 0.01);
+        nn.Train(trainData, 0.01, 30, 50);
 
         Console.WriteLine("Testing...");
-        int guessed = 0;
-        foreach (var item in testData)
-        {
-            var prediction = nn.Predict(item.inputs);
-            var max = prediction.Max();
-            int indexOfMaxPrediction = prediction.ToList().IndexOf(max);
-
-            var expectedMax = item.outputs.Max();
-            int indexOfMaxExpected = item.outputs.ToList().IndexOf(expectedMax);
-
-            if (indexOfMaxPrediction == indexOfMaxExpected)
-            {
-                guessed++;
-            }
-        }
-
-        Console.WriteLine($"Correctness: {(guessed * 100.0 / (double)testData.Length).ToString("0.00")}%");
+        var correctness = nn.CalculateCorrectness(testData);
+        Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
     }
 
-    private static (double[] inputs, double[] outputs)[] GetMnistData(params string[] paths)
-    {
-        var result = new List<(double[] inputs, double[] outputs)>();
 
-        foreach (var path in paths)
-        {
-            var data = FilesCreatorHelper.ReadInputFromCSV(path, ',').Skip(1);
-
-            foreach (var item in data)
-            {
-                double[] inputs = new double[784];
-                double[] expected = new double[10];
-
-                int numer = int.Parse(item[0]);
-                expected[numer] = 1;
-
-                inputs = item.Skip(1).Select(x => double.Parse(x) / 255.0).ToArray();
-
-                result.Add((inputs, expected));
-            }
-        }
-
-        return result.ToArray();
-    }
-
-    private static (Matrix input, Matrix expectedOutput)[] GetMnistDataMatrix(params string[] paths)
+    private static (Matrix input, Matrix expectedOutput)[] GetMnistDataMatrix(bool flatten, params string[] paths)
     {
         var results = new List<(Matrix, Matrix)>();
 
@@ -160,7 +117,10 @@ internal class Program
                     }
                 }
 
-                if (numer == 0 || numer == 1) //TODO remove after testing
+                // if (numer == 0 || numer == 1) //TODO remove after testing
+                if(flatten)
+                    results.Add((MatrixExtender.FlattenMatrix(tmpIn), tmpOut));
+                else
                     results.Add((tmpIn, tmpOut));
             }
         }

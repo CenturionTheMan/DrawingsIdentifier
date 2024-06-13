@@ -5,14 +5,14 @@ public static class MatrixExtender
 {
     #region SHAPE TRANSFORMATIONS
 
-    internal static (int outputRows, int outputColumns) GetSizeAfterConvolution((int rows, int columns) inputSize, (int rows, int columns) kernel, int stride)
+    public static (int outputRows, int outputColumns) GetSizeAfterConvolution((int rows, int columns) inputSize, (int rows, int columns) kernel, int stride)
     {
         var outputRows = (inputSize.rows - kernel.rows) / stride + 1;
         var outputColumns = (inputSize.columns - kernel.columns) / stride + 1;
         return (outputRows, outputColumns);
     }
 
-    internal static Matrix FlattenMatrix(Matrix[] matrices)
+    public static Matrix FlattenMatrix(params Matrix[] matrices)
     {
         List<double> flattenedList = new();
         foreach (var matrix in matrices)
@@ -29,7 +29,7 @@ public static class MatrixExtender
         return new Matrix(flattenedList.ToArray());
     }
 
-    internal static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int rowsAmount, int columnsAmount)
+    public static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int rowsAmount, int columnsAmount)
     {
         if (flattenedMatrix.RowsAmount % rowsAmount * columnsAmount != 0)
             throw new ArgumentException("Invalid matrix size");
@@ -53,7 +53,7 @@ public static class MatrixExtender
         return matrices.ToArray();
     }
 
-    internal static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int matrixSize)
+    public static Matrix[] UnflattenMatrix(Matrix flattenedMatrix, int matrixSize)
     {
         return UnflattenMatrix(flattenedMatrix, matrixSize, matrixSize);
     }

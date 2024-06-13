@@ -1,89 +1,53 @@
-﻿using System.Diagnostics;
-using static NeuralNetworkLibrary.ActivationFunctionsHandler;
-
 namespace NeuralNetworkLibrary;
-
 
 public class FeedForwardNeuralNetwork : INeuralNetwork
 {
+    public Action<int, int, double>? OnLearningIteration
+    {
+        get => onLearningIteration;
+        set => onLearningIteration = value;
+    }
+
+    public Action<int, float, double>? OnBatchLearningIteration
+    {
+        get => onBatchLearningIteration;
+        set => onBatchLearningIteration = value;
+    }
+
+    private Action<int, int, double>? onLearningIteration; //epoch, sample index, error
+    private Action<int, float, double>? onBatchLearningIteration; //epoch, epochPercentFinish, error(mean)
+
     private static Random random = new Random();
 
-    private int[] layersSizes;
-    private Matrix[] biasesForLayers;
-    private Matrix[] weightsForLayers;
-    private Matrix[] layersBeforeActivation;
-    private double learningRate;
-    private ActivationFunction[] activationFunctions;
-    private int layersAmount;
+    internal double LearningRate;
 
-    private Action<int, double, double>? onLearningIteration;
-    public Action<int, double, double>? OnLearningIteration { get => onLearningIteration; set => onLearningIteration = value; }
 
-    #region Constructors
+    private FullyConnectedLayer[] fullyConnectedLayers;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FeedForwardNeuralNetwork"/> class.
-    /// </summary>
-    /// <param name="layersSizes"></param>
-    /// <param name="activationFunctions"></param>
-    /// <exception cref="ArgumentException"></exception>
-    public FeedForwardNeuralNetwork(int[] layersSizes, ActivationFunction[] activationFunctions)
+    public FeedForwardNeuralNetwork(int inputSize, FullyConnectedLayer[] fullyConnectedLayers)
     {
-        if (layersSizes.Length != activationFunctions.Length + 1)
+        this.fullyConnectedLayers = fullyConnectedLayers;
+
+        if (fullyConnectedLayers.Length > 0)
         {
-            throw new ArgumentException("Activation functions amount must be equal to layers amount - 1");
-        }
-
-        this.layersSizes = layersSizes;
-        this.layersAmount = layersSizes.Length;
-
-        this.activationFunctions = activationFunctions;
-
-        this.layersBeforeActivation = new Matrix[layersAmount];
-        this.biasesForLayers = new Matrix[layersAmount - 1];
-        this.weightsForLayers = new Matrix[layersAmount - 1];
-
-        for (int i = 0; i < layersAmount; i++)
-        {
-            this.layersBeforeActivation[i] = new Matrix(layersSizes[i], 1);
-        }
-
-        for (int i = 0; i < layersAmount - 1; i++)
-        {
-            int fromLayer = layersSizes[i];
-            int toLayer = layersSizes[i + 1];
-            this.weightsForLayers[i] = new Matrix(toLayer, fromLayer, -0.25, 0.25);
-            this.biasesForLayers[i] = new Matrix(toLayer, 1, -0.1, 0.1);
+            fullyConnectedLayers[0].Initialize(inputSize);
+            for (int i = 1; i < fullyConnectedLayers.Length; i++)
+            {
+                fullyConnectedLayers[i].Initialize(fullyConnectedLayers[i - 1].LayerSize);
+            }
         }
     }
 
-    #endregion Constructors
-
-    #region Training and Predicting
-
-    /// <summary>
-    /// Trains the network using the given data.
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="learningRate"></param>
-    /// <param name="epochAmount"></param>
-    /// <param name="batchSize"></param>
-    /// <param name="expectedMaxError"></param>
-    /// <param name="onIteration"></param>
-    /// <exception cref="ArgumentException"></exception>
-    public void Train((double[] inputs, double[] outputs)[] data, double learningRate, int epochAmount, int batchSize, double expectedMaxError = 0.001)
+    public Task TrainOnNewTask((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken=default)
     {
-        if (data[0].inputs.Length != layersSizes[0])
-        {
-            throw new ArgumentException("Inputs length must be equal to the first layer size");
-        }
+        return Task.Run(() => Train(data, learningRate, epochAmount, batchSize, cancellationToken), cancellationToken);
+    }
 
-        if (data[0].outputs.Length != layersSizes[layersAmount - 1])
-        {
-            throw new ArgumentException("Outputs length must be equal to the last layer size");
-        }
+    public void Train((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken=default)
+    {
+        this.LearningRate = learningRate;
 
-        this.learningRate = learningRate;
+        data = data.Select(x => (MatrixExtender.FlattenMatrix(x.input), x.output)).ToArray();
 
         for (int epoch = 0; epoch < epochAmount; epoch++)
         {
@@ -92,194 +56,95 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
 
             while (batchBeginIndex < data.Length)
             {
-                var batchSamples = batchBeginIndex + batchSize < data.Length ? data.Skip(batchBeginIndex).Take(batchSize) : data[batchBeginIndex..];
+                var batchSamples = batchBeginIndex + batchSize < data.Length ? data.Skip(batchBeginIndex).Take(batchSize).ToArray() : data[batchBeginIndex..].ToArray();
 
-                Matrix[] inputSamples = batchSamples.Select(x => new Matrix(x.inputs)).ToArray()!;
-                Matrix[] expectsOutputsSamples = batchSamples.Select(x => new Matrix(x.outputs)).ToArray()!;
+                double batchErrorSum = 0;
 
-                double batchError = PerformLearningIteration(inputSamples, expectsOutputsSamples);
-
-                onLearningIteration?.Invoke(epoch + 1, 100 * batchBeginIndex / (double)data.Length, batchError);
-
-                if (batchError < expectedMaxError)
+                Parallel.For(0, batchSamples.Length, (i, loopState) =>
                 {
-                    return;
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        loopState.Stop();
+                        return;
+                    }
+
+                    (Matrix prediction, Matrix[] fullyConnectedLayersOutputBeforeActivation) = Feedforward(batchSamples[i].input);
+                    Backpropagation(batchSamples[i].output, prediction, fullyConnectedLayersOutputBeforeActivation);
+
+                    double error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
+                    batchErrorSum += error;
+                    OnLearningIteration?.Invoke(epoch, batchBeginIndex+i, error);
+                });
+                if (cancellationToken.IsCancellationRequested) return;
+
+                foreach (var layer in fullyConnectedLayers)
+                {
+                    layer.UpdateWeightsAndBiases(batchSize);
                 }
+
+                float epochPercentFinish = 100 * batchBeginIndex / (float)data.Length;
+                OnBatchLearningIteration?.Invoke(epoch, epochPercentFinish, batchErrorSum / batchSize);
+
 
                 batchBeginIndex += batchSize;
             }
         }
     }
 
-    /// <summary>
-    /// Predicts the output for the given inputs.
-    /// </summary>
-    /// <param name="inputs"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public double[] Predict(double[] inputs)
+    public Matrix Predict(Matrix input)
     {
-        if (inputs.Length != layersSizes[0])
-        {
-            throw new ArgumentException("Inputs length must be equal to the first layer size");
-        }
-
-        var result = Feedforward(new Matrix(inputs));
-
-        List<double> resultList = new List<double>();
-
-        for (int i = 0; i < result.RowsAmount; i++)
-        {
-            resultList.Add(result[i, 0]);
-        }
-
-        return resultList.ToArray();
+        var (activatedOutput, _) = Feedforward(input);
+        return activatedOutput;
     }
 
-    #endregion Training and Predicting
-
-    #region Base Methods
-
-    /// <summary>
-    /// Performs a learning iteration using the given data samples (mini batch) and expected results.
-    /// </summary>
-    /// <param name="dataSamples"></param>
-    /// <param name="expectedResults"></param>
-    /// <returns></returns>
-    private double PerformLearningIteration(Matrix[] dataSamples, Matrix[] expectedResults)
+    public float CalculateCorrectness((Matrix input, Matrix expectedOutput)[] testData)
     {
-        Matrix[] changesForWeightsSum = new Matrix[layersAmount - 1];
-        Matrix[] changesForBiasesSum = new Matrix[layersAmount - 1];
-        for (int i = 0; i < layersAmount - 1; i++)
+        int guessed = 0;
+
+        Parallel.ForEach(testData, item =>
         {
-            changesForWeightsSum[i] = new Matrix(weightsForLayers[i].RowsAmount, weightsForLayers[i].ColumnsAmount);
-            changesForBiasesSum[i] = new Matrix(biasesForLayers[i].RowsAmount, biasesForLayers[i].ColumnsAmount);
-        }
+            var prediction = Predict(item.input);
+            var max = prediction.Max();
 
-        double errorSum = 0.0;
+            int predictedNumber = prediction.IndexOfMax();
+            int expectedNumber = item.expectedOutput.IndexOfMax();
 
-        Parallel.For(0, dataSamples.Length, i =>
-        {
-            Matrix prediction = Feedforward(dataSamples[i]);
-
-            var changes = Backpropagation(expectedResults[i], prediction);
-
-            errorSum += activationFunctions[^1] == ActivationFunction.Softmax ? CalculateCrossEntropyCost(expectedResults[i], prediction) : CalculateMeanSquaredError(expectedResults[i], prediction);
-
-            for (int j = 0; j < layersAmount - 1; j++)
+            if (predictedNumber == expectedNumber)
             {
-                changesForWeightsSum[j] = changesForWeightsSum[j].ElementWiseAdd(changes.changeForWeights[j]);
-                changesForBiasesSum[j] = changesForBiasesSum[j].ElementWiseAdd(changes.changeForBiases[j]);
+                Interlocked.Increment(ref guessed);
             }
         });
 
-        Parallel.For(0, layersAmount - 1, i =>
-        {
-            weightsForLayers[i] = weightsForLayers[i].ElementWiseAdd(changesForWeightsSum[i].ApplyFunction(x => x / dataSamples.Length));
-            biasesForLayers[i] = biasesForLayers[i].ElementWiseAdd(changesForBiasesSum[i].ApplyFunction(x => x / dataSamples.Length));
-        });
-
-        return errorSum / (double)dataSamples.Length;
+        return guessed * 100.0f / testData.Length;
     }
 
-    /// <summary>
-    /// Feeds the input through the network and returns the output.
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    private Matrix Feedforward(Matrix input)
+    internal (Matrix output, Matrix[] fullyConnectedLayersOutputBeforeActivation) Feedforward(Matrix input)
     {
-        layersBeforeActivation[0] = input;
-        Matrix currentLayer = layersBeforeActivation[0];
-
-        for (int i = 0; i < layersAmount - 1; i++)
+        List<Matrix> fullyConnectedLayersOutputBeforeActivation = new List<Matrix>(this.fullyConnectedLayers.Length + 1)
         {
-            Matrix multipliedByWeightsLayer = Matrix.DotProductMatrices(weightsForLayers[i], currentLayer);
+            input
+        };
 
-            Matrix layerWithAddedBiases = multipliedByWeightsLayer.ElementWiseAdd(biasesForLayers[i]);
+        (Matrix activatedOutput, Matrix outputBeforeActivation) = fullyConnectedLayers[0].Forward(input);
+        fullyConnectedLayersOutputBeforeActivation.Add(outputBeforeActivation);
 
-            Matrix activatedLayer = activationFunctions[i] switch
-            {
-                ActivationFunction.ReLU => ReLU(layerWithAddedBiases),
-                ActivationFunction.Sigmoid => Sigmoid(layerWithAddedBiases),
-                ActivationFunction.Softmax => Softmax(layerWithAddedBiases),
-                _ => throw new NotImplementedException()
-            };
-
-            layersBeforeActivation[i + 1] = layerWithAddedBiases;
-            currentLayer = activatedLayer;
+        for (int i = 1; i < fullyConnectedLayers.Length; i++)
+        {
+            (activatedOutput, outputBeforeActivation) = fullyConnectedLayers[i].Forward(activatedOutput);
+            fullyConnectedLayersOutputBeforeActivation.Add(outputBeforeActivation);
         }
 
-        return currentLayer;
+        return (activatedOutput, fullyConnectedLayersOutputBeforeActivation.ToArray());
     }
 
-    /// <summary>
-    /// Performs backpropagation and returns the changes for weights and biases.
-    /// </summary>
-    /// <param name="expectedResults"></param>
-    /// <param name="predictions"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    private (Matrix[] changeForWeights, Matrix[] changeForBiases) Backpropagation(Matrix expectedResults, Matrix predictions)
+    internal void Backpropagation(Matrix expectedResult, Matrix prediction, Matrix[] fullyConnectedLayersOutputBeforeActivation)
     {
-        Matrix[] changeForWeights = new Matrix[layersAmount - 1];
-        Matrix[] changeForBiases = new Matrix[layersAmount - 1];
+        var error = expectedResult.ElementWiseSubtract(prediction);
 
-        Matrix errorMatrix = expectedResults.ElementWiseSubtract(predictions);
-
-        for (int i = layersAmount - 2; i >= 0; i--)
+        for (int i = fullyConnectedLayers.Length - 1; i >= 0; i--)
         {
-            Matrix activationDerivativeLayer = activationFunctions[i] switch
-            {
-                ActivationFunction.ReLU => DerivativeReLU(layersBeforeActivation[i + 1]),
-                ActivationFunction.Sigmoid => DerivativeSigmoid(layersBeforeActivation[i + 1]),
-                ActivationFunction.Softmax => DerivativeSoftmax(layersBeforeActivation[i + 1]),
-                _ => throw new NotImplementedException()
-            };
-
-            Matrix gradientMatrix = activationDerivativeLayer.ElementWiseMultiply(errorMatrix).ApplyFunction(x => x * learningRate);
-
-            Matrix deltaWeightsMatrix = Matrix.DotProductMatrices(gradientMatrix, layersBeforeActivation[i].Transpose());
-
-            changeForWeights[i] = deltaWeightsMatrix;
-            changeForBiases[i] = gradientMatrix;
-
-            errorMatrix = Matrix.DotProductMatrices(weightsForLayers[i].Transpose(), errorMatrix);
+            error = fullyConnectedLayers[i].Backward(error, fullyConnectedLayersOutputBeforeActivation[i], fullyConnectedLayersOutputBeforeActivation[i + 1], LearningRate);
         }
-
-        return (changeForWeights, changeForBiases);
     }
 
-    #endregion Base Methods
-
-    #region Helper Methods
-
-    public bool IsStructureEqual(int[] layersSize, ActivationFunction[] activationFunctions)
-    {
-        if (layersSize.Length != layersSizes.Length || activationFunctions.Length != this.activationFunctions.Length)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < layersSize.Length; i++)
-        {
-            if (layersSize[i] != layersSizes[i])
-            {
-                return false;
-            }
-        }
-
-        for (int i = 0; i < activationFunctions.Length; i++)
-        {
-            if (activationFunctions[i] != this.activationFunctions[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    #endregion Helper Methods
 }

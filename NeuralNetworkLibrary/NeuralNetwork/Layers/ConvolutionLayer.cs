@@ -13,10 +13,11 @@ public class ConvolutionLayer : IFeatureExtractionLayer
     public int Depth => depth;
     public int KernelSize => kernelSize;
     public ActivationFunction ActivationFunction => activationFunction;
-    public int Stride => 1;
+    public int Stride => stride;
 
     private int depth;
     private int kernelSize;
+    private int stride;
 
     private ActivationFunction activationFunction;
 
@@ -34,10 +35,11 @@ public class ConvolutionLayer : IFeatureExtractionLayer
     private double minInitValue;
     private double maxInitValue;
 
-    public ConvolutionLayer(int kernelSize, int kernelsDepth, ActivationFunction activationFunction, double minInitValue = -0.1, double maxInitValue = 0.1)
+    public ConvolutionLayer(int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction, double minInitValue = -0.1, double maxInitValue = 0.1)
     {
         this.depth = kernelsDepth;
         this.kernelSize = kernelSize;
+        this.stride = stride;
         this.activationFunction = activationFunction;
         this.minInitValue = minInitValue;
         this.maxInitValue = maxInitValue;
@@ -72,8 +74,10 @@ public class ConvolutionLayer : IFeatureExtractionLayer
                 kernels[i, j] = new Matrix(kernelSize, kernelSize, minInitValue, maxInitValue);
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
-            biases[i] = new Matrix(inputShape.inputHeight - kernelSize + 1, inputShape.inputWidth - kernelSize + 1, minInitValue, maxInitValue);
-            changeForBiases[i] = new Matrix(inputShape.inputHeight - kernelSize + 1, inputShape.inputWidth - kernelSize + 1);
+
+            (int outputRows, int outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
+            biases[i] = new Matrix(outputRows, outputColumns, minInitValue, maxInitValue);
+            changeForBiases[i] = new Matrix(outputRows, outputColumns);
         }
     }
 
@@ -83,7 +87,7 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         Matrix[] A = new Matrix[depth];
         // output before activation
         Matrix[] Z = new Matrix[depth];
-
+        
         for (int i = 0; i < depth; i++)
         {
             A[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
@@ -94,7 +98,7 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         {
             for (int j = 0; j < inputs.Length; j++)
             {
-                var single = inputs[j].CrossCorrelationValid(kernels[i, j], stride: 1);
+                var single = inputs[j].CrossCorrelationValid(kernels[i, j], stride: this.stride);
                 Z[i] = Z[i].ElementWiseAdd(single);
             }
             Z[i] = Z[i].ElementWiseAdd(biases[i]);
@@ -107,7 +111,6 @@ public class ConvolutionLayer : IFeatureExtractionLayer
 
     Matrix[] IFeatureExtractionLayer.Backward(Matrix[] dAin, Matrix[] layerInputFromForward, Matrix[] layerOutputBeforeActivation, double learningRate)
     {
-        //output gradient
         Matrix[] dA = new Matrix[inputDepth];
         for (int i = 0; i < inputDepth; i++)
         {
@@ -124,14 +127,11 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         {
             for (int j = 0; j < inputDepth; j++)
             {
-                Matrix kernelGradient = layerInputFromForward[j].CrossCorrelationValid(dZ[i], stride: 1);
+                Matrix kernelGradient = layerInputFromForward[j].CrossCorrelationValid(dZ[i], stride: this.stride);
                 kernelGradient = kernelGradient * learningRate;
                 changeForKernels[i, j] = changeForKernels[i, j].ElementWiseAdd(kernelGradient);
 
-                // var inputGradientSingle = inputGradient[i].ConvolutionFull(kernels[i, j], stride: 1);
-                // outputGradient[j] = outputGradient[j].ElementWiseAdd(inputGradientSingle);
-
-                var dASingle = dZ[i].ConvolutionFull(kernels[i, j], stride: 1);
+                var dASingle = dZ[i].ConvolutionFull(kernels[i, j], stride: this.stride);
                 dA[j] = dA[j].ElementWiseAdd(dASingle);
             }
 
@@ -143,14 +143,16 @@ public class ConvolutionLayer : IFeatureExtractionLayer
 
     public void UpdateWeightsAndBiases(double batchSize)
     {
+        double multiplier = 1.0 / batchSize;
+
         for (int i = 0; i < depth; i++)
         {
             for (int j = 0; j < kernels.GetLength(1); j++)
             {
-                kernels[i, j] = kernels[i, j].ElementWiseAdd(changeForKernels[i, j] * (1.0 / batchSize));
+                kernels[i, j] = kernels[i, j].ElementWiseAdd(changeForKernels[i, j] * multiplier);
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
-            biases[i] = biases[i].ElementWiseAdd(changeForBiases[i] * (1.0 / batchSize));
+            biases[i] = biases[i].ElementWiseAdd(changeForBiases[i] * multiplier);
             changeForBiases[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
         }
     }
