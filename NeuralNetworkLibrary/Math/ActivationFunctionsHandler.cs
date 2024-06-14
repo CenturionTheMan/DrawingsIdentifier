@@ -98,7 +98,7 @@ internal static class ActivationFunctionsHandler
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += predictions[i, j] > 0 ? expected[i, j] * Math.Log(predictions[i, j]) : 0.0;
+                sum += expected[i, j] * Math.Log(predictions[i, j]);
             }
         }
 

@@ -69,6 +69,8 @@ public class FeedForwardNeuralNetwork : INeuralNetwork
                     }
 
                     (Matrix prediction, Matrix[] fullyConnectedLayersOutputBeforeActivation) = Feedforward(batchSamples[i].input);
+                    prediction = prediction + double.Epsilon;
+
                     Backpropagation(batchSamples[i].output, prediction, fullyConnectedLayersOutputBeforeActivation);
 
                     double error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);

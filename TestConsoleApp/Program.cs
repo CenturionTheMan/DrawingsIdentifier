@@ -27,15 +27,15 @@ internal class Program
 
         TestCNN(new ConvolutionalNeuralNetwork((1, 28, 28),
             [
-                new ConvolutionLayer(3, 6, 1, ActivationFunction.ReLU),
                 new PoolingLayer(2, 2),
-                new ConvolutionLayer(3, 3, 1, ActivationFunction.ReLU),
+                new ConvolutionLayer(3, 8, 1, ActivationFunction.ReLU),
                 new PoolingLayer(2, 2),
+                new ConvolutionLayer(3, 4, 1, ActivationFunction.ReLU),
             ],
             [
                 new FullyConnectedLayer(16, ActivationFunction.ReLU),
                 new FullyConnectedLayer(10, ActivationFunction.Softmax)
-            ]), 0.1, 2, 100);
+            ]), 0.01, 2, 100);
 
         // TestNN();
     }
