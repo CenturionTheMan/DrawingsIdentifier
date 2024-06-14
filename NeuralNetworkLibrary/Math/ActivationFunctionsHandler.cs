@@ -98,7 +98,7 @@ internal static class ActivationFunctionsHandler
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += expected[i, j] * Math.Log(predictions[i, j]);
+                sum += predictions[i, j] > 0 ? expected[i, j] * Math.Log(predictions[i, j]) : 0.0;
             }
         }
 
@@ -157,7 +157,7 @@ internal static class ActivationFunctionsHandler
     internal static Matrix Softmax(Matrix mat)
     {
         var expMat = mat.ApplyFunction(x => Math.Exp(x));
-        double sumOfMatrix = expMat.Sum();
+        double sumOfMatrix = expMat.Sum() + double.Epsilon;
         return expMat.ApplyFunction(x => x / sumOfMatrix);
     }
 

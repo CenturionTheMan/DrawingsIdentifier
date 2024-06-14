@@ -27,7 +27,7 @@ public static class MatrixExtender
                         if (rowIndex < matrix.RowsAmount && colIndex < matrix.ColumnsAmount && matrix[rowIndex, colIndex] > max)
                         {
                             max = matrix[rowIndex, colIndex];
-                            maxIndex = rowIndex * matrix.ColumnsAmount + colIndex;
+                            maxIndex = IndexCalculations.GetIndex(rowIndex, colIndex, matrix.ColumnsAmount);
                         }
                     }
                 }
@@ -214,6 +214,11 @@ public static class MatrixExtender
 
 
     #region MATH OPERATIONS
+
+     public static Matrix ClampValues(this Matrix a, double min, double max)
+    {
+        return a.ApplyFunction(x => Math.Clamp(x, min, max));
+    }
 
     public static int IndexOfMax(this Matrix matrix)
     {

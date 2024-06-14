@@ -8,7 +8,7 @@ namespace TestConsoleApp;
 
 internal class Program
 {
-    private const string MnistDataDirPath = "D:\\GoogleDriveMirror\\Projects\\NeuralNetworkProject\\mnist_data\\";
+    private const string MnistDataDirPath = "C:\\Personal\\mnist_data\\";
 
     private static void Main(string[] args)
     {
@@ -28,12 +28,14 @@ internal class Program
         TestCNN(new ConvolutionalNeuralNetwork((1, 28, 28),
             [
                 new ConvolutionLayer(3, 6, 1, ActivationFunction.ReLU),
+                new PoolingLayer(2, 2),
                 new ConvolutionLayer(3, 3, 1, ActivationFunction.ReLU),
+                new PoolingLayer(2, 2),
             ],
             [
                 new FullyConnectedLayer(16, ActivationFunction.ReLU),
                 new FullyConnectedLayer(10, ActivationFunction.Softmax)
-            ]), 0.01, 1, 50);
+            ]), 0.1, 2, 100);
 
         // TestNN();
     }
@@ -95,7 +97,7 @@ internal class Program
     private static (Matrix input, Matrix expectedOutput)[] GetMnistDataMatrix(bool flatten, params string[] paths)
     {
         var results = new List<(Matrix, Matrix)>();
-
+        int[] filter = []; //TODO remove after testing
         foreach (var path in paths)
         {
             var data = FilesCreatorHelper.ReadInputFromCSV(path, ',').Skip(1);
@@ -107,6 +109,9 @@ internal class Program
                 double[] expected = new double[10];
                 int numer = int.Parse(item[0]);
                 expected[numer] = 1;
+
+                if(filter.Contains(numer)) continue;
+
                 Matrix tmpOut = new Matrix(expected);
 
                 for (int i = 0; i < 28; i++)
@@ -117,7 +122,6 @@ internal class Program
                     }
                 }
 
-                // if (numer == 0 || numer == 1) //TODO remove after testing
                 if(flatten)
                     results.Add((MatrixExtender.FlattenMatrix(tmpIn), tmpOut));
                 else

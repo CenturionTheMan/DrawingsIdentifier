@@ -34,7 +34,7 @@ public class ConvolutionLayer : IFeatureExtractionLayer
     private double minInitValue;
     private double maxInitValue;
 
-    public ConvolutionLayer(int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction, double minInitValue = -0.1, double maxInitValue = 0.1)
+    public ConvolutionLayer(int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction, double minInitValue = -0.2, double maxInitValue = 0.2)
     {
         if(stride != 1)
         {
@@ -64,7 +64,7 @@ public class ConvolutionLayer : IFeatureExtractionLayer
         this.changeForBiases = new Matrix[0];
     }
 
-    void IFeatureExtractionLayer.Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape)
+    (int outputDepth, int outputHeight, int outputWidth) IFeatureExtractionLayer.Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape)
     {
         this.inputDepth = inputShape.inputDepth;
         this.inputWidth = inputShape.inputWidth;
@@ -89,9 +89,11 @@ public class ConvolutionLayer : IFeatureExtractionLayer
             biases[i] = new Matrix(outputRows, outputColumns, minInitValue, maxInitValue);
             changeForBiases[i] = new Matrix(outputRows, outputColumns);
         }
+
+        return (depth, outputRows, outputColumns);
     }
 
-    (Matrix[] output, Matrix[] outputsBeforeActivation) IFeatureExtractionLayer.Forward(Matrix[] inputs)
+    (Matrix[] output, Matrix[] otherOutput) IFeatureExtractionLayer.Forward(Matrix[] inputs)
     {
         // activated output
         Matrix[] A = new Matrix[depth];

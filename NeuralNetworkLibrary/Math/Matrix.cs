@@ -147,6 +147,21 @@ public class Matrix
         return (double[,])Values.Clone();
     }
 
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                sb.AppendFormat("{0,5}", Values[i, j].ToString("0.00"));
+            }
+            sb.Append("\n");
+        }
+
+        return sb.ToString();
+    }
+
     /// <summary>
     /// Creates new matrix which is result of dot product of two matrices
     /// </summary>

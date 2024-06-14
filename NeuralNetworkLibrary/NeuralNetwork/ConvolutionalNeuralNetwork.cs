@@ -39,22 +39,17 @@ public class ConvolutionalNeuralNetwork : INeuralNetwork
         this.featureLayers = featureExtractionLayers;
         this.fullyConnectedLayers = fullyConnectedLayers;
 
-        if (featureExtractionLayers.Length > 0)
+        (int nextDepth, int nextHeight, int nextWidth) = input;
+        for (int i = 0; i < featureExtractionLayers.Length; i++)
         {
-            featureExtractionLayers[0].Initialize(input);
-            var size = MatrixExtender.GetSizeAfterConvolution((input.rows, input.columns), (featureExtractionLayers[0].KernelSize, featureExtractionLayers[0].KernelSize), featureExtractionLayers[0].Stride);
-
-            for (int i = 1; i < featureExtractionLayers.Length; i++)
-            {
-                featureExtractionLayers[i].Initialize((featureExtractionLayers[i - 1].Depth, size.outputRows, size.outputColumns));
-                size = MatrixExtender.GetSizeAfterConvolution((size.outputRows, size.outputColumns), (featureExtractionLayers[i].KernelSize, featureExtractionLayers[i].KernelSize), featureExtractionLayers[i].Stride);
-            }
-            outputFromLastFeatureLayerSize = (size.outputRows, size.outputColumns);
+            (nextDepth, nextHeight, nextWidth) = featureExtractionLayers[i].Initialize((nextDepth, nextHeight, nextWidth));
         }
+
+        outputFromLastFeatureLayerSize = (nextHeight, nextWidth);
 
         if (fullyConnectedLayers.Length > 0)
         {
-            int depth = featureExtractionLayers.Length > 0 ? featureExtractionLayers.Last().Depth : input.depth;
+            int depth = featureExtractionLayers.Length > 0 ? nextDepth : input.depth;
             fullyConnectedLayers[0].Initialize(outputFromLastFeatureLayerSize.rows * outputFromLastFeatureLayerSize.columns * depth);
             for (int i = 1; i < fullyConnectedLayers.Length; i++)
             {
@@ -92,6 +87,8 @@ public class ConvolutionalNeuralNetwork : INeuralNetwork
                     }
 
                     (Matrix prediction, Matrix[][] featureLayersOutputs, Matrix[] fullyConnectedLayersOutputBeforeActivation) = Feedforward(batchSamples[i].input);
+                    prediction = prediction + double.Epsilon;
+                    
                     Backpropagation(batchSamples[i].output, prediction, featureLayersOutputs, fullyConnectedLayersOutputBeforeActivation);
 
                     double error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
