@@ -12,9 +12,7 @@ public class ConvolutionLayer : ILayer
 {
     LayerType ILayer.LayerType => LayerType.Convolution;
 
-    // public int Depth => depth;
-    // public int KernelSize => kernelSize;
-    // public int Stride => stride;
+    private const double maxNorm = 0.5;
 
     private int depth;
     private int kernelSize;
@@ -32,7 +30,7 @@ public class ConvolutionLayer : ILayer
     private int inputWidth;
     private int inputHeight;
 
-    public ConvolutionLayer((int inputDepth, int inputHeight, int inputWidth) inputShape, int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction, double minInitValue = -0.2, double maxInitValue = 0.2)
+    public ConvolutionLayer((int inputDepth, int inputHeight, int inputWidth) inputShape, int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction)
     {
         if(stride != 1)
         {
@@ -65,11 +63,25 @@ public class ConvolutionLayer : ILayer
         {
             for (int j = 0; j < inputShape.inputDepth; j++)
             {
-                kernels[i, j] = new Matrix(kernelSize, kernelSize, minInitValue, maxInitValue);
+                kernels[i, j] = new Matrix(kernelSize, kernelSize);
+                switch (activationFunction)
+                {
+                    case ActivationFunction.ReLU:
+                        kernels[i, j].InitializeHe();
+                        break;
+                    case ActivationFunction.Sigmoid:
+                        kernels[i, j].InitializeXavier();
+                        break;
+                    case ActivationFunction.Softmax:
+                        kernels[i, j].InitializeXavier();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
 
-            biases[i] = new Matrix(outputRows, outputColumns, minInitValue, maxInitValue);
+            biases[i] = new Matrix(outputRows, outputColumns);
             changeForBiases[i] = new Matrix(outputRows, outputColumns);
         }
     }
@@ -142,7 +154,12 @@ public class ConvolutionLayer : ILayer
         {
             for (int j = 0; j < kernels.GetLength(1); j++)
             {
-                kernels[i, j] = kernels[i, j].ElementWiseAdd(changeForKernels[i, j] * multiplier);
+                var change = changeForKernels[i, j] * multiplier;
+                double clipCoefficient = maxNorm / (change.GetNorm() + double.Epsilon);
+                if (clipCoefficient < 1)
+                    change = change * clipCoefficient;
+
+                kernels[i, j] = kernels[i, j].ElementWiseAdd(change);
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
             biases[i] = biases[i].ElementWiseAdd(changeForBiases[i] * multiplier);

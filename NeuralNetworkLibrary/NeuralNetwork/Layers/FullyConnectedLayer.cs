@@ -6,6 +6,8 @@ public class FullyConnectedLayer : ILayer
 {
     LayerType ILayer.LayerType => LayerType.FullyConnected;
 
+    private const double maxNorm = 0.5;
+
     private ActivationFunction activationFunction;
     private int layerSize;
 
@@ -15,16 +17,8 @@ public class FullyConnectedLayer : ILayer
     private Matrix weightsGradientSum;
     private Matrix biasesGradientSum;
 
-    private double minWeight;
-    private double maxWeight;
-
-    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction, double minWeight = -0.2, double maxWeight = 0.2) 
+    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction) 
     {
-        this.minWeight = minWeight;
-        this.maxWeight = maxWeight;
-
-        // this.weights = new Matrix(layerSize, previousLayerSize, minWeight, maxWeight);
-        // this.biases = new Matrix(layerSize, 1, minWeight, maxWeight);
         this.weights = new Matrix(layerSize, previousLayerSize);
         this.biases = new Matrix(layerSize, 1);
 
@@ -32,17 +26,14 @@ public class FullyConnectedLayer : ILayer
         {
             case ActivationFunction.ReLU:
                 this.weights.InitializeHe();
-                this.biases.InitializeHe();
                 break;
 
             case ActivationFunction.Sigmoid:
                 this.weights.InitializeXavier();
-                this.biases.InitializeXavier();
                 break;
 
             case ActivationFunction.Softmax:
                 this.weights.InitializeXavier();
-                this.biases.InitializeXavier();
                 break;
             default:
                 throw new NotImplementedException();
@@ -101,7 +92,13 @@ public class FullyConnectedLayer : ILayer
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
         double multiplier = 1.0 / (double)batchSize;
-        weights = weights.ElementWiseAdd(weightsGradientSum.ApplyFunction(x => x * multiplier));
+        var changeForWeights = weightsGradientSum * multiplier;
+
+        double clipCoefficient = maxNorm / (changeForWeights.GetNorm() + double.Epsilon);
+        if (clipCoefficient < 1)
+            changeForWeights = changeForWeights * clipCoefficient;
+
+        weights = weights.ElementWiseAdd(changeForWeights);
         biases = biases.ElementWiseAdd(biasesGradientSum.ApplyFunction(x => x * multiplier));
 
         weightsGradientSum = new Matrix(layerSize, weights.ColumnsAmount);

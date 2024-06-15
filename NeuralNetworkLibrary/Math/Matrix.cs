@@ -80,28 +80,46 @@ public class Matrix
 
     public void InitializeXavier()
     {
-        double variance = 1.0 / Math.Sqrt(ColumnsAmount);
+        double limit = Math.Sqrt(6.0 / (RowsAmount + ColumnsAmount));
 
         for (int i = 0; i < RowsAmount; i++)
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                this[i, j] = random.NextDouble() * Math.Sqrt(2.0 * variance);
+                this[i, j] = random.NextDouble() * 2 * limit - limit;
             }
         }
     }
 
     public void InitializeHe()
     {
-        double variance = 2.0 / Math.Sqrt(ColumnsAmount);
+        double limit = Math.Sqrt(6.0 / ColumnsAmount);
 
         for (int i = 0; i < RowsAmount; i++)
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                this[i, j] = random.NextDouble() * Math.Sqrt(2.0 * variance);
+                this[i, j] = random.NextDouble() * 2 * limit - limit;
             }
         }
+    }
+
+    public double GetUnSquaredNorm()
+    {
+        double sum = 0;
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                sum += Values[i, j] * Values[i, j];
+            }
+        }
+        return sum;
+    }
+
+    public double GetNorm()
+    {
+        return Math.Sqrt(GetUnSquaredNorm());
     }
 
     /// <summary>

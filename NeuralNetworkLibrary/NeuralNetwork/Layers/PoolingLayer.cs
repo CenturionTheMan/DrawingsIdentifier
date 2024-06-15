@@ -53,7 +53,7 @@ public class PoolingLayer : ILayer
                 {
                     int maxIndex = (int)maxIndexMap[i][j, k];
                     
-                    var dim = IndexCalculations.GetRowAndColumn(maxIndex, prevLayerSize[i].ColumnsAmount);
+                    var dim = MatrixHelpers.GetRowAndColumn(maxIndex, prevLayerSize[i].ColumnsAmount);
                     result[i][dim.row, dim.column] += deltas[i][j, k];
                 }
             }

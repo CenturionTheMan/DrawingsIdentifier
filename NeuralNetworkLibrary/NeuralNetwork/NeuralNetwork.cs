@@ -23,19 +23,25 @@ public class NeuralNetwork : INeuralNetwork
         set => onBatchLearningIteration = value;
     }
 
+    public Action<int, float>? OnEpochLearningIteration
+    {
+        get => onEpochLearningIteration;
+        set => onEpochLearningIteration = value;
+    }
+
     private Action<int, int, double>? onLearningIteration; //epoch, sample index, error
     private Action<int, float, double>? onBatchLearningIteration; //epoch, epochPercentFinish, error(mean)
+    private Action<int, float>? onEpochLearningIteration; //epoch, correctness
 
     private static Random random = new Random();
 
     private ILayer[] layers;
  
     internal double LearningRate;
-    private (int rows, int columns) outputFromLastFeatureLayerSize;
 
     public NeuralNetwork(int inputSize, LayerTemplate[] layerTemplates) : this(1, inputSize, 1, layerTemplates)
     {
-
+        
     }
 
     public NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, LayerTemplate[] layerTemplates)
@@ -56,7 +62,7 @@ public class NeuralNetwork : INeuralNetwork
                         throw new InvalidOperationException("Convolution layer should be after another convolution layer or pooling layer");
                     }
 
-                    var layer = new ConvolutionLayer(currentInput, currentTemplate.KernelSize, currentTemplate.Depth, currentTemplate.Stride, currentTemplate.ActivationFunction, currentTemplate.MinWeight, currentTemplate.MaxWeight);
+                    var layer = new ConvolutionLayer(currentInput, currentTemplate.KernelSize, currentTemplate.Depth, currentTemplate.Stride, currentTemplate.ActivationFunction);
                     layers.Add(layer);
                     var size = MatrixExtender.GetSizeAfterConvolution((currentInput.inputRowsAmount, currentInput.inputColumnsAmount), (currentTemplate.KernelSize, currentTemplate.KernelSize), currentTemplate.Stride);
                     currentInput = (currentTemplate.Depth, size.outputRows, size.outputColumns);
@@ -82,7 +88,7 @@ public class NeuralNetwork : INeuralNetwork
                         layers.Add(reshapeLayer);
                     }
 
-                    var fullyConnectedLayer = new FullyConnectedLayer(currentInput.inputRowsAmount, currentTemplate.LayerSize, currentTemplate.ActivationFunction, currentTemplate.MinWeight, currentTemplate.MaxWeight);
+                    var fullyConnectedLayer = new FullyConnectedLayer(currentInput.inputRowsAmount, currentTemplate.LayerSize, currentTemplate.ActivationFunction);
                     layers.Add(fullyConnectedLayer);
                     currentInput = (1, currentTemplate.LayerSize, 1);
                     isPrevFullyConnected = true;
@@ -107,6 +113,12 @@ public class NeuralNetwork : INeuralNetwork
         {
             throw new NotImplementedException();
         }
+    }
+
+    public void Train((Matrix input, Matrix output)[] data, LearningScheduler learningScheduler)
+    {
+        learningScheduler.SetLearningNanny(this);
+        Train(data, learningScheduler.initialLearningRate, learningScheduler.epochAmount, learningScheduler.batchSize, learningScheduler.cts.Token);
     }
 
     public Task TrainOnNewTask((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken=default)
@@ -143,11 +155,6 @@ public class NeuralNetwork : INeuralNetwork
                     double error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
                     batchErrorSum += error;
 
-                    if(double.IsNaN(error) || double.IsInfinity(error) || double.IsNegativeInfinity(error))
-                    {
-                        throw new InvalidOperationException("Error is NaN or Infinity");
-                    }
-
                     Backpropagation(batchSamples[i].output, prediction, outputsBeforeActivation);
 
                     
@@ -156,6 +163,7 @@ public class NeuralNetwork : INeuralNetwork
 
 
                 if (cancellationToken.IsCancellationRequested) return;
+
 
 
                 foreach (var layer in layers)
@@ -169,6 +177,10 @@ public class NeuralNetwork : INeuralNetwork
 
                 batchBeginIndex += batchSize;
             }
+
+            int toTake = data.Length / 20 > 100? data.Length / 20 : 100;
+            float correctness = CalculateCorrectness(data.Take(toTake).OrderBy(x => random.Next()).ToArray());
+            OnEpochLearningIteration?.Invoke(epoch, correctness);
         }
     }
 
@@ -184,6 +196,26 @@ public class NeuralNetwork : INeuralNetwork
         if(currentInput.Length != 1)
             throw new InvalidOperationException("Prediction should return only one matrix");
         return currentInput[0];
+    }
+
+    public void SaveFeatureMaps(Matrix input, string directoryPath)
+    {
+        Matrix[] currentInput = [input];
+
+        for (int i = 0; i < layers.Length; i++)
+        {
+            (currentInput, _) = layers[i].Forward(currentInput);
+
+            if(layers[i].LayerType == LayerType.Convolution || layers[i].LayerType == LayerType.Pooling)
+            {
+                for (int j = 0; j < currentInput.Length; j++)
+                {
+                    var featureMap = currentInput[j];
+                    ImagesProcessor.DataReader.SaveToImage(featureMap.ToArray(), directoryPath + $"featureMap_{i}_{j}.png");
+                }
+            }
+        }
+
     }
 
     public float CalculateCorrectness((Matrix input, Matrix expectedOutput)[] testData)
@@ -218,6 +250,8 @@ public class NeuralNetwork : INeuralNetwork
         {
             (currentInput, var otherOutput) = layers[i].Forward(currentInput);
 
+            //? Currently in between feature layer and classification layer there is putted activated output
+            //? Do tests with not activated as all the others... 
             layersBeforeActivation.Add(otherOutput);
         }
 

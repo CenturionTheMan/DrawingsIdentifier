@@ -6,8 +6,6 @@ public class LayerTemplate
 {   
     internal LayerType LayerType => layerType;
     internal ActivationFunction ActivationFunction => activationFunction;
-    internal double MinWeight => minWeight;
-    internal double MaxWeight => maxWeight;
 
     internal int LayerSize => layerSize;
 
@@ -19,8 +17,6 @@ public class LayerTemplate
 
     private LayerType layerType;
     private ActivationFunction activationFunction;
-    private double minWeight;
-    private double maxWeight;
 
     private int layerSize;
 
@@ -35,14 +31,12 @@ public class LayerTemplate
 
     }
 
-    public static LayerTemplate CreateFullyConnectedLayer(int layerSize, ActivationFunction activationFunction, double minWeight = -0.2, double maxWeight = 0.2)
+    public static LayerTemplate CreateFullyConnectedLayer(int layerSize, ActivationFunction activationFunction)
     {
         return new LayerTemplate
         {
             layerType = LayerType.FullyConnected,
             activationFunction = activationFunction,
-            minWeight = minWeight,
-            maxWeight = maxWeight,
             layerSize = layerSize
         };
     }
@@ -57,7 +51,7 @@ public class LayerTemplate
         };
     }
 
-    public static LayerTemplate CreateConvolutionLayer(int kernelSize, int depth, int stride, ActivationFunction activationFunction, double minWeight = -0.2, double maxWeight = 0.2)
+    public static LayerTemplate CreateConvolutionLayer(int kernelSize, int depth, int stride, ActivationFunction activationFunction)
     {
         return new LayerTemplate
         {
@@ -66,8 +60,6 @@ public class LayerTemplate
             depth = depth,
             stride = stride,
             activationFunction = activationFunction,
-            minWeight = minWeight,
-            maxWeight = maxWeight
         };
     }
 }

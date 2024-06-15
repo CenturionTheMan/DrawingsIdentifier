@@ -160,6 +160,14 @@ internal static class ActivationFunctionsHandler
         double sumOfMatrix = expMat.Sum() + double.Epsilon;
         var tmp = expMat.ApplyFunction(x => x / sumOfMatrix);
 
+        // foreach (var item in tmp)
+        // {
+        //     if(double.IsNaN(item) || double.IsInfinity(item))
+        //     {
+        //         throw new InvalidOperationException("Softmax resulted in NaN or Infinity");
+        //     }
+        // }
+
         return tmp;
     }
 
