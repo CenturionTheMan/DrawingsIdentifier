@@ -27,7 +27,7 @@ public static class MatrixExtender
                         if (rowIndex < matrix.RowsAmount && colIndex < matrix.ColumnsAmount && matrix[rowIndex, colIndex] > max)
                         {
                             max = matrix[rowIndex, colIndex];
-                            maxIndex = IndexCalculations.GetIndex(rowIndex, colIndex, matrix.ColumnsAmount);
+                            maxIndex = MatrixHelpers.GetIndex(rowIndex, colIndex, matrix.ColumnsAmount);
                         }
                     }
                 }

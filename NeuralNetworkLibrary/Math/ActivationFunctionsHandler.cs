@@ -158,7 +158,9 @@ internal static class ActivationFunctionsHandler
     {
         var expMat = mat.ApplyFunction(x => Math.Exp(x));
         double sumOfMatrix = expMat.Sum() + double.Epsilon;
-        return expMat.ApplyFunction(x => x / sumOfMatrix);
+        var tmp = expMat.ApplyFunction(x => x / sumOfMatrix);
+
+        return tmp;
     }
 
     /// <summary>

@@ -8,10 +8,9 @@ using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
 namespace NeuralNetworkLibrary;
 
-public class PoolingLayer : IFeatureExtractionLayer
+public class PoolingLayer : ILayer
 {
-    public int PoolSize => poolSize;
-    public int Stride => stride;
+    LayerType ILayer.LayerType => LayerType.Pooling;
 
     private int poolSize;
     private int stride;
@@ -22,19 +21,13 @@ public class PoolingLayer : IFeatureExtractionLayer
         this.stride = stride;
     }
 
-    (int outputDepth, int outputHeight, int outputWidth) IFeatureExtractionLayer.Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape)
+
+    void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
-        var size = MatrixExtender.GetSizeAfterPooling((inputShape.inputHeight, inputShape.inputWidth), poolSize, stride);
-        return (inputShape.inputDepth, size.outputRows, size.outputColumns);
+        //nothing to do here
     }
 
-
-    void IFeatureExtractionLayer.UpdateWeightsAndBiases(double batchSize)
-    {
-        
-    }
-
-    (Matrix[] output, Matrix[] otherOutput) IFeatureExtractionLayer.Forward(Matrix[] inputs)
+    (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] inputs)
     {
         // this.previousLayerOutputs = inputs;
 
@@ -47,7 +40,7 @@ public class PoolingLayer : IFeatureExtractionLayer
         return (result, maxIndexMap);
     }
 
-    Matrix[] IFeatureExtractionLayer.Backward(Matrix[] deltas, Matrix[] prevLayerSize, Matrix[] maxIndexMap, double learningRate)
+    Matrix[] ILayer.Backward(Matrix[] deltas, Matrix[] prevLayerSize, Matrix[] maxIndexMap, double learningRate)
     {
         Matrix[] result = new Matrix[deltas.Length];
         for (int i = 0; i < deltas.Length; i++)

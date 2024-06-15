@@ -1,9 +1,13 @@
+using System.Data.Common;
+
 namespace NeuralNetworkLibrary;
 
-public class FullyConnectedLayer
+public class FullyConnectedLayer : ILayer
 {
-    public readonly int LayerSize;
-    public readonly ActivationFunction ActivationFunction;
+    LayerType ILayer.LayerType => LayerType.FullyConnected;
+
+    private ActivationFunction activationFunction;
+    private int layerSize;
 
     private Matrix weights;
     private Matrix biases;
@@ -11,44 +15,57 @@ public class FullyConnectedLayer
     private Matrix weightsGradientSum;
     private Matrix biasesGradientSum;
 
-    private int previousLayerSize;
-
     private double minWeight;
     private double maxWeight;
 
-    public FullyConnectedLayer(int layerSize, ActivationFunction ActivationFunction, double minWeight = -0.2, double maxWeight = 0.2)
+    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction, double minWeight = -0.2, double maxWeight = 0.2) 
     {
-        this.LayerSize = layerSize;
-        this.ActivationFunction = ActivationFunction;
         this.minWeight = minWeight;
         this.maxWeight = maxWeight;
 
-        this.previousLayerSize = -1;
-        this.weights = new Matrix(0, 0);
-        this.biases = new Matrix(0, 0);
-        this.weightsGradientSum = new Matrix(0, 0);
-        this.biasesGradientSum = new Matrix(0, 0);
+        // this.weights = new Matrix(layerSize, previousLayerSize, minWeight, maxWeight);
+        // this.biases = new Matrix(layerSize, 1, minWeight, maxWeight);
+        this.weights = new Matrix(layerSize, previousLayerSize);
+        this.biases = new Matrix(layerSize, 1);
+
+        switch (activationFunction)
+        {
+            case ActivationFunction.ReLU:
+                this.weights.InitializeHe();
+                this.biases.InitializeHe();
+                break;
+
+            case ActivationFunction.Sigmoid:
+                this.weights.InitializeXavier();
+                this.biases.InitializeXavier();
+                break;
+
+            case ActivationFunction.Softmax:
+                this.weights.InitializeXavier();
+                this.biases.InitializeXavier();
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+
+        this.weightsGradientSum = new Matrix(layerSize, previousLayerSize);
+        this.biasesGradientSum = new Matrix(layerSize, 1);
+
+        this.activationFunction = activationFunction;
+        this.layerSize = layerSize;
     }
-
-    internal void Initialize(int previousLayerSize)
+    
+    (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] input)
     {
-        this.previousLayerSize = previousLayerSize;
+        if(input.Length != 1)
+            throw new ArgumentException("Fully connected layer can only have one input");
 
-        this.weights = new Matrix(LayerSize, previousLayerSize, minWeight, maxWeight);
-        this.biases = new Matrix(LayerSize, 1, minWeight, maxWeight);
-
-        this.weightsGradientSum = new Matrix(LayerSize, previousLayerSize);
-        this.biasesGradientSum = new Matrix(LayerSize, 1);
-    }
-
-    internal (Matrix activatedOutput, Matrix outputBeforeActivation) Forward(Matrix input)
-    {
-        Matrix currentLayer = input;
+        Matrix currentLayer = input[0];
 
         Matrix multipliedByWeightsLayer = Matrix.DotProductMatrices(weights, currentLayer);
         Matrix layerWithAddedBiases = multipliedByWeightsLayer.ElementWiseAdd(biases);
 
-        Matrix activatedLayer = ActivationFunction switch
+        Matrix activatedLayer = activationFunction switch
         {
             ActivationFunction.ReLU => ActivationFunctionsHandler.ReLU(layerWithAddedBiases),
             ActivationFunction.Sigmoid => ActivationFunctionsHandler.Sigmoid(layerWithAddedBiases),
@@ -56,35 +73,38 @@ public class FullyConnectedLayer
             _ => throw new NotImplementedException()
         };
 
-        return (activatedLayer, layerWithAddedBiases);
+        return ([activatedLayer], [layerWithAddedBiases]);
     }
 
-    internal Matrix Backward(Matrix errorMatrix, Matrix prevLayerOutputBeforeActivation, Matrix thisLayerOutputBeforeActivation, double learningRate)
+    Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputBeforeActivation, Matrix[] thisLayerOutputBeforeActivation, double learningRate)
     {
-        Matrix activationDerivativeLayer = ActivationFunction switch
+        if(errorMatrix.Length != 1)
+            throw new ArgumentException("Fully connected layer can only have one input");
+
+        Matrix activationDerivativeLayer = activationFunction switch
         {
-            ActivationFunction.ReLU => ActivationFunctionsHandler.DerivativeReLU(thisLayerOutputBeforeActivation),
-            ActivationFunction.Sigmoid => ActivationFunctionsHandler.DerivativeSigmoid(thisLayerOutputBeforeActivation),
-            ActivationFunction.Softmax => ActivationFunctionsHandler.DerivativeSoftmax(thisLayerOutputBeforeActivation),
+            ActivationFunction.ReLU => ActivationFunctionsHandler.DerivativeReLU(thisLayerOutputBeforeActivation[0]),
+            ActivationFunction.Sigmoid => ActivationFunctionsHandler.DerivativeSigmoid(thisLayerOutputBeforeActivation[0]),
+            ActivationFunction.Softmax => ActivationFunctionsHandler.DerivativeSoftmax(thisLayerOutputBeforeActivation[0]),
             _ => throw new NotImplementedException()
         };
 
-        Matrix gradientMatrix = activationDerivativeLayer.ElementWiseMultiply(errorMatrix).ApplyFunction(x => x * learningRate);
-        Matrix deltaWeightsMatrix = Matrix.DotProductMatrices(gradientMatrix, prevLayerOutputBeforeActivation.Transpose());
+        Matrix gradientMatrix = activationDerivativeLayer.ElementWiseMultiply(errorMatrix[0]).ApplyFunction(x => x * learningRate);
+        Matrix deltaWeightsMatrix = Matrix.DotProductMatrices(gradientMatrix, prevLayerOutputBeforeActivation[0].Transpose());
 
         weightsGradientSum = weightsGradientSum.ElementWiseAdd(deltaWeightsMatrix);
         biasesGradientSum = biasesGradientSum.ElementWiseAdd(gradientMatrix);
 
-        return Matrix.DotProductMatrices(weights.Transpose(), errorMatrix);
+        return [Matrix.DotProductMatrices(weights.Transpose(), errorMatrix[0])];
     }
 
-    internal void UpdateWeightsAndBiases(int batchSize)
+    void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
-        double multiplier = 1.0 / batchSize;
+        double multiplier = 1.0 / (double)batchSize;
         weights = weights.ElementWiseAdd(weightsGradientSum.ApplyFunction(x => x * multiplier));
         biases = biases.ElementWiseAdd(biasesGradientSum.ApplyFunction(x => x * multiplier));
 
-        weightsGradientSum = new Matrix(LayerSize, weights.ColumnsAmount);
-        biasesGradientSum = new Matrix(LayerSize, 1);
+        weightsGradientSum = new Matrix(layerSize, weights.ColumnsAmount);
+        biasesGradientSum = new Matrix(layerSize, 1);
     }
 }

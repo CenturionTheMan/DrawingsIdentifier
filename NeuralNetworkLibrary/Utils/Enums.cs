@@ -12,3 +12,11 @@ public enum ActivationFunction
     Sigmoid,
     Softmax,
 }
+
+internal enum LayerType
+{
+    Convolution,
+    Pooling,
+    FullyConnected,
+    Reshape
+}

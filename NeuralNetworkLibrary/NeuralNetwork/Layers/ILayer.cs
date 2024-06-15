@@ -1,9 +1,9 @@
 namespace NeuralNetworkLibrary;
 
-public interface IFeatureExtractionLayer
+internal interface ILayer
 {
-    internal (int outputDepth, int outputHeight, int outputWidth) Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape);
-
+    //internal (int outputDepth, int outputHeight, int outputWidth) Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape);
+    internal LayerType LayerType { get; }
 
     /// <summary>
     /// Forward pass for the layer
@@ -29,5 +29,5 @@ public interface IFeatureExtractionLayer
     /// </param>
     internal Matrix[] Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, double learningRate);
 
-    internal void UpdateWeightsAndBiases(double batchSize);
+    internal void UpdateWeightsAndBiases(int batchSize);
 }

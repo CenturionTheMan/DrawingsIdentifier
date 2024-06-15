@@ -78,6 +78,32 @@ public class Matrix
         }
     }
 
+    public void InitializeXavier()
+    {
+        double variance = 1.0 / Math.Sqrt(ColumnsAmount);
+
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                this[i, j] = random.NextDouble() * Math.Sqrt(2.0 * variance);
+            }
+        }
+    }
+
+    public void InitializeHe()
+    {
+        double variance = 2.0 / Math.Sqrt(ColumnsAmount);
+
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                this[i, j] = random.NextDouble() * Math.Sqrt(2.0 * variance);
+            }
+        }
+    }
+
     /// <summary>
     /// Gives access to the value at the given indexes
     /// </summary>
