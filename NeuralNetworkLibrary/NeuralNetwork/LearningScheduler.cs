@@ -9,7 +9,8 @@ public class LearningScheduler
     internal int batchSize;
 
 
-    int epochDropCount;
+    private const int batchErrorsAvgAmount = 10;
+    private int epochDropCount;
 
     public LearningScheduler(double initialLearningRate, int epochAmount, int batchSize, int epochDropCount)
     {
@@ -34,7 +35,7 @@ public class LearningScheduler
             }
         };
 
-        Queue<double> errors = new Queue<double>(3);
+        Queue<double> errors = new Queue<double>(batchErrorsAvgAmount);
         neuralNetwork.OnBatchLearningIteration += (epoch, epochPercentFinish, error) =>
         {
             if(double.IsNaN(error))
@@ -58,7 +59,7 @@ public class LearningScheduler
 
             errors.Enqueue(error);
 
-            if (errors.Count > 3)
+            if (errors.Count > batchErrorsAvgAmount)
             {
                 errors.Dequeue();
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -29,6 +30,9 @@ public class NeuralNetwork : INeuralNetwork
         set => onEpochLearningIteration = value;
     }
 
+    public double LearningRate { get; internal set; }
+
+
     private Action<int, int, double>? onLearningIteration; //epoch, sample index, error
     private Action<int, float, double>? onBatchLearningIteration; //epoch, epochPercentFinish, error(mean)
     private Action<int, float>? onEpochLearningIteration; //epoch, correctness
@@ -37,7 +41,6 @@ public class NeuralNetwork : INeuralNetwork
 
     private ILayer[] layers;
  
-    internal double LearningRate;
 
     public NeuralNetwork(int inputSize, LayerTemplate[] layerTemplates) : this(1, inputSize, 1, layerTemplates)
     {
@@ -178,9 +181,13 @@ public class NeuralNetwork : INeuralNetwork
                 batchBeginIndex += batchSize;
             }
 
-            int toTake = data.Length / 20 > 100? data.Length / 20 : 100;
-            float correctness = CalculateCorrectness(data.Take(toTake).OrderBy(x => random.Next()).ToArray());
-            OnEpochLearningIteration?.Invoke(epoch, correctness);
+            if(OnEpochLearningIteration != null)
+            {
+                int toTake = data.Length < 1000 ? data.Length : 1000;
+                float correctness = CalculateCorrectness(data.Take(toTake).OrderBy(x => random.Next()).ToArray());
+                OnEpochLearningIteration.Invoke(epoch, correctness);
+            }
+            
         }
     }
 
@@ -250,8 +257,13 @@ public class NeuralNetwork : INeuralNetwork
         {
             (currentInput, var otherOutput) = layers[i].Forward(currentInput);
 
-            //? Currently in between feature layer and classification layer there is putted activated output
-            //? Do tests with not activated as all the others... 
+            //TODO Test with and without it (probably better without but more tests needed)
+            // if(layers[i].LayerType == LayerType.Reshape)
+            // {
+            //     (otherOutput, _) = layers[i].Forward(layersBeforeActivation.Last());
+            // }
+            
+
             layersBeforeActivation.Add(otherOutput);
         }
 

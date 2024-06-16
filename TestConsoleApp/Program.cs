@@ -15,17 +15,22 @@ internal class Program
         //TODO saving NN to file
         //TODO loading NN from file
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
-        
+
         var nn = new NeuralNetwork(1, 28, 28, [
-            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 4, stride: 1, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         ]);
 
-        TestNN(nn, 0.0005, 10, 100);
+
+        //82.24% correctness
+        TestNN(nn, new LearningScheduler(0.001, 5, 200, 1));
     }
 
-    private static void TestNN(NeuralNetwork nn, double learningRate, int epochAmount, int batchSize)
+    private static void TestNN(NeuralNetwork nn, LearningScheduler learningScheduler)
     {
         Console.WriteLine("Loading data...");
 
@@ -42,16 +47,17 @@ internal class Program
             Console.WriteLine(
                             $"Epoch: {epoch + 1}\n" +
                             $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
-                            $"Batch error: {error.ToString("0.000")}\n");
+                            $"Batch error: {error.ToString("0.000")}\n" + 
+                            $"Learning rate: {nn.LearningRate}\n");
         };
 
-        nn.OnEpochLearningIteration += (epoch, correctness) =>
-        {
-            Console.WriteLine($"============================================\n" + 
-            $"Epoch: {epoch + 1}\nCorrectness: {correctness.ToString("0.00")}%\n============================================");
-        };
+        // nn.OnEpochLearningIteration += (epoch, correctness) =>
+        // {
+        //     Console.WriteLine($"============================================\n" + 
+        //     $"Epoch: {epoch + 1}\nCorrectness: {correctness.ToString("0.00")}%\n============================================");
+        // };
 
-        nn.Train(trainData, new LearningScheduler(learningRate, epochAmount, batchSize, 1));
+        nn.Train(trainData, learningScheduler);
 
 
         Console.WriteLine("FINAL Testing...");
