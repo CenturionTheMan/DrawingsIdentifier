@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using Accord;
 using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
@@ -10,10 +12,16 @@ namespace NeuralNetworkLibrary;
 
 public class PoolingLayer : ILayer
 {
+    #region PARAMS
+
     LayerType ILayer.LayerType => LayerType.Pooling;
 
     private int poolSize;
     private int stride;
+
+    #endregion PARAMS
+
+    #region CTOR
 
     public PoolingLayer(int poolSize, int stride)
     {
@@ -21,6 +29,23 @@ public class PoolingLayer : ILayer
         this.stride = stride;
     }
 
+    internal static ILayer? LoadLayerData(XElement layerHead, XElement layerData)
+    {
+        string? poolSizeStr = layerHead.Element("PoolSize")?.Value;
+        string? strideStr = layerHead.Element("Stride")?.Value;
+
+        if (poolSizeStr == null || strideStr == null)
+            return null;
+
+        if (!int.TryParse(poolSizeStr, out int poolSize) || !int.TryParse(strideStr, out int stride))
+            return null;
+
+        return new PoolingLayer(poolSize, stride);
+    }
+
+    #endregion CTOR
+
+    #region METHODS
 
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
@@ -52,7 +77,7 @@ public class PoolingLayer : ILayer
                 for (int k = 0; k < deltas[i].ColumnsAmount; k++)
                 {
                     int maxIndex = (int)maxIndexMap[i][j, k];
-                    
+
                     var dim = MatrixHelpers.GetRowAndColumn(maxIndex, prevLayerSize[i].ColumnsAmount);
                     result[i][dim.row, dim.column] += deltas[i][j, k];
                 }
@@ -60,4 +85,25 @@ public class PoolingLayer : ILayer
         }
         return result;
     }
+
+    #endregion METHODS
+
+    #region SAVE
+
+    void ILayer.SaveLayerDescription(XmlTextWriter doc)
+    {
+        doc.WriteStartElement("LayerHead");
+        doc.WriteAttributeString("LayerType", LayerType.Pooling.ToString());
+        doc.WriteElementString("PoolSize", poolSize.ToString());
+        doc.WriteElementString("Stride", stride.ToString());
+        doc.WriteEndElement();
+    }
+
+    void ILayer.SaveLayerData(XmlTextWriter doc)
+    {
+        doc.WriteStartElement("LayerData");
+        doc.WriteEndElement();
+    }
+
+    #endregion SAVE
 }

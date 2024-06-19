@@ -54,6 +54,11 @@ public class LearningScheduler
             if (error > avg * 1.5)
             {
                 learningRate /= 2;
+                if(double.IsNaN(learningRate) || double.IsInfinity(learningRate) || double.IsNegativeInfinity(learningRate) || double.IsPositiveInfinity(learningRate))
+                {
+                    cts.Cancel();
+                    return;
+                }
                 neuralNetwork.LearningRate = learningRate;
             }   
 

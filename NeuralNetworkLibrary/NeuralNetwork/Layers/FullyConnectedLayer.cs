@@ -1,9 +1,13 @@
 using System.Data.Common;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace NeuralNetworkLibrary;
 
 public class FullyConnectedLayer : ILayer
 {
+    #region PARAMS
+
     LayerType ILayer.LayerType => LayerType.FullyConnected;
 
     private const double maxNorm = 0.5;
@@ -17,7 +21,11 @@ public class FullyConnectedLayer : ILayer
     private Matrix weightsGradientSum;
     private Matrix biasesGradientSum;
 
-    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction) 
+    #endregion PARAMS
+
+    #region CTOR
+
+    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction)
     {
         this.weights = new Matrix(layerSize, previousLayerSize);
         this.biases = new Matrix(layerSize, 1);
@@ -35,6 +43,7 @@ public class FullyConnectedLayer : ILayer
             case ActivationFunction.Softmax:
                 this.weights.InitializeXavier();
                 break;
+
             default:
                 throw new NotImplementedException();
         }
@@ -45,10 +54,38 @@ public class FullyConnectedLayer : ILayer
         this.activationFunction = activationFunction;
         this.layerSize = layerSize;
     }
-    
+
+    internal static ILayer? LoadLayerData(XElement layerHead, XElement layerData)
+    {
+        string? previousLayerSizeStr = layerHead.Element("previousLayerSize")?.Value;
+        string? layerSizeStr = layerHead.Element("layerSize")?.Value;
+        string? activationFunctionStr = layerHead.Element("activationFunction")?.Value;
+
+        string? weightsStr = layerData.Element("Weights")?.Value;
+        string? biasesStr = layerData.Element("Biases")?.Value;
+
+        if (previousLayerSizeStr == null || layerSizeStr == null || activationFunctionStr == null || weightsStr == null || biasesStr == null)
+            return null;
+
+        if (!int.TryParse(previousLayerSizeStr, out int previousLayerSize) || !int.TryParse(layerSizeStr, out int layerSize) || !Enum.TryParse<ActivationFunction>(activationFunctionStr, out ActivationFunction activationFunction))
+            return null;
+
+        if (!Matrix.TryParse(weightsStr, out Matrix weights) || !Matrix.TryParse(biasesStr, out Matrix biases))
+            return null;
+
+        FullyConnectedLayer layer = new FullyConnectedLayer(previousLayerSize, layerSize, activationFunction);
+        layer.weights = weights;
+        layer.biases = biases;
+        return layer;
+    }
+
+    #endregion CTOR
+
+    #region METHODS
+
     (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] input)
     {
-        if(input.Length != 1)
+        if (input.Length != 1)
             throw new ArgumentException("Fully connected layer can only have one input");
 
         Matrix currentLayer = input[0];
@@ -69,7 +106,7 @@ public class FullyConnectedLayer : ILayer
 
     Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputBeforeActivation, Matrix[] thisLayerOutputBeforeActivation, double learningRate)
     {
-        if(errorMatrix.Length != 1)
+        if (errorMatrix.Length != 1)
             throw new ArgumentException("Fully connected layer can only have one input");
 
         Matrix activationDerivativeLayer = activationFunction switch
@@ -104,4 +141,30 @@ public class FullyConnectedLayer : ILayer
         weightsGradientSum = new Matrix(layerSize, weights.ColumnsAmount);
         biasesGradientSum = new Matrix(layerSize, 1);
     }
+
+    #endregion METHODS
+
+    #region SAVE
+
+    void ILayer.SaveLayerDescription(XmlTextWriter doc)
+    {
+        doc.WriteStartElement("LayerHead");
+        doc.WriteAttributeString("LayerType", $"{LayerType.FullyConnected.ToString()}");
+        doc.WriteElementString("previousLayerSize", weights.ColumnsAmount.ToString());
+        doc.WriteElementString("layerSize", layerSize.ToString());
+        doc.WriteElementString("activationFunction", activationFunction.ToString());
+        doc.WriteEndElement();
+    }
+
+    void ILayer.SaveLayerData(XmlTextWriter doc)
+    {
+        doc.WriteStartElement("LayerData");
+
+        doc.WriteElementString("Weights", weights.ToFileString());
+        doc.WriteElementString("Biases", biases.ToFileString());
+
+        doc.WriteEndElement();
+    }
+
+    #endregion SAVE
 }

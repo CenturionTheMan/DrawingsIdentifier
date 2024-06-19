@@ -38,8 +38,8 @@ public interface INeuralNetwork
     /// <param name="batchSize">Size of the batch</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task</returns>
-    public Task TrainOnNewTask((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken=default);
-    
+    public Task TrainOnNewTask((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Trains the neural network on the given data
     /// Learning will be done on current thread
@@ -49,7 +49,7 @@ public interface INeuralNetwork
     /// <param name="epochAmount">Amount of epochs</param>
     /// <param name="batchSize">Size of the batch</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    public void Train((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken=default);
+    public void Train((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Predicts the output for the given input

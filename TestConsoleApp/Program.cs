@@ -3,37 +3,40 @@ using MyBaseLibrary;
 using NeuralNetworkLibrary;
 using ImagesProcessor;
 using static NeuralNetworkLibrary.MatrixExtender;
+using Accord.IO;
 
 namespace TestConsoleApp;
 
 internal class Program
 {
-    private const string MnistDataDirPath = "D:\\GoogleDriveMirror\\Projects\\NeuralNetworkProject\\mnist_data\\";
+    private const string MnistDataDirPath = "./../../../../../Datasets/Mnist/";
 
     private static void Main(string[] args)
     {
-        //TODO saving NN to file
-        //TODO loading NN from file
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
 
+        // var nn = new NeuralNetwork(1, 28, 28, [
+        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 4, stride: 1, activationFunction: ActivationFunction.ReLU),
+        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
+        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        // ]);
+        // //82.24% correctness
+        // TestNN(nn, new LearningScheduler(0.001, 5, 200, 1));
+
+        //88% correctness
         var nn = new NeuralNetwork(1, 28, 28, [
-            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 4, stride: 1, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
             LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         ]);
-
-
-        //82.24% correctness
-        TestNN(nn, new LearningScheduler(0.001, 5, 200, 1));
+        TestNN(nn, new LearningScheduler(0.01, 1, 50, 1));
     }
 
     private static void TestNN(NeuralNetwork nn, LearningScheduler learningScheduler)
     {
-        Console.WriteLine("Loading data...");
-
         const bool flatten = false;
         var trainData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
         var testData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_test_data.csv");
@@ -51,21 +54,14 @@ internal class Program
                             $"Learning rate: {nn.LearningRate}\n");
         };
 
-        // nn.OnEpochLearningIteration += (epoch, correctness) =>
-        // {
-        //     Console.WriteLine($"============================================\n" + 
-        //     $"Epoch: {epoch + 1}\nCorrectness: {correctness.ToString("0.00")}%\n============================================");
-        // };
-
         nn.Train(trainData, learningScheduler);
-
+       
 
         Console.WriteLine("FINAL Testing...");
         var correctness = nn.CalculateCorrectness(testData);
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
-
-        nn.SaveFeatureMaps(testData[0].input, "./../../../");
+        //nn.SaveFeatureMaps(testData[0].input, "./../../../");
     }
 
     

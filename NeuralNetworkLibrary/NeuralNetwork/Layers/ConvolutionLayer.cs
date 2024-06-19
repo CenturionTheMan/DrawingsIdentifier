@@ -4,12 +4,15 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using static NeuralNetworkLibrary.ActivationFunctionsHandler;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace NeuralNetworkLibrary;
 
 public class ConvolutionLayer : ILayer
 {
+    #region PARAMS
+
     LayerType ILayer.LayerType => LayerType.Convolution;
 
     private const double maxNorm = 0.5;
@@ -30,14 +33,18 @@ public class ConvolutionLayer : ILayer
     private int inputWidth;
     private int inputHeight;
 
-    public ConvolutionLayer((int inputDepth, int inputHeight, int inputWidth) inputShape, int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction)
+    #endregion PARAMS
+
+    #region CTOR
+
+    internal ConvolutionLayer((int inputDepth, int inputHeight, int inputWidth) inputShape, int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction)
     {
-        if(stride != 1)
+        if (stride != 1)
         {
             throw new NotImplementedException("Stride != 1 is not implemented yet");
         }
 
-        if(stride < 1)
+        if (stride < 1)
         {
             throw new ArgumentException("Stride must be greater than 0");
         }
@@ -57,7 +64,6 @@ public class ConvolutionLayer : ILayer
         changeForKernels = new Matrix[depth, inputShape.inputDepth];
         changeForBiases = new Matrix[depth];
 
-
         (int outputRows, int outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
         for (int i = 0; i < depth; i++)
         {
@@ -69,12 +75,15 @@ public class ConvolutionLayer : ILayer
                     case ActivationFunction.ReLU:
                         kernels[i, j].InitializeHe();
                         break;
+
                     case ActivationFunction.Sigmoid:
                         kernels[i, j].InitializeXavier();
                         break;
+
                     case ActivationFunction.Softmax:
                         kernels[i, j].InitializeXavier();
                         break;
+
                     default:
                         throw new NotImplementedException();
                 }
@@ -86,13 +95,73 @@ public class ConvolutionLayer : ILayer
         }
     }
 
+    internal static ILayer? LoadLayerData(XElement layerHead, XElement layerData)
+    {
+        string? inputShapeStr = layerHead.Element("inputShape")?.Value;
+        string? depthStr = layerHead.Element("depth")?.Value;
+        string? kernelSizeStr = layerHead.Element("kernelSize")?.Value;
+        string? strideStr = layerHead.Element("stride")?.Value;
+        string? activationFunctionStr = layerHead.Element("activationFunction")?.Value;
+
+        if (inputShapeStr == null || depthStr == null || kernelSizeStr == null || strideStr == null || activationFunctionStr == null)
+            return null;
+
+        if (!int.TryParse(depthStr, out int depth) || !int.TryParse(kernelSizeStr, out int kernelSize) || !int.TryParse(strideStr, out int stride) || !Enum.TryParse<ActivationFunction>(activationFunctionStr, out ActivationFunction activationFunction))
+            return null;
+
+        string[] inputShape = inputShapeStr.Split(' ');
+        if (inputShape.Length != 3 || !int.TryParse(inputShape[0], out int inputDepth) || !int.TryParse(inputShape[1], out int inputHeight) || !int.TryParse(inputShape[2], out int inputWidth))
+            return null;
+
+        ConvolutionLayer layer = new ConvolutionLayer((inputDepth, inputHeight, inputWidth), kernelSize, depth, stride, activationFunction);
+
+        if (layerData.Element("Biases") == null || layerData.Element("Kernels") == null)
+            return null;
+
+        foreach (var kernel in layerData.Element("Kernels")!.Elements("Kernel"))
+        {
+            string? indexStr = kernel.Attribute("Index")?.Value;
+            string? kernelStr = kernel.Value;
+            if (indexStr == null || kernelStr == null)
+                return null;
+
+            string[] index = indexStr.Split(' ');
+            if (index.Length != 2 || !int.TryParse(index[0], out int i) || !int.TryParse(index[1], out int j))
+                return null;
+
+            if (!Matrix.TryParse(kernelStr, out Matrix kernelMatrix))
+                return null;
+
+            layer.kernels[i, j] = kernelMatrix;
+        }
+
+        foreach (var bias in layerData.Element("Biases")!.Elements("Bias"))
+        {
+            string? indexStr = bias.Attribute("Index")?.Value;
+            string? biasStr = bias.Value;
+            if (indexStr == null || biasStr == null)
+                return null;
+
+            if (!int.TryParse(indexStr, out int i) || !Matrix.TryParse(biasStr, out Matrix biasMatrix))
+                return null;
+
+            layer.biases[i] = biasMatrix;
+        }
+
+        return layer;
+    }
+
+    #endregion CTOR
+
+    #region METHODS
+
     (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] inputs)
     {
         // activated output
         Matrix[] A = new Matrix[depth];
         // output before activation
         Matrix[] Z = new Matrix[depth];
-        
+
         for (int i = 0; i < depth; i++)
         {
             A[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
@@ -125,7 +194,7 @@ public class ConvolutionLayer : ILayer
         Matrix[] dZ = new Matrix[layerOutputBeforeActivation.Length];
         for (int i = 0; i < layerOutputBeforeActivation.Length; i++)
         {
-            dZ[i] = Matrix.ElementWiseMultiplyMatrices(dAin[i], layerOutputBeforeActivation[i].DerivativeActivationFunction(activationFunction)); 
+            dZ[i] = Matrix.ElementWiseMultiplyMatrices(dAin[i], layerOutputBeforeActivation[i].DerivativeActivationFunction(activationFunction));
         }
 
         for (int i = 0; i < depth; i++)
@@ -166,4 +235,52 @@ public class ConvolutionLayer : ILayer
             changeForBiases[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
         }
     }
+
+    #endregion METHODS
+
+    #region SAVE
+
+    void ILayer.SaveLayerDescription(XmlTextWriter doc)
+    {
+        doc.WriteStartElement("LayerHead");
+        doc.WriteAttributeString("LayerType", $"{LayerType.Convolution.ToString()}");
+        doc.WriteElementString("inputShape", $"{inputDepth} {inputHeight} {inputWidth}");
+        doc.WriteElementString("depth", depth.ToString());
+        doc.WriteElementString("kernelSize", kernelSize.ToString());
+        doc.WriteElementString("stride", stride.ToString());
+        doc.WriteElementString("activationFunction", activationFunction.ToString());
+        doc.WriteEndElement();
+    }
+
+    void ILayer.SaveLayerData(XmlTextWriter doc)
+    {
+        doc.WriteStartElement("LayerData");
+
+        doc.WriteStartElement("Kernels");
+        for (int i = 0; i < kernels.GetLength(0); i++)
+        {
+            for (int j = 0; j < kernels.GetLength(1); j++)
+            {
+                doc.WriteStartElement("Kernel");
+                doc.WriteAttributeString("Index", $"{i} {j}");
+                doc.WriteString(kernels[i, j].ToFileString());
+                doc.WriteEndElement();
+            }
+        }
+        doc.WriteEndElement();
+
+        doc.WriteStartElement("Biases");
+        for (int i = 0; i < biases.Length; i++)
+        {
+            doc.WriteStartElement("Bias");
+            doc.WriteAttributeString("Index", $"{i}");
+            doc.WriteString(biases[i].ToFileString());
+            doc.WriteEndElement();
+        }
+        doc.WriteEndElement();
+
+        doc.WriteEndElement();
+    }
+
+    #endregion SAVE
 }

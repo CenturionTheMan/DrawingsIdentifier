@@ -198,12 +198,55 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                sb.AppendFormat("{0,5}", Values[i, j].ToString("0.00"));
+                sb.AppendFormat("{0,5} ", Values[i, j].ToString("0.00"));
             }
             sb.Append("\n");
         }
 
         return sb.ToString();
+    }
+
+    public string ToFileString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < RowsAmount; i++)
+        {
+            for (int j = 0; j < ColumnsAmount; j++)
+            {
+                sb.Append(Values[i, j].ToString() + " ");
+            }
+            sb.Append("\n");
+        }
+
+        return sb.ToString();
+    }
+
+    public static bool TryParse(string matrixString, out Matrix matrix)
+    {
+        string[] rows = matrixString.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        double[,] values = new double[rows.Length, rows[0].Split(' ', StringSplitOptions.RemoveEmptyEntries).Length];
+
+        for (int i = 0; i < rows.Length; i++)
+        {
+            string[] columns = rows[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            for (int j = 0; j < columns.Length; j++)
+            {
+                if(double.TryParse(columns[j], out double value) == false)
+                {
+                    matrix = new Matrix(0, 0);
+                    return false;
+                }
+                if(values.GetLength(1) <= j || values.GetLength(0) <= i)
+                {
+                    matrix = new Matrix(0, 0);
+                    return false;
+                }
+                values[i, j] = value;
+            }
+        }
+
+        matrix = new Matrix(values);
+        return true;
     }
 
     /// <summary>

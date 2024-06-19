@@ -1,8 +1,10 @@
+using System.Xml;
+using System.Xml.Linq;
+
 namespace NeuralNetworkLibrary;
 
 internal interface ILayer
 {
-    //internal (int outputDepth, int outputHeight, int outputWidth) Initialize((int inputDepth, int inputHeight, int inputWidth) inputShape);
     internal LayerType LayerType { get; }
 
     /// <summary>
@@ -14,7 +16,6 @@ internal interface ILayer
     /// convolution layer)
     /// </returns>
     internal (Matrix[] output, Matrix[] otherOutput) Forward(Matrix[] inputs);
-
 
     /// <summary>
     /// Backward pass for the layer
@@ -29,5 +30,22 @@ internal interface ILayer
     /// </param>
     internal Matrix[] Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, double learningRate);
 
+    /// <summary>
+    /// Update weights and biases of the layer.
+    /// Values are updated based on the averege of deltas calculated in the backward pass.
+    /// </summary>
+    /// <param name="batchSize">batch size used in learning</param>
     internal void UpdateWeightsAndBiases(int batchSize);
+
+    /// <summary>
+    /// Method to save layer description to xml (header)
+    /// </summary>
+    /// <param name="doc"></param>
+    internal void SaveLayerDescription(XmlTextWriter doc);
+
+    /// <summary>
+    /// Method to save layer data to xml (weights and biases)
+    /// </summary>
+    /// <param name="doc"></param>
+    internal void SaveLayerData(XmlTextWriter doc);
 }

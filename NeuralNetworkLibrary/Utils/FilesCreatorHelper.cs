@@ -185,7 +185,7 @@ public static class FilesCreatorHelper
         }
     }
 
-    public static XmlTextWriter CreateXmlFile(string filePath, bool createErrMess = true)
+    public static XmlTextWriter? CreateXmlFile(string filePath)
     {
         try
         {
@@ -193,15 +193,10 @@ public static class FilesCreatorHelper
             writer.Formatting = Formatting.Indented;
             return writer;
         }
-        catch (Exception e)
+        catch
         {
-            if(!createErrMess)
-            {
-                Console.WriteLine(e.StackTrace);
-                throw;
-            }
-
-            throw new Exception("Something went wrong when XML file was created, make sure that output file path is correct.");
+            return null;
+            // throw new Exception("Something went wrong when XML file was created, make sure that output file path is correct.");
         }
     }
 
