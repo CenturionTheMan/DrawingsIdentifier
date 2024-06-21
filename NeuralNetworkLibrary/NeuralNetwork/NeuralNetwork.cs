@@ -6,44 +6,26 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using MyBaseLibrary;
 
 namespace NeuralNetworkLibrary;
 
-public class NeuralNetwork : INeuralNetwork
+public class NeuralNetwork
 {
     #region PARAMS
 
-    public Action<int, int, double>? OnLearningIteration
-    {
-        get => onLearningIteration;
-        set => onLearningIteration = value;
-    }
-
-    public Action<int, float, double>? OnBatchLearningIteration
-    {
-        get => onBatchLearningIteration;
-        set => onBatchLearningIteration = value;
-    }
-
-    public Action<int, float>? OnEpochLearningIteration
-    {
-        get => onEpochLearningIteration;
-        set => onEpochLearningIteration = value;
-    }
+    public Action<int, int, double>? OnTrainingIteration; //epoch, sample index, error
+    public Action<int, float, double>? OnBatchTrainingIteration; //epoch, epochPercentFinish, error(mean)
+    public Action<int, float>? OnEpochTrainingIteration; //epoch, correctness
+    public Action? OnTrainingFinished;
 
     public double LearningRate { get; internal set; }
     public float LastTrainCorrectness { get; internal set; }
 
-    private Action<int, int, double>? onLearningIteration; //epoch, sample index, error
-    private Action<int, float, double>? onBatchLearningIteration; //epoch, epochPercentFinish, error(mean)
-    private Action<int, float>? onEpochLearningIteration; //epoch, correctness
-
     private static Random random = new Random();
-
     private ILayer[] layers;
 
     #endregion PARAMS
+
 
     #region CTORS
 
@@ -133,12 +115,6 @@ public class NeuralNetwork : INeuralNetwork
 
     #region TRAINING
 
-    public void Train((Matrix input, Matrix output)[] data, LearningScheduler learningScheduler)
-    {
-        learningScheduler.SetLearningNanny(this);
-        Train(data, learningScheduler.initialLearningRate, learningScheduler.epochAmount, learningScheduler.batchSize, learningScheduler.cts.Token);
-    }
-
     public Task TrainOnNewTask((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         return Task.Run(() => Train(data, learningRate, epochAmount, batchSize, cancellationToken), cancellationToken);
@@ -175,10 +151,14 @@ public class NeuralNetwork : INeuralNetwork
 
                     Backpropagation(batchSamples[i].output, prediction, outputsBeforeActivation);
 
-                    OnLearningIteration?.Invoke(epoch, batchBeginIndex + i, error);
+                    OnTrainingIteration?.Invoke(epoch, batchBeginIndex + i, error);
                 });
 
-                if (cancellationToken.IsCancellationRequested) return;
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    OnTrainingFinished?.Invoke();
+                    return;
+                }
 
                 foreach (var layer in layers)
                 {
@@ -186,7 +166,7 @@ public class NeuralNetwork : INeuralNetwork
                 }
 
                 float epochPercentFinish = 100 * batchBeginIndex / (float)data.Length;
-                OnBatchLearningIteration?.Invoke(epoch, epochPercentFinish, batchErrorSum / batchSize);
+                OnBatchTrainingIteration?.Invoke(epoch, epochPercentFinish, batchErrorSum / batchSize);
 
                 batchBeginIndex += batchSize;
             }
@@ -194,8 +174,10 @@ public class NeuralNetwork : INeuralNetwork
             int toTake = data.Length < 1000 ? data.Length : 1000;
             float correctness = CalculateCorrectness(data.Take(toTake).OrderBy(x => random.Next()).ToArray());
             this.LastTrainCorrectness = correctness;
-            OnEpochLearningIteration?.Invoke(epoch, correctness);
+            OnEpochTrainingIteration?.Invoke(epoch, correctness);
         }
+
+        OnTrainingFinished?.Invoke();
     }
 
     #endregion TRAINING

@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using NeuralNetworkLibrary;
-using MyBaseLibrary;
 using System.Windows;
 
 namespace DrawingIdentifierGui.ViewModels.Windows;

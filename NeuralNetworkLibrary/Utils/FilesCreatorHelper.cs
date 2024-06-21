@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 using Log = System.Console;
 
-namespace MyBaseLibrary;
+namespace NeuralNetworkLibrary;
 
 public static class FilesCreatorHelper
 {

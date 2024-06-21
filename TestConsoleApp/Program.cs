@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using MyBaseLibrary;
 using NeuralNetworkLibrary;
 using ImagesProcessor;
 using static NeuralNetworkLibrary.MatrixExtender;
@@ -14,38 +13,16 @@ internal class Program
     private static void Main(string[] args)
     {
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
+        var tester = new NNTrainingTests();
+        tester.RunTests();
+        return;
 
-        // var nn = new NeuralNetwork(1, 28, 28, [
-        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 4, stride: 1, activationFunction: ActivationFunction.ReLU),
-        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
-        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        // ]);
-        // //82.24% correctness
-        // TestNN(nn, new LearningScheduler(0.001, 5, 200, 1));
 
-        //88% correctness
-        var nn = new NeuralNetwork(1, 28, 28, [
-            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        ]);
-        TestNN(nn, new LearningScheduler(0.01, 1, 50, 1));
     }
 
-    private static void TestNN(NeuralNetwork nn, LearningScheduler learningScheduler)
+    private static void TestNN(NeuralNetwork nn)
     {
-        const bool flatten = false;
-        var trainData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
-        var testData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_test_data.csv");
-
-        Console.WriteLine("Training...");
-
-        CancellationTokenSource cts = new CancellationTokenSource();
-
-        nn.OnBatchLearningIteration += (epoch, epochPercentFinish, error) =>
+        nn.OnBatchTrainingIteration += (epoch, epochPercentFinish, error) =>
         {
             Console.WriteLine(
                             $"Epoch: {epoch + 1}\n" +
@@ -54,11 +31,32 @@ internal class Program
                             $"Learning rate: {nn.LearningRate}\n");
         };
 
-        nn.Train(trainData, learningScheduler);
-       
+        const bool flatten = false;
+        var trainData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
+        var testData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_test_data.csv");
+
+        var trainer = new Trainer(nn, testData, 
+            initialLearningRate: 0.01, 
+            minLearningRate: 0.000001,
+            epochAmount: 2, 
+            batchSize: 50);
+
+        trainer.SetPatience(
+            initialIgnore: 0.3, 
+            patience: 0.1,
+            learningRateModifier: (lr) => lr * 0.9);
+
+        var outputDir = trainer.SetLogSaving("./../../../../LearningLogs/", saveNN: true);
+
+        Console.WriteLine("Training...");
+        trainer.RunTraining();
 
         Console.WriteLine("FINAL Testing...");
         var correctness = nn.CalculateCorrectness(testData);
+
+        var tmp = outputDir[..^1];
+        Directory.Move(tmp, tmp + $"__{correctness.ToString("0.00")}");
+
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
         //nn.SaveFeatureMaps(testData[0].input, "./../../../");
