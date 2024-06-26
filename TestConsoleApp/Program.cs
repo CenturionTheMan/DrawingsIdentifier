@@ -3,6 +3,7 @@ using NeuralNetworkLibrary;
 using ImagesProcessor;
 using static NeuralNetworkLibrary.MatrixExtender;
 using Accord.IO;
+using System.Diagnostics;
 
 namespace TestConsoleApp;
 
@@ -13,15 +14,25 @@ internal class Program
     private static void Main(string[] args)
     {
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
-        var tester = new NNTrainingTests();
-        tester.RunTests();
-        return;
+        // var tester = new NNTrainingTests();
+        // tester.RunTests();
 
 
+        TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }));
     }
 
     private static void TestNN(NeuralNetwork nn)
     {
+        Stopwatch stopwatch = new Stopwatch();
+
         nn.OnBatchTrainingIteration += (epoch, epochPercentFinish, error) =>
         {
             Console.WriteLine(
@@ -31,32 +42,26 @@ internal class Program
                             $"Learning rate: {nn.LearningRate}\n");
         };
 
+        Console.WriteLine("Loading data...");
         const bool flatten = false;
         var trainData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
         var testData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_test_data.csv");
 
-        var trainer = new Trainer(nn, testData, 
-            initialLearningRate: 0.01, 
-            minLearningRate: 0.000001,
-            epochAmount: 2, 
-            batchSize: 50);
-
-        trainer.SetPatience(
-            initialIgnore: 0.3, 
-            patience: 0.1,
-            learningRateModifier: (lr) => lr * 0.9);
-
-        var outputDir = trainer.SetLogSaving("./../../../../LearningLogs/", saveNN: true);
-
         Console.WriteLine("Training...");
-        trainer.RunTraining();
+
+        const double learningRate = 0.01;        
+        const int epochAmount = 1;
+        const int batchSize = 50;
+
+        stopwatch.Start();
+        nn.Train(trainData, learningRate, epochAmount, batchSize);
+        stopwatch.Stop();
+
+        Console.WriteLine($"\n Elapsed time: {stopwatch.Elapsed.TotalSeconds.ToString("0.00")}s\n Avg time per sample: {(stopwatch.Elapsed.TotalSeconds / (trainData.Length*epochAmount) ).ToString("0.0000")}s\n");
+
 
         Console.WriteLine("FINAL Testing...");
         var correctness = nn.CalculateCorrectness(testData);
-
-        var tmp = outputDir[..^1];
-        Directory.Move(tmp, tmp + $"__{correctness.ToString("0.00")}");
-
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
         //nn.SaveFeatureMaps(testData[0].input, "./../../../");
@@ -64,9 +69,9 @@ internal class Program
 
     
 
-    private static (Matrix input, Matrix expectedOutput)[] GetMnistDataMatrix(bool flatten, params string[] paths)
+    private static (Matrix[] inputChannels, Matrix expectedOutput)[] GetMnistDataMatrix(bool flatten, params string[] paths)
     {
-        var results = new List<(Matrix, Matrix)>();
+        var results = new List<(Matrix[], Matrix)>();
         int[] filter = []; //TODO remove after testing
         foreach (var path in paths)
         {
@@ -93,9 +98,9 @@ internal class Program
                 }
 
                 if(flatten)
-                    results.Add((MatrixExtender.FlattenMatrix(tmpIn), tmpOut));
+                    results.Add(([MatrixExtender.FlattenMatrix(tmpIn)], tmpOut));
                 else
-                    results.Add((tmpIn, tmpOut));
+                    results.Add(([tmpIn], tmpOut));
             }
         }
         return results.ToArray();

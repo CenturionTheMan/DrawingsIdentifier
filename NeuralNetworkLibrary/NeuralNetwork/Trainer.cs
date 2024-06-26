@@ -5,7 +5,7 @@ namespace NeuralNetworkLibrary;
 public class Trainer
 {
     private NeuralNetwork neuralNetwork;
-    private (Matrix input, Matrix output)[] data;
+    private (Matrix[] inputChannels, Matrix output)[] data;
     private double initialLearningRate;
     private double minLearningRate;
     private int epochAmount;
@@ -27,7 +27,7 @@ public class Trainer
     private record TrainingIterationData(int epoch, int dataIndex, double error, double learningRate, double elapsedSeconds);
 
 
-    public Trainer(NeuralNetwork neuralNetwork, (Matrix input, Matrix output)[] data, double initialLearningRate, double minLearningRate, int epochAmount, int batchSize)
+    public Trainer(NeuralNetwork neuralNetwork, (Matrix[] inputChannels, Matrix output)[] data, double initialLearningRate, double minLearningRate, int epochAmount, int batchSize)
     {
         this.neuralNetwork = neuralNetwork;
         this.data = data;

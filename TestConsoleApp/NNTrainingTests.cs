@@ -16,7 +16,7 @@ class NNTrainingTests
         // (Matrix input, Matrix output)[] trainData = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv"); 
         // (Matrix input, Matrix output)[] testData = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_test_data.csv");
 
-        ((Matrix input, Matrix output)[] trainData, (Matrix input, Matrix output)[] testData) = GetQuickDrawDataMatrix(QuickDrawDirPath, 5000);
+        ((Matrix[] inputChannels, Matrix output)[] trainData, (Matrix[] inputChannels, Matrix output)[] testData) = GetQuickDrawDataMatrix(QuickDrawDirPath, 5000);
 
         //! TEST 1
         var nn = new NeuralNetwork(1, 28, 28,
@@ -37,7 +37,7 @@ class NNTrainingTests
         Single(testData, nn, trainer);
     }
 
-    private void Single((Matrix input, Matrix output)[] testData, NeuralNetwork nn, Trainer trainer)
+    private void Single((Matrix[] inputChannels, Matrix output)[] testData, NeuralNetwork nn, Trainer trainer)
     {
         Console.WriteLine($"Test {++counter}");
 
@@ -67,20 +67,20 @@ class NNTrainingTests
         string mapsDir = outputDir + "FeatureMaps";
         if(!Directory.Exists(mapsDir))
             Directory.CreateDirectory(mapsDir);
-        nn.SaveFeatureMaps(testData[0].input, mapsDir + "/");
+        nn.SaveFeatureMaps(testData[0].inputChannels, mapsDir + "/");
 
         Console.WriteLine();
     }
 
 
 
-    private static ((Matrix input, Matrix expectedOutput)[] train, (Matrix input, Matrix expectedOutput)[] test) GetQuickDrawDataMatrix(string pathDir, int samplesPerFile)
+    private static ((Matrix[] inputChannels, Matrix expectedOutput)[] train, (Matrix[] input, Matrix expectedOutput)[] test) GetQuickDrawDataMatrix(string pathDir, int samplesPerFile)
     {
         QuickDrawSet qds = ImagesProcessor.DataReader.LoadQuickDrawSamplesFromDirectory(pathDir, amountToLoadFromEachFile: samplesPerFile);
         var rawSplit = qds.SplitIntoTrainTest();
 
-        (Matrix input, Matrix expectedOutput)[] train = new (Matrix input, Matrix expectedOutput)[rawSplit.trainData.Length]; 
-        (Matrix input, Matrix expectedOutput)[] test = new (Matrix input, Matrix expectedOutput)[rawSplit.testData.Length];
+        (Matrix[] inputChannels, Matrix expectedOutput)[] train = new (Matrix[] inputChannels, Matrix expectedOutput)[rawSplit.trainData.Length]; 
+        (Matrix[] inputChannels, Matrix expectedOutput)[] test = new (Matrix[] inputChannels, Matrix expectedOutput)[rawSplit.testData.Length];
         for (int i = 0; i < rawSplit.trainData.Length; i++)
         {
             var sample = rawSplit.trainData[i];
@@ -89,7 +89,7 @@ class NNTrainingTests
             if(unflatten.Length > 1)
                 throw new Exception("Unflatten matrix has more than one element");
             tmp = unflatten[0];
-            train[i] = (tmp, new Matrix(sample.outputs));   
+            train[i] = ([tmp], new Matrix(sample.outputs));   
         }
 
         for (int i = 0; i < rawSplit.testData.Length; i++)
@@ -100,7 +100,7 @@ class NNTrainingTests
             if(unflatten.Length > 1)
                 throw new Exception("Unflatten matrix has more than one element");
             tmp = unflatten[0];
-            test[i] = (tmp, new Matrix(sample.outputs));   
+            test[i] = ([tmp], new Matrix(sample.outputs));   
         }
 
         return (train, test);

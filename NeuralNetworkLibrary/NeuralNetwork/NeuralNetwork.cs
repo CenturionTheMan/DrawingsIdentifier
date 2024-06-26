@@ -24,16 +24,24 @@ public class NeuralNetwork
     private static Random random = new Random();
     private ILayer[] layers;
 
+    private int inputDepth;
+    private int inputRowsAmount;
+    private int inputColumnsAmount;
+
     #endregion PARAMS
 
 
     #region CTORS
 
-    private NeuralNetwork(ILayer[] layers, double learningRate, float lastTrainCorrectness)
+    private NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, ILayer[] layers, double learningRate, float lastTrainCorrectness)
     {
         this.layers = layers;
         this.LearningRate = learningRate;
         this.LastTrainCorrectness = lastTrainCorrectness;
+
+        this.inputDepth = inputDepth;
+        this.inputRowsAmount = inputRowsAmount;
+        this.inputColumnsAmount = inputColumnsAmount;
     }
 
     public NeuralNetwork(int inputSize, LayerTemplate[] layerTemplates) : this(1, inputSize, 1, layerTemplates)
@@ -42,11 +50,14 @@ public class NeuralNetwork
 
     public NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, LayerTemplate[] layerTemplates)
     {
-        bool isPrevFullyConnected = false;
+        this.inputDepth = inputDepth;
+        this.inputRowsAmount = inputRowsAmount;
+        this.inputColumnsAmount = inputColumnsAmount;
 
+        bool isPrevFullyConnected = false;
         List<ILayer> layers = new List<ILayer>();
         var currentInput = (inputDepth, inputRowsAmount, inputColumnsAmount);
-
+        
         for (int i = 0; i < layerTemplates.Length; i++)
         {
             var currentTemplate = layerTemplates[i];
@@ -115,12 +126,12 @@ public class NeuralNetwork
 
     #region TRAINING
 
-    public Task TrainOnNewTask((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
+    public Task TrainOnNewTask((Matrix[] inputChannels, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         return Task.Run(() => Train(data, learningRate, epochAmount, batchSize, cancellationToken), cancellationToken);
     }
 
-    public void Train((Matrix input, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
+    public void Train((Matrix[] inputChannels, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         this.LearningRate = learningRate;
 
@@ -143,7 +154,7 @@ public class NeuralNetwork
                         return;
                     }
 
-                    (Matrix prediction, Matrix[][] outputsBeforeActivation) = Feedforward(batchSamples[i].input);
+                    (Matrix prediction, Matrix[][] outputsBeforeActivation) = Feedforward(batchSamples[i].inputChannels);
                     prediction = prediction + double.Epsilon;
 
                     double error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
@@ -184,9 +195,9 @@ public class NeuralNetwork
 
     #region INTERACTIONS
 
-    public Matrix Predict(Matrix input)
+    public Matrix Predict(Matrix[] inputChannels)
     {
-        Matrix[] currentInput = [input];
+        Matrix[] currentInput = inputChannels;
 
         for (int i = 0; i < layers.Length; i++)
         {
@@ -198,9 +209,9 @@ public class NeuralNetwork
         return currentInput[0];
     }
 
-    public void SaveFeatureMaps(Matrix input, string directoryPath)
+    public void SaveFeatureMaps(Matrix[] inputChannels, string directoryPath)
     {
-        Matrix[] currentInput = [input];
+        Matrix[] currentInput = inputChannels;
 
         for (int i = 0; i < layers.Length; i++)
         {
@@ -217,13 +228,13 @@ public class NeuralNetwork
         }
     }
 
-    public float CalculateCorrectness((Matrix input, Matrix expectedOutput)[] testData)
+    public float CalculateCorrectness((Matrix[] inputChannels, Matrix expectedOutput)[] testData)
     {
         int guessed = 0;
 
         Parallel.ForEach(testData, item =>
         {
-            var prediction = Predict(item.input);
+            var prediction = Predict(item.inputChannels);
             var max = prediction.Max();
 
             int predictedNumber = prediction.IndexOfMax();
@@ -332,18 +343,29 @@ public class NeuralNetwork
             layers[i] = layer;
         }
 
-        return new NeuralNetwork(layers, learningRate, lastTrainCorrectness);
+        var firstLayerHead = layersHead.ElementAt(0);
+        string? inputShapeStr = firstLayerHead.Element("inputShape")?.Value;
+        if(inputShapeStr == null)
+            return null;
+        string[] inputShape = inputShapeStr.Split(' ');
+        if (inputShape.Length != 3 || !int.TryParse(inputShape[0], out int inputDepth) || !int.TryParse(inputShape[1], out int inputHeight) || !int.TryParse(inputShape[2], out int inputWidth))
+            return null;
+
+        return new NeuralNetwork(inputDepth, inputHeight, inputWidth, layers, learningRate, lastTrainCorrectness);
     }
 
     #endregion SAVING / LOADING
 
     #region FORWARD / BACKWARD
 
-    internal (Matrix output, Matrix[][] layersBeforeActivation) Feedforward(Matrix input)
+    internal (Matrix output, Matrix[][] layersBeforeActivation) Feedforward(Matrix[] inputChannels)
     {
+        if(inputChannels.Length != inputDepth || inputChannels[0].RowsAmount != inputRowsAmount || inputChannels[0].ColumnsAmount != inputColumnsAmount)
+            throw new InvalidOperationException($" Input channels have wrong dimensions!\n Was {inputChannels.Length}x{inputChannels[0].RowsAmount}x{inputChannels[0].ColumnsAmount} but expected {inputDepth}x{inputRowsAmount}x{inputColumnsAmount}");
+
         List<Matrix[]> layersBeforeActivation = new(this.layers.Length + 1);
 
-        Matrix[] currentInput = [input];
+        Matrix[] currentInput = inputChannels;
         layersBeforeActivation.Add(currentInput);
 
         for (int i = 0; i < layers.Length; i++)
