@@ -15,7 +15,7 @@ public class ConvolutionLayer : ILayer
 
     LayerType ILayer.LayerType => LayerType.Convolution;
 
-    private const double maxNorm = 0.5;
+    private const float maxNorm = 0.5f;
 
     private int depth;
     private int kernelSize;
@@ -183,7 +183,7 @@ public class ConvolutionLayer : ILayer
         return (A, Z);
     }
 
-    Matrix[] ILayer.Backward(Matrix[] dAin, Matrix[] layerInputFromForward, Matrix[] layerOutputBeforeActivation, double learningRate)
+    Matrix[] ILayer.Backward(Matrix[] dAin, Matrix[] layerInputFromForward, Matrix[] layerOutputBeforeActivation, float learningRate)
     {
         Matrix[] dA = new Matrix[inputDepth];
         for (int i = 0; i < inputDepth; i++)
@@ -217,14 +217,14 @@ public class ConvolutionLayer : ILayer
 
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
-        double multiplier = 1.0 / (double)batchSize;
+        float multiplier = 1.0f / batchSize;
 
         for (int i = 0; i < depth; i++)
         {
             for (int j = 0; j < kernels.GetLength(1); j++)
             {
                 var change = changeForKernels[i, j] * multiplier;
-                double clipCoefficient = maxNorm / (change.GetNorm() + double.Epsilon);
+                float clipCoefficient = maxNorm / (change.GetNorm() + float.Epsilon);
                 if (clipCoefficient < 1)
                     change = change * clipCoefficient;
 

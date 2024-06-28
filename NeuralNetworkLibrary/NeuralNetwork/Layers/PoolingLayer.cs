@@ -65,7 +65,7 @@ public class PoolingLayer : ILayer
         return (result, maxIndexMap);
     }
 
-    Matrix[] ILayer.Backward(Matrix[] deltas, Matrix[] prevLayerSize, Matrix[] maxIndexMap, double learningRate)
+    Matrix[] ILayer.Backward(Matrix[] deltas, Matrix[] prevLayerSize, Matrix[] maxIndexMap, float learningRate)
     {
         Matrix[] result = new Matrix[deltas.Length];
         for (int i = 0; i < deltas.Length; i++)

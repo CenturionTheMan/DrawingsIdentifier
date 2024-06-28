@@ -28,7 +28,7 @@ internal interface ILayer
     /// <param name="prevLayerOutputOther">
     /// output of the previous layer (in backprop chain), not activated.
     /// </param>
-    internal Matrix[] Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, double learningRate);
+    internal Matrix[] Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, float learningRate);
 
     /// <summary>
     /// Update weights and biases of the layer.

@@ -43,7 +43,7 @@ internal class ReshapeFeatureToClassificationLayer : ILayer
         return ([flattenedMatrix], [flattenedMatrix]);
     }
 
-    Matrix[] ILayer.Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, double learningRate)
+    Matrix[] ILayer.Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, float learningRate)
     {
         if (prevOutput.Length != 1)
             throw new ArgumentException("Reshape layer can only have one input");

@@ -13,12 +13,12 @@ public class NeuralNetwork
 {
     #region PARAMS
 
-    public Action<int, int, double>? OnTrainingIteration; //epoch, sample index, error
-    public Action<int, float, double>? OnBatchTrainingIteration; //epoch, epochPercentFinish, error(mean)
+    public Action<int, int, float>? OnTrainingIteration; //epoch, sample index, error
+    public Action<int, float, float>? OnBatchTrainingIteration; //epoch, epochPercentFinish, error(mean)
     public Action<int, float>? OnEpochTrainingIteration; //epoch, correctness
     public Action? OnTrainingFinished;
 
-    public double LearningRate { get; internal set; }
+    public float LearningRate { get; internal set; }
     public float LastTrainCorrectness { get; internal set; }
 
     private static Random random = new Random();
@@ -33,7 +33,7 @@ public class NeuralNetwork
 
     #region CTORS
 
-    private NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, ILayer[] layers, double learningRate, float lastTrainCorrectness)
+    private NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, ILayer[] layers, float learningRate, float lastTrainCorrectness)
     {
         this.layers = layers;
         this.LearningRate = learningRate;
@@ -126,12 +126,12 @@ public class NeuralNetwork
 
     #region TRAINING
 
-    public Task TrainOnNewTask((Matrix[] inputChannels, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
+    public Task TrainOnNewTask((Matrix[] inputChannels, Matrix output)[] data, float learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         return Task.Run(() => Train(data, learningRate, epochAmount, batchSize, cancellationToken), cancellationToken);
     }
 
-    public void Train((Matrix[] inputChannels, Matrix output)[] data, double learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
+    public void Train((Matrix[] inputChannels, Matrix output)[] data, float learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         this.LearningRate = learningRate;
 
@@ -144,7 +144,7 @@ public class NeuralNetwork
             {
                 var batchSamples = batchBeginIndex + batchSize < data.Length ? data.Skip(batchBeginIndex).Take(batchSize).ToArray() : data[batchBeginIndex..].ToArray();
 
-                double batchErrorSum = 0;
+                float batchErrorSum = 0;
 
                 Parallel.For(0, batchSamples.Length, (i, loopState) =>
                 {
@@ -155,9 +155,9 @@ public class NeuralNetwork
                     }
 
                     (Matrix prediction, Matrix[][] outputsBeforeActivation) = Feedforward(batchSamples[i].inputChannels);
-                    prediction = prediction + double.Epsilon;
+                    prediction = prediction + float.Epsilon;
 
-                    double error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
+                    float error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
                     batchErrorSum += error;
 
                     Backpropagation(batchSamples[i].output, prediction, outputsBeforeActivation);
@@ -222,7 +222,7 @@ public class NeuralNetwork
                 for (int j = 0; j < currentInput.Length; j++)
                 {
                     var featureMap = currentInput[j];
-                    ImagesProcessor.DataReader.SaveToImage(featureMap.ToArray(), directoryPath + $"featureMap_{i}_{j}.png");
+                    //ImagesProcessor.DataReader.SaveToImage(featureMap.ToArray(), directoryPath + $"featureMap_{i}_{j}.png");
                 }
             }
         }
@@ -298,7 +298,7 @@ public class NeuralNetwork
             return null;
         }
 
-        double learningRate = double.Parse(config.Element("LearningRate")!.Value);
+        float learningRate = float.Parse(config.Element("LearningRate")!.Value);
         float lastTrainCorrectness = float.Parse(config.Element("LastTrainCorrectness")!.Value);
         int layersAmount = int.Parse(config.Element("LayersAmount")!.Value);
 

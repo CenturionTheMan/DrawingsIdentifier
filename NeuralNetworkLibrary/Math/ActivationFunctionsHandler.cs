@@ -58,20 +58,20 @@ internal static class ActivationFunctionsHandler
     /// <param name="predictions"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static double CalculateMeanSquaredError(Matrix expected, Matrix predictions)
+    internal static float CalculateMeanSquaredError(Matrix expected, Matrix predictions)
     {
         if (predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
         {
             throw new ArgumentException("Predictions and expected results matrices must have the same dimensions");
         }
 
-        double sum = 0;
+        float sum = 0;
 
         for (int i = 0; i < predictions.RowsAmount; i++)
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += Math.Pow(expected[i, j] - predictions[i, j], 2);
+                sum += (float)Math.Pow(expected[i, j] - predictions[i, j], 2);
             }
         }
 
@@ -85,20 +85,20 @@ internal static class ActivationFunctionsHandler
     /// <param name="predictions"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static double CalculateCrossEntropyCost(Matrix expected, Matrix predictions)
+    internal static float CalculateCrossEntropyCost(Matrix expected, Matrix predictions)
     {
         if (predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
         {
             throw new ArgumentException("Predictions and expected results matrices must have the same dimensions");
         }
 
-        double sum = 0;
+        float sum = 0;
 
         for (int i = 0; i < predictions.RowsAmount; i++)
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += expected[i, j] * Math.Log(predictions[i, j]);
+                sum += expected[i, j] * (float)Math.Log(predictions[i, j]);
             }
         }
 
@@ -122,7 +122,7 @@ internal static class ActivationFunctionsHandler
     /// <returns></returns>
     internal static Matrix DerivativeReLU(Matrix mat)
     {
-        return mat.ApplyFunction(x => { return x >= 0 ? 1.0 : 0.0; });
+        return mat.ApplyFunction(x => { return x >= 0 ? 1.0f : 0.0f; });
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ internal static class ActivationFunctionsHandler
     /// <returns></returns>
     internal static Matrix Sigmoid(Matrix mat)
     {
-        return mat.ApplyFunction(x => 1 / (1 + Math.Exp(-x)));
+        return mat.ApplyFunction(x => 1 / (float)(1 + Math.Exp(-x)));
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ internal static class ActivationFunctionsHandler
     {
         return mat.ApplyFunction(x =>
         {
-            var sig = 1 / (1 + Math.Exp(-x));
+            var sig = 1 / (1 + (float)Math.Exp(-x));
             return sig * (1 - sig);
         });
     }
@@ -156,13 +156,13 @@ internal static class ActivationFunctionsHandler
     /// <returns></returns>
     internal static Matrix Softmax(Matrix mat)
     {
-        var expMat = mat.ApplyFunction(x => Math.Exp(x));
-        double sumOfMatrix = expMat.Sum() + double.Epsilon;
+        var expMat = mat.ApplyFunction(x => (float)Math.Exp(x));
+        float sumOfMatrix = expMat.Sum() + float.Epsilon;
         var tmp = expMat.ApplyFunction(x => x / sumOfMatrix);
 
         // foreach (var item in tmp)
         // {
-        //     if(double.IsNaN(item) || double.IsInfinity(item))
+        //     if(float.IsNaN(item) || float.IsInfinity(item))
         //     {
         //         throw new InvalidOperationException("Softmax resulted in NaN or Infinity");
         //     }

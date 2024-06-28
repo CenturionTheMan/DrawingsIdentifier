@@ -6,28 +6,28 @@ public class Trainer
 {
     private NeuralNetwork neuralNetwork;
     private (Matrix[] inputChannels, Matrix output)[] data;
-    private double initialLearningRate;
-    private double minLearningRate;
+    private float initialLearningRate;
+    private float minLearningRate;
     private int epochAmount;
     private int batchSize;
 
     private bool isPatience = false;
-    private double userInitialIgnore = 0.0f;
-    private double userPatience = 0;
-    private Queue<(double max, double avg)>? lastErrorsRange;
-    private double initialIgnore = 10.0f; //percent
+    private float userInitialIgnore = 0.0f;
+    private float userPatience = 0;
+    private Queue<(float max, float avg)>? lastErrorsRange;
+    private float initialIgnore = 10.0f; //percent
     private int patienceAmount = 50;
     private bool hasCrossedIgnoreThreshold = false;
-    private Func<double, double> learningRateModifier = (lr) => lr * 0.9;
+    private Func<float, float> learningRateModifier = (lr) => lr * 0.9f;
 
     private bool saveToLog = false;
     private bool saveNN = false;
     private string trainingLogDir = "";
     
-    private record TrainingIterationData(int epoch, int dataIndex, double error, double learningRate, double elapsedSeconds);
+    private record TrainingIterationData(int epoch, int dataIndex, float error, float learningRate, float elapsedSeconds);
 
 
-    public Trainer(NeuralNetwork neuralNetwork, (Matrix[] inputChannels, Matrix output)[] data, double initialLearningRate, double minLearningRate, int epochAmount, int batchSize)
+    public Trainer(NeuralNetwork neuralNetwork, (Matrix[] inputChannels, Matrix output)[] data, float initialLearningRate, float minLearningRate, int epochAmount, int batchSize)
     {
         this.neuralNetwork = neuralNetwork;
         this.data = data;
@@ -37,7 +37,7 @@ public class Trainer
         this.batchSize = batchSize;
     }
 
-    public void SetPatience(double initialIgnore, double patience, Func<double, double>? learningRateModifier = null)
+    public void SetPatience(float initialIgnore, float patience, Func<float, float>? learningRateModifier = null)
     {
         initialIgnore = Math.Clamp(initialIgnore, 0, 1);
         patience = Math.Clamp(patience, 0, 1);
@@ -81,17 +81,17 @@ public class Trainer
         Stack<TrainingIterationData> trainingIterationData = new();
         List<float> trainCorrectness = new List<float>(epochAmount);
 
-        Queue<double> lastAvgBatchErrors = new Queue<double>(patienceAmount);
+        Queue<float> lastAvgBatchErrors = new Queue<float>(patienceAmount);
 
         neuralNetwork.OnTrainingIteration += (epoch, dataIndex, error) =>
         {
             if(saveToLog)
             {
                 var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-                trainingIterationData.Push(new TrainingIterationData(epoch, dataIndex, error, neuralNetwork.LearningRate, elapsedSeconds));
+                trainingIterationData.Push(new TrainingIterationData(epoch, dataIndex, error, neuralNetwork.LearningRate, (float)elapsedSeconds));
             }
 
-            if(double.IsNaN(error))
+            if(float.IsNaN(error))
             {
                 cts?.Cancel();
             }
@@ -132,7 +132,7 @@ public class Trainer
             SaveTrainingData(trainingLogDir, trainingIterationData.ToArray(), trainCorrectness.ToArray());
     }
 
-    private void HandlePatience(NeuralNetwork nn, Queue<double> lastAvgBatchErrors, float epochPercentFinish)
+    private void HandlePatience(NeuralNetwork nn, Queue<float> lastAvgBatchErrors, float epochPercentFinish)
     {
         if(hasCrossedIgnoreThreshold == false || nn.LearningRate <= minLearningRate)
         {
@@ -159,6 +159,8 @@ public class Trainer
 
     private void SaveTrainingData(string dirPath, TrainingIterationData[] trainingIterationData, float[] trainEpochCorrectness)
     {
+        trainingIterationData = trainingIterationData.Reverse().ToArray();
+
         List<object[]> data = [["Epoch", "DataIndex", "Error", "LearningRate", "ElapsedSeconds"]];
         foreach (var item in trainingIterationData)
         {
@@ -176,10 +178,10 @@ public class Trainer
             for (int i = 0; i < trainEpochCorrectness.Length; i++)
             {
                 var tmp = trainingIterationData.Where(x => x.epoch == i).ToArray();
-                double avgError = tmp.Average(x => x.error);
-                double minError = tmp.Min(x => x.error);
-                double maxError = tmp.Max(x => x.error);
-                double elapsedSeconds = tmp.Max(x => x.elapsedSeconds);
+                float avgError = tmp.Average(x => x.error);
+                float minError = tmp.Min(x => x.error);
+                float maxError = tmp.Max(x => x.error);
+                float elapsedSeconds = tmp.Max(x => x.elapsedSeconds);
                 data.Add([i, trainEpochCorrectness[i], avgError, minError, maxError, elapsedSeconds]);
             }
             FilesCreatorHelper.CreateCsvFile(data, dirPath + "EpochError.csv");

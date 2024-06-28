@@ -10,7 +10,7 @@ public class FullyConnectedLayer : ILayer
 
     LayerType ILayer.LayerType => LayerType.FullyConnected;
 
-    private const double maxNorm = 0.5;
+    private const float maxNorm = 0.5f;
 
     private ActivationFunction activationFunction;
     private int layerSize;
@@ -104,7 +104,7 @@ public class FullyConnectedLayer : ILayer
         return ([activatedLayer], [layerWithAddedBiases]);
     }
 
-    Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputBeforeActivation, Matrix[] thisLayerOutputBeforeActivation, double learningRate)
+    Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputBeforeActivation, Matrix[] thisLayerOutputBeforeActivation, float learningRate)
     {
         if (errorMatrix.Length != 1)
             throw new ArgumentException("Fully connected layer can only have one input");
@@ -128,10 +128,10 @@ public class FullyConnectedLayer : ILayer
 
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
-        double multiplier = 1.0 / (double)batchSize;
+        float multiplier = 1.0f / batchSize;
         var changeForWeights = weightsGradientSum * multiplier;
 
-        double clipCoefficient = maxNorm / (changeForWeights.GetNorm() + double.Epsilon);
+        float clipCoefficient = maxNorm / (changeForWeights.GetNorm() + float.Epsilon);
         if (clipCoefficient < 1)
             changeForWeights = changeForWeights * clipCoefficient;
 

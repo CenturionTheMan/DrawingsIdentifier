@@ -29,11 +29,11 @@ class NNTrainingTests
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         ]);
         Trainer trainer = new Trainer(nn, trainData, 
-            initialLearningRate: 0.01, 
-            minLearningRate: 0.001, 
+            initialLearningRate: 0.01f, 
+            minLearningRate: 0.001f, 
             epochAmount: 20, 
             batchSize: 50);
-        trainer.SetPatience(initialIgnore: 0.2, patience: 0.1, learningRateModifier: (lr) => lr * 0.9);
+        trainer.SetPatience(initialIgnore: 0.2f, patience: 0.1f, learningRateModifier: (lr) => lr * 0.9f);
         Single(testData, nn, trainer);
     }
 
@@ -117,8 +117,8 @@ class NNTrainingTests
             {
                 Matrix tmpIn = new Matrix(28, 28);
 
-                double[] input = item.Skip(1).Select(x => double.Parse(x) / 255.0).ToArray();
-                double[] expected = new double[10];
+                float[] input = item.Skip(1).Select(x => float.Parse(x) / 255.0f).ToArray();
+                float[] expected = new float[10];
                 int numer = int.Parse(item[0]);
                 expected[numer] = 1;
 

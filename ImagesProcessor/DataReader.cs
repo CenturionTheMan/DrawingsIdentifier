@@ -18,7 +18,7 @@ public class DataReader
 {
     private static Random random = new Random();
 
-    public static QuickDrawSet LoadQuickDrawSamplesFromFiles(string[] filePaths, int amountToLoadFromEachFile = 2000, bool colorReverse = true, double maxValue = 255.0)
+    public static QuickDrawSet LoadQuickDrawSamplesFromFiles(string[] filePaths, int amountToLoadFromEachFile = 2000, bool colorReverse = true, float maxValue = 255.0f)
     {
         List<QuickDrawSet> result = new();
 
@@ -41,17 +41,17 @@ public class DataReader
         return new QuickDrawSet(samples);
     }
 
-    public static QuickDrawSet LoadQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool colorReverse = true, double maxValue = 255.0)
+    public static QuickDrawSet LoadQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool colorReverse = true, float maxValue = 255.0f)
     {
         var files = Directory.GetFiles(directoryPath, "*.npy");
 
         return LoadQuickDrawSamplesFromFiles(files, amountToLoadFromEachFile, colorReverse, maxValue);
     }
 
-    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad, bool colorReverse = true, double maxValue = 255.0)
+    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad, bool colorReverse = true, float maxValue = 255.0f)
     {
         NDArray npArray = np.load(path);
-        double[,] array = (double[,])npArray.ToMuliDimArray<double>();
+        float[,] array = (float[,])npArray.ToMuliDimArray<float>();
 
         List<QuickDrawSample> result = new(amountToLoad);
         string categoryName = Path.GetFileName(path.Replace(".npy", ""));
@@ -60,7 +60,7 @@ public class DataReader
         Parallel.For(0, upperBound, i =>
         {
             int sampleIndex = random.Next(array.GetLength(0));
-            double[] row = new double[array.GetLength(1)];
+            float[] row = new float[array.GetLength(1)];
             for (int j = 0; j < array.GetLength(1); j++)
             {
                 row[j] = colorReverse ? 1 - array[sampleIndex, j] / maxValue : array[sampleIndex, j] / maxValue;
@@ -71,7 +71,7 @@ public class DataReader
         return result;
     }
 
-    public static void SaveToImage(double[,] data, string path)
+    public static void SaveToImage(float[,] data, string path)
     {
         var bitmap = new Bitmap(data.GetLength(1), data.GetLength(0));
 
@@ -79,7 +79,7 @@ public class DataReader
         {
             for (int x = 0; x < data.GetLength(1); x++)
             {
-                double value = data[y, x];
+                float value = data[y, x];
 
                 int colorValue = (int)(value * 255);
 
@@ -101,7 +101,7 @@ public class DataReader
         }
     }
 
-    public static void SaveToImage(double[] data, string path, int width = 28, int height = 28)
+    public static void SaveToImage(float[] data, string path, int width = 28, int height = 28)
     {
         var bitmap = new Bitmap(width, height);
 
@@ -111,7 +111,7 @@ public class DataReader
             {
                 int dataIndex = y * width + x;
 
-                double value = data[dataIndex];
+                float value = data[dataIndex];
 
                 int colorValue = (int)(value * 255);
 

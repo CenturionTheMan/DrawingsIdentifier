@@ -9,9 +9,9 @@ namespace ImagesProcessor;
 public struct QuickDrawSample
 {
     public readonly string category;
-    public readonly double[] data;
+    public readonly float[] data;
 
-    public QuickDrawSample(string category, double[] data)
+    public QuickDrawSample(string category, float[] data)
     {
         this.category = category;
         this.data = data;
@@ -43,14 +43,14 @@ public class QuickDrawSet
             this.samples = samples;
     }
 
-    private double[] OutputForNN(string category)
+    private float[] OutputForNN(string category)
     {
-        double[] output = new double[10];
+        float[] output = new float[10];
         output[categories[category]] = 1;
         return output;
     }
 
-    public ((double[] inputs, double[] outputs)[] trainData, (double[] inputs, double[] outputs)[] testData) SplitIntoTrainTest(int testSizePercent = 20)
+    public ((float[] inputs, float[] outputs)[] trainData, (float[] inputs, float[] outputs)[] testData) SplitIntoTrainTest(int testSizePercent = 20)
     {
         int testCount = (int)(samples.Count() * (testSizePercent/100.0));
         var shuffledData = samples.OrderBy(x => Guid.NewGuid()).ToList();

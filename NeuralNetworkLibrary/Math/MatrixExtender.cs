@@ -16,7 +16,7 @@ public static class MatrixExtender
         {
             for (int j = 0; j < newColumns; j++)
             {
-                double max = double.MinValue;
+                float max = float.MinValue;
                 int maxIndex = -1;
                 for (int x = 0; x < poolSize; x++)
                 {
@@ -53,7 +53,7 @@ public static class MatrixExtender
 
     public static Matrix FlattenMatrix(params Matrix[] matrices)
     {
-        List<double> flattenedList = new();
+        List<float> flattenedList = new();
         foreach (var matrix in matrices)
         {
             for (int i = 0; i < matrix.RowsAmount; i++)
@@ -112,7 +112,7 @@ public static class MatrixExtender
         {
             for (int j = 0; j < outputColumns; j++)
             {
-                double sum = 0;
+                float sum = 0;
 
                 for (int m = 0; m < kernel.RowsAmount; m++)
                 {
@@ -156,7 +156,7 @@ public static class MatrixExtender
         {
             for (int j = 0; j < outputColumns; j++)
             {
-                double sum = 0;
+                float sum = 0;
 
                 for (int m = 0; m < kernel.RowsAmount; m++)
                 {
@@ -215,7 +215,7 @@ public static class MatrixExtender
 
     #region MATH OPERATIONS
 
-     public static Matrix ClampValues(this Matrix a, double min, double max)
+     public static Matrix ClampValues(this Matrix a, float min, float max)
     {
         return a.ApplyFunction(x => Math.Clamp(x, min, max));
     }
@@ -225,7 +225,7 @@ public static class MatrixExtender
         if (matrix.ColumnsAmount != 1)
             throw new ArgumentException("Matrix must have only one column");
 
-        double max = double.MinValue;
+        float max = float.MinValue;
         int index = 0;
         for (int i = 0; i < matrix.RowsAmount; i++)
         {
@@ -243,9 +243,9 @@ public static class MatrixExtender
     /// </summary>
     /// <param name="a">Matrix to sum</param>
     /// <returns>Sum of all elements</returns>
-    public static double Sum(this Matrix a)
+    public static float Sum(this Matrix a)
     {
-        double sum = 0;
+        float sum = 0;
         foreach (var item in a)
         {
             sum += item;
@@ -258,9 +258,9 @@ public static class MatrixExtender
     /// </summary>
     /// <param name="a">Matrix to search</param>
     /// <returns>Maximum value in the matrix</returns>
-    public static double Max(this Matrix a)
+    public static float Max(this Matrix a)
     {
-        double max = double.MinValue;
+        float max = float.MinValue;
         foreach (var item in a)
         {
             if (item > max)
@@ -297,7 +297,7 @@ public static class MatrixExtender
     /// <param name="a">Matrix to apply function to</param>
     /// <param name="function">Function to apply</param>
     /// <returns>Matrix with applied function</returns>
-    public static Matrix ApplyFunction(this Matrix a, Func<double, double> function)
+    public static Matrix ApplyFunction(this Matrix a, Func<float, float> function)
     {
         Matrix result = new Matrix(a.RowsAmount, a.ColumnsAmount);
 

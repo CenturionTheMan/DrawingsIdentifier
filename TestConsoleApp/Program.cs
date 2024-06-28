@@ -14,19 +14,19 @@ internal class Program
     private static void Main(string[] args)
     {
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
-        // var tester = new NNTrainingTests();
-        // tester.RunTests();
+        var tester = new NNTrainingTests();
+        tester.RunTests();
 
 
-        TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        {
-            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
-            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }));
+        // TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        // {
+        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
+        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
+        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        // }));
     }
 
     private static void TestNN(NeuralNetwork nn)
@@ -49,7 +49,7 @@ internal class Program
 
         Console.WriteLine("Training...");
 
-        const double learningRate = 0.01;        
+        const float learningRate = 0.01f;        
         const int epochAmount = 1;
         const int batchSize = 50;
 
@@ -80,8 +80,8 @@ internal class Program
             {
                 Matrix tmpIn = new Matrix(28, 28);
 
-                double[] input = item.Skip(1).Select(x => double.Parse(x) / 255.0).ToArray();
-                double[] expected = new double[10];
+                float[] input = item.Skip(1).Select(x => (float)(float.Parse(x) / 255.0)).ToArray();
+                float[] expected = new float[10];
                 int numer = int.Parse(item[0]);
                 expected[numer] = 1;
 

@@ -11,7 +11,7 @@ namespace NeuralNetworkLibrary;
 public class Matrix
 {
     private static Random random = new();
-    private double[,] Values { get; set; }
+    private float[,] Values { get; set; }
 
     public readonly int RowsAmount;
     public readonly int ColumnsAmount;
@@ -20,9 +20,9 @@ public class Matrix
     /// Creates a new Matrix filled with zeros of dimensions rows: singleColumnValues, columns: 1
     /// </summary>
     /// <param name="singleColumnValues">Rows amount</param>
-    public Matrix(double[] singleColumnValues)
+    public Matrix(float[] singleColumnValues)
     {
-        this.Values = new double[singleColumnValues.Length, 1];
+        this.Values = new float[singleColumnValues.Length, 1];
 
         for (int i = 0; i < singleColumnValues.Length; i++)
         {
@@ -37,7 +37,7 @@ public class Matrix
     /// Creates a new Matrix based on the given values
     /// </summary>
     /// <param name="values">Values to be assigned to the matrix</param>
-    public Matrix(double[,] values)
+    public Matrix(float[,] values)
     {
         this.Values = values;
         RowsAmount = values.GetLength(0);
@@ -51,7 +51,7 @@ public class Matrix
     /// <param name="columnsAmount">Columns amount</param>
     public Matrix(int rowsAmount, int columnsAmount)
     {
-        Values = new double[rowsAmount, columnsAmount];
+        Values = new float[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
         ColumnsAmount = columnsAmount;
     }
@@ -63,9 +63,9 @@ public class Matrix
     /// <param name="columnsAmount">Columns amount</param>
     /// <param name="min">Minimum value</param>
     /// <param name="max">Maximum value</param>
-    public Matrix(int rowsAmount, int columnsAmount, double min, double max)
+    public Matrix(int rowsAmount, int columnsAmount, float min, float max)
     {
-        Values = new double[rowsAmount, columnsAmount];
+        Values = new float[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
         ColumnsAmount = columnsAmount;
 
@@ -73,40 +73,40 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                Values[i, j] = random.NextDouble() * (max - min) + min;
+                Values[i, j] = random.NextSingle() * (max - min) + min;
             }
         }
     }
 
     public void InitializeXavier()
     {
-        double limit = Math.Sqrt(6.0 / (RowsAmount + ColumnsAmount));
+        float limit = (float)Math.Sqrt(6.0 / (RowsAmount + ColumnsAmount));
 
         for (int i = 0; i < RowsAmount; i++)
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                this[i, j] = random.NextDouble() * 2 * limit - limit;
+                this[i, j] = random.NextSingle() * 2 * limit - limit;
             }
         }
     }
 
     public void InitializeHe()
     {
-        double limit = Math.Sqrt(6.0 / ColumnsAmount);
+        float limit = (float)Math.Sqrt(6.0 / ColumnsAmount);
 
         for (int i = 0; i < RowsAmount; i++)
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                this[i, j] = random.NextDouble() * 2 * limit - limit;
+                this[i, j] = random.NextSingle() * 2 * limit - limit;
             }
         }
     }
 
-    public double GetUnSquaredNorm()
+    public float GetUnSquaredNorm()
     {
-        double sum = 0;
+        float sum = 0;
         for (int i = 0; i < RowsAmount; i++)
         {
             for (int j = 0; j < ColumnsAmount; j++)
@@ -117,9 +117,9 @@ public class Matrix
         return sum;
     }
 
-    public double GetNorm()
+    public float GetNorm()
     {
-        return Math.Sqrt(GetUnSquaredNorm());
+        return (float)Math.Sqrt(GetUnSquaredNorm());
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ public class Matrix
     /// <param name="j">Column index</param>
     /// <returns>Value at the given indexes</returns>
     /// <exception cref="IndexOutOfRangeException">Thrown when given indexes are out of range</exception>
-    public double this[int i, int j]
+    public float this[int i, int j]
     {
         get
         {
@@ -149,7 +149,7 @@ public class Matrix
         }
     }
 
-    public IEnumerator<double> GetEnumerator()
+    public IEnumerator<float> GetEnumerator()
     {
         for (int i = 0; i < RowsAmount; i++)
         {
@@ -183,12 +183,12 @@ public class Matrix
 
     public Matrix Copy()
     {
-        return new Matrix((double[,])this.Values.Clone());
+        return new Matrix((float[,])this.Values.Clone());
     }
 
-    public double[,] ToArray()
+    public float[,] ToArray()
     {
-        return (double[,])Values.Clone();
+        return (float[,])Values.Clone();
     }
 
     public override string ToString()
@@ -224,14 +224,14 @@ public class Matrix
     public static bool TryParse(string matrixString, out Matrix matrix)
     {
         string[] rows = matrixString.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        double[,] values = new double[rows.Length, rows[0].Split(' ', StringSplitOptions.RemoveEmptyEntries).Length];
+        float[,] values = new float[rows.Length, rows[0].Split(' ', StringSplitOptions.RemoveEmptyEntries).Length];
 
         for (int i = 0; i < rows.Length; i++)
         {
             string[] columns = rows[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
             for (int j = 0; j < columns.Length; j++)
             {
-                if(double.TryParse(columns[j], out double value) == false)
+                if(float.TryParse(columns[j], out float value) == false)
                 {
                     matrix = new Matrix(0, 0);
                     return false;
@@ -310,12 +310,12 @@ public class Matrix
         return EachElementAssignment(a, (i, j) => a.Values[i, j] - b.Values[i, j]);
     }
 
-    public static Matrix operator *(Matrix a, double b)
+    public static Matrix operator *(Matrix a, float b)
     {
         return EachElementAssignment(a, (i, j) => a.Values[i, j] * b);
     }
 
-    public static Matrix operator +(Matrix a, double b)
+    public static Matrix operator +(Matrix a, float b)
     {
         return EachElementAssignment(a, (i, j) => a.Values[i, j] + b);
     }
@@ -326,7 +326,7 @@ public class Matrix
     /// <param name="a">Matrix to apply function to</param>
     /// <param name="b">Second matrix. Method will use if only for checking dimensions</param>
     /// <param name="mathOperation">Function to apply</param>
-    private static Matrix EachElementAssignment(Matrix a, Func<int, int, double> mathOperation)
+    private static Matrix EachElementAssignment(Matrix a, Func<int, int, float> mathOperation)
     {
         Matrix result = new Matrix(a.RowsAmount, a.ColumnsAmount);
 
