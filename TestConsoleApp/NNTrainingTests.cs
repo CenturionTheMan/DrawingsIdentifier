@@ -39,7 +39,7 @@ class NNTrainingTests
         Single(
             testData: testData,
 
-            trainer: new Trainer(`
+            trainer: new Trainer(
                 new NeuralNetwork(1, 28, 28,
                 [
                     LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 12, stride: 1, activationFunction: ActivationFunction.ReLU),
