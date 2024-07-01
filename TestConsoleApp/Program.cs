@@ -25,6 +25,7 @@ internal class Program
         //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
         //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
         //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+        //     LayerTemplate.CreateDropoutLayer(dropoutRate: 0.5f),
         //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         // }));
     }
@@ -50,7 +51,7 @@ internal class Program
         Console.WriteLine("Training...");
 
         const float learningRate = 0.01f;        
-        const int epochAmount = 1;
+        const int epochAmount = 3;
         const int batchSize = 50;
 
         stopwatch.Start();
@@ -63,6 +64,12 @@ internal class Program
         Console.WriteLine("FINAL Testing...");
         var correctness = nn.CalculateCorrectness(testData);
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
+
+
+
+        nn.SaveToXmlFile("./../../../nn.xml");
+        var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
+        Console.WriteLine($"Loaded NN correctness: {nnLod.CalculateCorrectness(testData).ToString("0.00")}%");
 
         //nn.SaveFeatureMaps(testData[0].input, "./../../../");
     }

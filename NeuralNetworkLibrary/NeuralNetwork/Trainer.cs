@@ -14,7 +14,6 @@ public class Trainer
     private bool isPatience = false;
     private float userInitialIgnore = 0.0f;
     private float userPatience = 0;
-    private Queue<(float max, float avg)>? lastErrorsRange;
     private float initialIgnore = 10.0f; //percent
     private int patienceAmount = 50;
     private bool hasCrossedIgnoreThreshold = false;
@@ -40,7 +39,7 @@ public class Trainer
     public void SetPatience(float initialIgnore, float patience, Func<float, float>? learningRateModifier = null)
     {
         initialIgnore = Math.Clamp(initialIgnore, 0, 1);
-        patience = Math.Clamp(patience, 0, 1);
+        patience = Math.Clamp(patience, 0, 0.95f);
         
         this.userInitialIgnore = initialIgnore;
         this.userPatience = patience;
@@ -48,7 +47,6 @@ public class Trainer
         this.initialIgnore = initialIgnore * 100;
         this.patienceAmount = (int)(data.Length * patience / batchSize);
         this.patienceAmount = Math.Max(1, patienceAmount);
-        this.lastErrorsRange = new(patienceAmount);
 
         if(learningRateModifier is not null)
             this.learningRateModifier = learningRateModifier;
@@ -81,7 +79,8 @@ public class Trainer
         Stack<TrainingIterationData> trainingIterationData = new();
         List<float> trainCorrectness = new List<float>(epochAmount);
 
-        Queue<float> lastAvgBatchErrors = new Queue<float>(patienceAmount);
+        Queue<(float error, float seconds)>? lastBatchErrors = new();
+
 
         neuralNetwork.OnTrainingIteration += (epoch, dataIndex, error) =>
         {
@@ -99,14 +98,11 @@ public class Trainer
 
         neuralNetwork.OnBatchTrainingIteration += (epoch, epochPercentFinish, batchAvgError) =>
         {
-            lastAvgBatchErrors.Enqueue(batchAvgError);
-            if(lastAvgBatchErrors.Count > patienceAmount)
-            {
-                lastAvgBatchErrors.Dequeue();
-            }
-
             if(isPatience)
-                HandlePatience(neuralNetwork, lastAvgBatchErrors, epochPercentFinish);
+            {
+                lastBatchErrors!.Enqueue((batchAvgError, (float)stopwatch.Elapsed.TotalSeconds));
+                HandlePatience(neuralNetwork, lastBatchErrors, epochPercentFinish);
+            }
         };
 
         neuralNetwork.OnEpochTrainingIteration += (epoch, correctness) =>
@@ -119,20 +115,37 @@ public class Trainer
             }
         };
 
+
+        bool hasFinished = false;
         neuralNetwork.OnTrainingFinished += () =>
         {
- 
+            if(saveToLog)
+                SaveTrainingData(trainingLogDir, trainingIterationData.ToArray(), trainCorrectness.ToArray());
+
+            stopwatch.Stop();
+            hasFinished = true;
         };
 
         stopwatch.Start();
-        neuralNetwork.Train(data, initialLearningRate, epochAmount, batchSize, cts.Token);
-        stopwatch.Stop();
-        
-        if(saveToLog)
-            SaveTrainingData(trainingLogDir, trainingIterationData.ToArray(), trainCorrectness.ToArray());
+        neuralNetwork.TrainOnNewTask(data, initialLearningRate, epochAmount, batchSize, cts.Token);
+
+        while (hasFinished == false)
+        {
+            if(cts!.IsCancellationRequested)
+            {
+                Console.WriteLine("Training has been stopped.");
+                Thread.Sleep(1000);
+                continue;
+            }
+            var pressedKey = Console.Read();
+            if(pressedKey == 'q')
+            {
+                cts!.Cancel();
+            }
+        }
     }
 
-    private void HandlePatience(NeuralNetwork nn, Queue<float> lastAvgBatchErrors, float epochPercentFinish)
+    private void HandlePatience(NeuralNetwork nn, Queue<(float, float)> lastAvgBatchErrors, float epochPercentFinish)
     {
         if(hasCrossedIgnoreThreshold == false || nn.LearningRate <= minLearningRate)
         {
@@ -142,24 +155,20 @@ public class Trainer
             return;
         }
 
-        var max = lastAvgBatchErrors.Max();
-        var avg = lastAvgBatchErrors.Average();
-        lastErrorsRange!.Enqueue((max, avg));
-        if(lastErrorsRange.Count() < patienceAmount)return;
+        if(lastAvgBatchErrors.Count() < patienceAmount)return;
 
-        var avgMax = lastErrorsRange.Average(x => x.max);
-        var avgAvg = lastErrorsRange.Average(x => x.avg);
+        (float slope, _) = Statistics.LinearRegression(lastAvgBatchErrors.ToArray());
 
-        if(max >= avgMax && avg >= avgAvg)
+        if(slope >= 0)
         {
             nn.LearningRate = Math.Max(minLearningRate, learningRateModifier(nn.LearningRate));
         }
-        lastErrorsRange?.Clear();
+        lastAvgBatchErrors!.Clear();
     }
 
     private void SaveTrainingData(string dirPath, TrainingIterationData[] trainingIterationData, float[] trainEpochCorrectness)
     {
-        trainingIterationData = trainingIterationData.Reverse().ToArray();
+        trainingIterationData = trainingIterationData.Where(x => x is not null).ToArray();
 
         List<object[]> data = [["Epoch", "DataIndex", "Error", "LearningRate", "ElapsedSeconds"]];
         foreach (var item in trainingIterationData)

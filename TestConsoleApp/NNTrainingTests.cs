@@ -13,13 +13,10 @@ class NNTrainingTests
     {
         //TODO test: https://github.com/amelie-vogel/image-classification-quickdraw
         
-        // (Matrix input, Matrix output)[] trainData = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv"); 
-        // (Matrix input, Matrix output)[] testData = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_test_data.csv");
-
         ((Matrix[] inputChannels, Matrix output)[] trainData, (Matrix[] inputChannels, Matrix output)[] testData) = GetQuickDrawDataMatrix(QuickDrawDirPath, 5000);
 
         //! TEST 1
-        var nn = new NeuralNetwork(1, 28, 28,
+        var nn1 = new NeuralNetwork(1, 28, 28,
         [
             LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
@@ -28,13 +25,50 @@ class NNTrainingTests
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         ]);
-        Trainer trainer = new Trainer(nn, trainData, 
+        Trainer trainer1 = new Trainer(nn1, trainData, 
             initialLearningRate: 0.01f, 
-            minLearningRate: 0.001f, 
-            epochAmount: 20, 
+            minLearningRate: 0.0001f, 
+            epochAmount: 30, 
             batchSize: 50);
-        trainer.SetPatience(initialIgnore: 0.2f, patience: 0.1f, learningRateModifier: (lr) => lr * 0.9f);
-        Single(testData, nn, trainer);
+        trainer1.SetPatience(initialIgnore: 0.9f, patience: 0.2f, learningRateModifier: (lr) => lr * 0.9f);
+        Single(testData, nn1, trainer1);
+
+        //! TEST 2
+        var nn2 = new NeuralNetwork(1, 28, 28,
+        [
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 12, stride: 1, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 24, stride: 1, activationFunction: ActivationFunction.Sigmoid),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        ]);
+        Trainer trainer2 = new Trainer(nn2, trainData, 
+            initialLearningRate: 0.01f, 
+            minLearningRate: 0.0001f, 
+            epochAmount: 30, 
+            batchSize: 50);
+        trainer2.SetPatience(initialIgnore: 0.9f, patience: 0.2f, learningRateModifier: (lr) => lr * 0.9f);
+        Single(testData, nn2, trainer2);
+
+        //! TEST 3
+        var nn3 = new NeuralNetwork(1, 28, 28,
+        [
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 12, stride: 1, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 24, stride: 1, activationFunction: ActivationFunction.Sigmoid),
+            LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        ]);
+        Trainer trainer3 = new Trainer(nn3, trainData, 
+            initialLearningRate: 0.01f, 
+            minLearningRate: 0.0001f, 
+            epochAmount: 30, 
+            batchSize: 50);
+        trainer3.SetPatience(initialIgnore: 0.9f, patience: 0.2f, learningRateModifier: (lr) => lr * 0.9f);
+        Single(testData, nn3, trainer3);
     }
 
     private void Single((Matrix[] inputChannels, Matrix output)[] testData, NeuralNetwork nn, Trainer trainer)

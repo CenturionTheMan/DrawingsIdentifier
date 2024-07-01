@@ -23,6 +23,7 @@ public class NeuralNetwork
 
     private static Random random = new Random();
     private ILayer[] layers;
+    private Dictionary<ILayer, float> layersDropoutRates = new Dictionary<ILayer, float>();
 
     private int inputDepth;
     private int inputRowsAmount;
@@ -33,7 +34,7 @@ public class NeuralNetwork
 
     #region CTORS
 
-    private NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, ILayer[] layers, float learningRate, float lastTrainCorrectness)
+    private NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, ILayer[] layers, float learningRate, float lastTrainCorrectness, Dictionary<ILayer, float> layersDropoutRates)
     {
         this.layers = layers;
         this.LearningRate = learningRate;
@@ -42,6 +43,8 @@ public class NeuralNetwork
         this.inputDepth = inputDepth;
         this.inputRowsAmount = inputRowsAmount;
         this.inputColumnsAmount = inputColumnsAmount;
+
+        this.layersDropoutRates = layersDropoutRates;
     }
 
     public NeuralNetwork(int inputSize, LayerTemplate[] layerTemplates) : this(1, inputSize, 1, layerTemplates)
@@ -101,6 +104,11 @@ public class NeuralNetwork
                     isPrevFullyConnected = true;
                     break;
 
+                case LayerType.Dropout:
+                    var dropoutLayer = new DropoutLayer((currentInput.inputRowsAmount, currentInput.inputColumnsAmount), currentTemplate.DropoutRate);
+                    layers.Add(dropoutLayer);
+                    layersDropoutRates.Add(dropoutLayer, currentTemplate.DropoutRate);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -201,7 +209,15 @@ public class NeuralNetwork
 
         for (int i = 0; i < layers.Length; i++)
         {
-            (currentInput, _) = layers[i].Forward(currentInput);
+            if(layers[i].LayerType == LayerType.Dropout)
+            {
+                float func = 1 - layersDropoutRates[layers[i]];
+                currentInput = currentInput.Select(x => x * func).ToArray();
+            }
+            else
+            {
+                (currentInput, _) = layers[i].Forward(currentInput);
+            }
         }
 
         if (currentInput.Length != 1)
@@ -215,14 +231,22 @@ public class NeuralNetwork
 
         for (int i = 0; i < layers.Length; i++)
         {
-            (currentInput, _) = layers[i].Forward(currentInput);
+            if(layers[i].LayerType == LayerType.Dropout)
+            {
+                float func = 1 - layersDropoutRates[layers[i]];
+                currentInput = currentInput.Select(x => x * func).ToArray();
+            }
+            else
+            {
+                (currentInput, _) = layers[i].Forward(currentInput);
+            }
 
             if (layers[i].LayerType == LayerType.Convolution || layers[i].LayerType == LayerType.Pooling)
             {
                 for (int j = 0; j < currentInput.Length; j++)
                 {
                     var featureMap = currentInput[j];
-                    //ImagesProcessor.DataReader.SaveToImage(featureMap.ToArray(), directoryPath + $"featureMap_{i}_{j}.png");
+                    ImagesProcessor.DataReader.SaveToImage(featureMap.ToArray(), directoryPath + $"featureMap_{i}_{j}.png");
                 }
             }
         }
@@ -305,6 +329,8 @@ public class NeuralNetwork
         var layersHead = root.Element("LayersHead")!.Elements();
         var layersData = root.Element("LayersData")!.Elements();
 
+        Dictionary<ILayer, float> layersDropoutRates = new();
+
         ILayer[] layers = new ILayer[layersAmount];
         for (int i = 0; i < layersAmount; i++)
         {
@@ -333,6 +359,15 @@ public class NeuralNetwork
                     layer = ReshapeFeatureToClassificationLayer.LoadLayerData(layerHead, layerData);
                     break;
 
+                case LayerType.Dropout:
+                    var dropLayer = DropoutLayer.LoadLayerData(layerHead, layerData);
+                    if(dropLayer != null)
+                    {
+                        layer = dropLayer;
+                        layersDropoutRates.Add(layer, dropLayer.dropoutRate);
+                    }
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -351,7 +386,7 @@ public class NeuralNetwork
         if (inputShape.Length != 3 || !int.TryParse(inputShape[0], out int inputDepth) || !int.TryParse(inputShape[1], out int inputHeight) || !int.TryParse(inputShape[2], out int inputWidth))
             return null;
 
-        return new NeuralNetwork(inputDepth, inputHeight, inputWidth, layers, learningRate, lastTrainCorrectness);
+        return new NeuralNetwork(inputDepth, inputHeight, inputWidth, layers, learningRate, lastTrainCorrectness, layersDropoutRates);
     }
 
     #endregion SAVING / LOADING

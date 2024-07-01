@@ -14,6 +14,8 @@ public class LayerTemplate
     internal int KernelSize => kernelSize;
     internal int Depth => depth;
 
+    internal float DropoutRate => dropoutRate;
+
 
     private LayerType layerType;
     private ActivationFunction activationFunction;
@@ -25,6 +27,7 @@ public class LayerTemplate
     private int kernelSize;
     private int depth;
 
+    private float dropoutRate;
 
     private LayerTemplate()
     {
@@ -60,6 +63,15 @@ public class LayerTemplate
             depth = depth,
             stride = stride,
             activationFunction = activationFunction,
+        };
+    }
+
+    public static LayerTemplate CreateDropoutLayer(float dropoutRate)
+    {
+        return new LayerTemplate
+        {
+            layerType = LayerType.Dropout,
+            dropoutRate = dropoutRate,
         };
     }
 }

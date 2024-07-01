@@ -1,0 +1,11 @@
+﻿<Root>
+  <BaseConfig>
+    <InitialLearningRate>0.01</InitialLearningRate>
+    <EpochAmount>25</EpochAmount>
+    <BatchSize>50</BatchSize>
+  </BaseConfig>
+  <PatienceConfig>
+    <InitialIgnore>0.2</InitialIgnore>
+    <Patience>0.1</Patience>
+  </PatienceConfig>
+</Root>

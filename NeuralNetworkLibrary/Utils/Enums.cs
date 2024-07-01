@@ -18,5 +18,6 @@ internal enum LayerType
     Convolution,
     Pooling,
     FullyConnected,
+    Dropout,
     Reshape
 }
