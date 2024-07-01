@@ -25,6 +25,21 @@ public class FullyConnectedLayer : ILayer
 
     #region CTOR
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class.
+    /// </summary>
+    /// <param name="previousLayerSize">
+    /// Size of the previous layer.
+    /// </param>
+    /// <param name="layerSize">
+    /// Current layer size.
+    /// </param>
+    /// <param name="activationFunction">
+    /// Function used for activation.
+    /// </param>
+    /// <exception cref="NotImplementedException">
+    /// Exception thrown when activation function is not implemented.
+    /// </exception>
     public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction)
     {
         this.weights = new Matrix(layerSize, previousLayerSize);
@@ -55,6 +70,12 @@ public class FullyConnectedLayer : ILayer
         this.layerSize = layerSize;
     }
 
+    /// <summary>
+    /// Load layer data from XML.
+    /// </summary>
+    /// <param name="layerHead"></param>
+    /// <param name="layerData"></param>
+    /// <returns></returns>
     internal static ILayer? LoadLayerData(XElement layerHead, XElement layerData)
     {
         string? previousLayerSizeStr = layerHead.Element("previousLayerSize")?.Value;
@@ -83,6 +104,17 @@ public class FullyConnectedLayer : ILayer
 
     #region METHODS
 
+    /// <summary>
+    /// Forward pass for fully connected layer.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException">
+    /// Exception thrown when fully connected layer has more than one input.
+    /// </exception>
+    /// <exception cref="NotImplementedException">
+    /// Exception thrown when activation function is not implemented.
+    /// </exception>
     (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] input)
     {
         if (input.Length != 1)
@@ -104,6 +136,30 @@ public class FullyConnectedLayer : ILayer
         return ([activatedLayer], [layerWithAddedBiases]);
     }
 
+    /// <summary>
+    /// Backward pass for fully connected layer.
+    /// </summary>
+    /// <param name="errorMatrix">
+    /// Error matrix from the next layer.
+    /// </param>
+    /// <param name="prevLayerOutputBeforeActivation">
+    /// Previous layer (next in general order) output before activation.
+    /// </param>
+    /// <param name="thisLayerOutputBeforeActivation">
+    /// This layer output before activation.
+    /// </param>
+    /// <param name="learningRate">
+    /// Learning rate.
+    /// </param>
+    /// <returns>
+    /// Error matrix for the previous layer.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Exception thrown when fully connected layer has more than one input.
+    /// </exception>
+    /// <exception cref="NotImplementedException">
+    /// Exception thrown when activation function is not implemented.
+    /// </exception>
     Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputBeforeActivation, Matrix[] thisLayerOutputBeforeActivation, float learningRate)
     {
         if (errorMatrix.Length != 1)
@@ -126,6 +182,12 @@ public class FullyConnectedLayer : ILayer
         return [Matrix.DotProductMatrices(weights.Transpose(), errorMatrix[0])];
     }
 
+    /// <summary>
+    /// Update weights and biases.
+    /// </summary>
+    /// <param name="batchSize">
+    /// Size of the batch.
+    /// </param>
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
         float multiplier = 1.0f / batchSize;

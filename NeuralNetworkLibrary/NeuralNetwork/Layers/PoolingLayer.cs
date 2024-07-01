@@ -23,12 +23,27 @@ public class PoolingLayer : ILayer
 
     #region CTOR
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PoolingLayer"/> class.
+    /// </summary>
+    /// <param name="poolSize">
+    /// Size of the pooling window.
+    /// </param>
+    /// <param name="stride">
+    /// Stride of the pooling window.
+    /// </param>
     public PoolingLayer(int poolSize, int stride)
     {
         this.poolSize = poolSize;
         this.stride = stride;
     }
 
+    /// <summary>
+    /// Load layer data from XML.
+    /// </summary>
+    /// <param name="layerHead"></param>
+    /// <param name="layerData"></param>
+    /// <returns></returns>
     internal static ILayer? LoadLayerData(XElement layerHead, XElement layerData)
     {
         string? poolSizeStr = layerHead.Element("PoolSize")?.Value;
@@ -47,11 +62,20 @@ public class PoolingLayer : ILayer
 
     #region METHODS
 
+    /// <summary>
+    /// Does nothing.
+    /// </summary>
+    /// <param name="batchSize"></param>
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
         //nothing to do here
     }
 
+    /// <summary>
+    /// Forward pass of the pooling layer.
+    /// </summary>
+    /// <param name="inputs"></param>
+    /// <returns></returns>
     (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] inputs)
     {
         // this.previousLayerOutputs = inputs;
@@ -65,6 +89,14 @@ public class PoolingLayer : ILayer
         return (result, maxIndexMap);
     }
 
+    /// <summary>
+    /// Backward pass of the pooling layer.
+    /// </summary>
+    /// <param name="deltas"></param>
+    /// <param name="prevLayerSize"></param>
+    /// <param name="maxIndexMap"></param>
+    /// <param name="learningRate"></param>
+    /// <returns></returns>
     Matrix[] ILayer.Backward(Matrix[] deltas, Matrix[] prevLayerSize, Matrix[] maxIndexMap, float learningRate)
     {
         Matrix[] result = new Matrix[deltas.Length];

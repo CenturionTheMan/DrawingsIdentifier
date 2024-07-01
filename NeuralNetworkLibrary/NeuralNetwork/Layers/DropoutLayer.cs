@@ -4,7 +4,7 @@ using System.Xml.Linq;
 namespace NeuralNetworkLibrary;
 
 
-class DropoutLayer : ILayer
+internal class DropoutLayer : ILayer
 {
     #region PARAMS
 
@@ -17,8 +17,20 @@ class DropoutLayer : ILayer
 
     #endregion PARAMS
 
-    #region CTOR    
+    #region CTOR
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DropoutLayer"/> class.
+    /// </summary>
+    /// <param name="inputShape">
+    /// Shape of the input data.
+    /// </param>
+    /// <param name="dropoutRate">
+    /// Dropout rate. Must be in range [0, 0.9].
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// Exception thrown when dropout rate is not in range [0, 0.9].
+    /// </exception>
     internal DropoutLayer((int inputHeight, int inputWidth) inputShape, float dropoutRate)
     {
         if(dropoutRate < 0 || dropoutRate > 0.9f)
@@ -30,6 +42,16 @@ class DropoutLayer : ILayer
         this.mask = GenerateMask();
     }
 
+    /// <summary>
+    /// Load layer data from XML.
+    /// </summary>
+    /// <param name="layerHead">
+    /// Head of the layer data.
+    /// </param>
+    /// <param name="layerData">
+    /// Not used
+    /// </param>
+    /// <returns></returns>
     internal static DropoutLayer? LoadLayerData(XElement layerHead, XElement layerData)
     {
         string? inputHeightStr = layerHead.Element("InputHeight")?.Value;
@@ -53,6 +75,12 @@ class DropoutLayer : ILayer
 
     #region METHODS
 
+    /// <summary>
+    /// Generates mask for dropout layer.
+    /// </summary>
+    /// <returns>
+    /// Returns random mask for dropout layer.
+    /// </returns>
     private Matrix GenerateMask()
     {
         var mask = new Matrix(inputShape.inputHeight, inputShape.inputWidth);
@@ -83,6 +111,14 @@ class DropoutLayer : ILayer
         return mask;
     }
 
+    /// <summary>
+    /// Backward pass for dropout layer.
+    /// </summary>
+    /// <param name="prevOutput"></param>
+    /// <param name="prevLayerOutputOther"></param>
+    /// <param name="currentLayerOutputOther"></param>
+    /// <param name="learningRate"></param>
+    /// <returns></returns>
     Matrix[] ILayer.Backward(Matrix[] prevOutput, Matrix[] prevLayerOutputOther, Matrix[] currentLayerOutputOther, float learningRate)
     {
         var tmp = new Matrix[prevOutput.Length];
@@ -93,6 +129,12 @@ class DropoutLayer : ILayer
         return tmp;
     }
 
+
+    /// <summary>
+    /// Forward pass for dropout layer.
+    /// </summary>
+    /// <param name="inputs"></param>
+    /// <returns></returns>
     (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] inputs)
     {
         var tmp = new Matrix[inputs.Length];
@@ -103,6 +145,10 @@ class DropoutLayer : ILayer
         return (tmp, tmp);
     }
 
+    /// <summary>
+    /// Updates dropout mask.
+    /// </summary>
+    /// <param name="batchSize"></param>
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
         this.mask = GenerateMask();

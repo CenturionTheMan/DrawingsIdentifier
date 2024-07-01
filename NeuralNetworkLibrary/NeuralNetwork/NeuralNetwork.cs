@@ -31,9 +31,19 @@ public class NeuralNetwork
 
     #endregion PARAMS
 
-
     #region CTORS
 
+    /// <summary>
+    /// Creates a new neural network with given layers and learning rate
+    /// used for loading neural network from file
+    /// </summary>
+    /// <param name="inputDepth"> Input depth (channels amount) </param>
+    /// <param name="inputRowsAmount"> Row amount (height) </param>
+    /// <param name="inputColumnsAmount"> Columns amount (width) </param>
+    /// <param name="layers">  </param>
+    /// <param name="learningRate"></param>
+    /// <param name="lastTrainCorrectness"></param>
+    /// <param name="layersDropoutRates"></param>
     private NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, ILayer[] layers, float learningRate, float lastTrainCorrectness, Dictionary<ILayer, float> layersDropoutRates)
     {
         this.layers = layers;
@@ -51,6 +61,14 @@ public class NeuralNetwork
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NeuralNetwork"/> class with the specified parameters.
+    /// Will throw an exception if the configuration or parameters values invalid.
+    /// </summary>
+    /// <param name="inputDepth">The depth of the input data.</param>
+    /// <param name="inputRowsAmount">The number of rows in the input data.</param>
+    /// <param name="inputColumnsAmount">The number of columns in the input data.</param>
+    /// <param name="layerTemplates">An array of <see cref="LayerTemplate"/> objects representing the layer configurations.</param>
     public NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, LayerTemplate[] layerTemplates)
     {
         this.inputDepth = inputDepth;
@@ -60,7 +78,7 @@ public class NeuralNetwork
         bool isPrevFullyConnected = false;
         List<ILayer> layers = new List<ILayer>();
         var currentInput = (inputDepth, inputRowsAmount, inputColumnsAmount);
-        
+
         for (int i = 0; i < layerTemplates.Length; i++)
         {
             var currentTemplate = layerTemplates[i];
@@ -117,6 +135,16 @@ public class NeuralNetwork
         this.layers = layers.ToArray();
     }
 
+    /// <summary>
+    /// Create reshape layer based on the input parameters
+    /// </summary>
+    /// <param name="featureToClassification"> 
+    /// If true will be created layer which reshapes feature layer into classification 
+    /// </param>
+    /// <param name="rows">from layer height</param>
+    /// <param name="columns">from layer width</param>
+    /// <returns>New instance of <see cref="ReshapeFeatureToClassificationLayer"/>  </returns>
+    /// <exception cref="NotImplementedException">Reshaping classification -> feature not yet implemented</exception>
     private ILayer ReshapeInput(bool featureToClassification, int rows, int columns)
     {
         if (featureToClassification)
@@ -126,7 +154,7 @@ public class NeuralNetwork
         }
         else
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Reshaping classification -> feature not yet implemented");
         }
     }
 
@@ -134,11 +162,29 @@ public class NeuralNetwork
 
     #region TRAINING
 
+    /// <summary>
+    /// Trains the neural network on a new task asynchronously.
+    /// </summary>
+    /// <param name="data">The training data consisting of input channels and corresponding output.</param>
+    /// <param name="learningRate">The learning rate for the training process.</param>
+    /// <param name="epochAmount">The number of epochs to train for.</param>
+    /// <param name="batchSize">The size of each training batch.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the training process.</param>
+    /// <returns>A task representing the asynchronous training process.</returns>
     public Task TrainOnNewTask((Matrix[] inputChannels, Matrix output)[] data, float learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         return Task.Run(() => Train(data, learningRate, epochAmount, batchSize, cancellationToken), cancellationToken);
     }
 
+
+    /// <summary>
+    /// Trains the neural network using the provided data.
+    /// </summary>
+    /// <param name="data">The training data, consisting of input channels and corresponding output.</param>
+    /// <param name="learningRate">The learning rate for the training process.</param>
+    /// <param name="epochAmount">The number of epochs to train for.</param>
+    /// <param name="batchSize">The size of each training batch.</param>
+    /// <param name="cancellationToken">The cancellation token to stop the training process.</param>
     public void Train((Matrix[] inputChannels, Matrix output)[] data, float learningRate, int epochAmount, int batchSize, CancellationToken cancellationToken = default)
     {
         this.LearningRate = learningRate;
@@ -203,13 +249,28 @@ public class NeuralNetwork
 
     #region INTERACTIONS
 
+    /// <summary>
+    /// Predicts the output based on the input channel.
+    /// </summary>
+    /// <param name="inputChannel"> Single channel of input </param>
+    /// <returns> Prediction </returns>
+    public Matrix Predict(Matrix inputChannel)
+    {
+        return Predict([inputChannel]);
+    }
+
+    /// <summary>
+    /// Predicts the output based on the input channels.
+    /// </summary>
+    /// <param name="inputChannels"> Channels of input </param>
+    /// <returns> Prediction </returns>
     public Matrix Predict(Matrix[] inputChannels)
     {
         Matrix[] currentInput = inputChannels;
 
         for (int i = 0; i < layers.Length; i++)
         {
-            if(layers[i].LayerType == LayerType.Dropout)
+            if (layers[i].LayerType == LayerType.Dropout)
             {
                 float func = 1 - layersDropoutRates[layers[i]];
                 currentInput = currentInput.Select(x => x * func).ToArray();
@@ -225,13 +286,18 @@ public class NeuralNetwork
         return currentInput[0];
     }
 
+    /// <summary>
+    /// Saves feature maps to the specified directory.
+    /// </summary>
+    /// <param name="inputChannels"> Channels of input </param>
+    /// <param name="directoryPath"></param>
     public void SaveFeatureMaps(Matrix[] inputChannels, string directoryPath)
     {
         Matrix[] currentInput = inputChannels;
 
         for (int i = 0; i < layers.Length; i++)
         {
-            if(layers[i].LayerType == LayerType.Dropout)
+            if (layers[i].LayerType == LayerType.Dropout)
             {
                 float func = 1 - layersDropoutRates[layers[i]];
                 currentInput = currentInput.Select(x => x * func).ToArray();
@@ -252,6 +318,11 @@ public class NeuralNetwork
         }
     }
 
+    /// <summary>
+    /// Calculates the correctness of the neural network on the given test data.
+    /// </summary>
+    /// <param name="testData"> Collection of data samples </param>
+    /// <returns>Correctness in percent</returns>
     public float CalculateCorrectness((Matrix[] inputChannels, Matrix expectedOutput)[] testData)
     {
         int guessed = 0;
@@ -277,6 +348,11 @@ public class NeuralNetwork
 
     #region SAVING / LOADING
 
+    /// <summary>
+    /// Saves the neural network to an XML file.
+    /// </summary>
+    /// <param name="path"> save file path </param>
+    /// <returns> True if success, false otherwise </returns>
     public bool SaveToXmlFile(string path)
     {
         var writer = FilesCreatorHelper.CreateXmlFile(path);
@@ -311,6 +387,11 @@ public class NeuralNetwork
         return true;
     }
 
+    /// <summary>
+    /// Loads the neural network from an XML file.
+    /// </summary>
+    /// <param name="path"> Load file path </param>
+    /// <returns> New object of <see cref="NeuralNetwork"/> if success, null otherwise </returns>
     public static NeuralNetwork? LoadFromXmlFile(string path)
     {
         XDocument xml = XDocument.Load(path);
@@ -361,7 +442,7 @@ public class NeuralNetwork
 
                 case LayerType.Dropout:
                     var dropLayer = DropoutLayer.LoadLayerData(layerHead, layerData);
-                    if(dropLayer != null)
+                    if (dropLayer != null)
                     {
                         layer = dropLayer;
                         layersDropoutRates.Add(layer, dropLayer.dropoutRate);
@@ -380,7 +461,7 @@ public class NeuralNetwork
 
         var firstLayerHead = layersHead.ElementAt(0);
         string? inputShapeStr = firstLayerHead.Element("inputShape")?.Value;
-        if(inputShapeStr == null)
+        if (inputShapeStr == null)
             return null;
         string[] inputShape = inputShapeStr.Split(' ');
         if (inputShape.Length != 3 || !int.TryParse(inputShape[0], out int inputDepth) || !int.TryParse(inputShape[1], out int inputHeight) || !int.TryParse(inputShape[2], out int inputWidth))
@@ -393,9 +474,17 @@ public class NeuralNetwork
 
     #region FORWARD / BACKWARD
 
+    /// <summary>
+    /// Feeds the input channels through the neural network and returns the output.
+    /// </summary>
+    /// <param name="inputChannels"> Data sample (its channels) </param>
+    /// <returns> 
+    /// Tuple with output matrix and array of layers outputs before activation functions
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
     internal (Matrix output, Matrix[][] layersBeforeActivation) Feedforward(Matrix[] inputChannels)
     {
-        if(inputChannels.Length != inputDepth || inputChannels[0].RowsAmount != inputRowsAmount || inputChannels[0].ColumnsAmount != inputColumnsAmount)
+        if (inputChannels.Length != inputDepth || inputChannels[0].RowsAmount != inputRowsAmount || inputChannels[0].ColumnsAmount != inputColumnsAmount)
             throw new InvalidOperationException($" Input channels have wrong dimensions!\n Was {inputChannels.Length}x{inputChannels[0].RowsAmount}x{inputChannels[0].ColumnsAmount} but expected {inputDepth}x{inputRowsAmount}x{inputColumnsAmount}");
 
         List<Matrix[]> layersBeforeActivation = new(this.layers.Length + 1);
@@ -406,13 +495,6 @@ public class NeuralNetwork
         for (int i = 0; i < layers.Length; i++)
         {
             (currentInput, var otherOutput) = layers[i].Forward(currentInput);
-
-            //TODO Test with and without it (probably better without but more tests needed)
-            // if(layers[i].LayerType == LayerType.Reshape)
-            // {
-            //     (otherOutput, _) = layers[i].Forward(layersBeforeActivation.Last());
-            // }
-
             layersBeforeActivation.Add(otherOutput);
         }
 
@@ -422,6 +504,18 @@ public class NeuralNetwork
         return (currentInput[0], layersBeforeActivation.ToArray());
     }
 
+    /// <summary>
+    /// Backpropagates the error through the neural network.
+    /// </summary>
+    /// <param name="expectedResult">
+    /// The expected result of the neural network.
+    /// </param>
+    /// <param name="prediction">
+    /// Prediction of the neural network.
+    /// </param>
+    /// <param name="layersBeforeActivation">
+    /// Collection of layers outputs before activation functions.
+    /// </param>
     internal void Backpropagation(Matrix expectedResult, Matrix prediction, Matrix[][] layersBeforeActivation)
     {
         var error = expectedResult.ElementWiseSubtract(prediction);

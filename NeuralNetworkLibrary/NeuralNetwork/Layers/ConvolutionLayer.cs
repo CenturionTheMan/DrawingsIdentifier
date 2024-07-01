@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace NeuralNetworkLibrary;
 
-public class ConvolutionLayer : ILayer
+internal class ConvolutionLayer : ILayer
 {
     #region PARAMS
 
@@ -37,6 +37,30 @@ public class ConvolutionLayer : ILayer
 
     #region CTOR
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class.
+    /// </summary>
+    /// <param name="inputShape">
+    /// Shape of the input tensor (depth, height, width)
+    /// </param>
+    /// <param name="kernelSize">
+    /// Size of the kernel (kernelSize x kernelSize)
+    /// </param>
+    /// <param name="kernelsDepth">
+    /// Depth of the kernels (number of kernels)
+    /// </param>
+    /// <param name="stride">
+    /// Stride of the convolution operation. Currently only stride = 1 is supported. Other values are not implemented yet.
+    /// </param>
+    /// <param name="activationFunction">
+    /// Activation function to be used after the convolution operation.
+    /// </param>
+    /// <exception cref="NotImplementedException">
+    /// Exception thrown when stride != 1. Currently only stride = 1 is supported.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Exception thrown when stride is less than 1.
+    /// </exception>
     internal ConvolutionLayer((int inputDepth, int inputHeight, int inputWidth) inputShape, int kernelSize, int kernelsDepth, int stride, ActivationFunction activationFunction)
     {
         if (stride != 1)
@@ -95,6 +119,19 @@ public class ConvolutionLayer : ILayer
         }
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class. 
+    /// Used for loading the layer from the file.
+    /// </summary>
+    /// <param name="layerHead">
+    /// Head of the layer containing the layer's parameters.
+    /// </param>
+    /// <param name="layerData">
+    /// Data of the layer containing the layer's weights and biases.
+    /// </param>
+    /// <returns>
+    /// Loaded layer or null if the layer could not be loaded.
+    /// </returns>
     internal static ILayer? LoadLayerData(XElement layerHead, XElement layerData)
     {
         string? inputShapeStr = layerHead.Element("inputShape")?.Value;
@@ -155,6 +192,15 @@ public class ConvolutionLayer : ILayer
 
     #region METHODS
 
+    /// <summary>
+    /// Forward pass of the convolutional layer.
+    /// </summary>
+    /// <param name="inputs">
+    /// Input tensor to the layer.
+    /// </param>
+    /// <returns>
+    /// Tuple containing the activated output and the output before activation.
+    /// </returns>
     (Matrix[] output, Matrix[] otherOutput) ILayer.Forward(Matrix[] inputs)
     {
         // activated output
@@ -183,6 +229,24 @@ public class ConvolutionLayer : ILayer
         return (A, Z);
     }
 
+    /// <summary>
+    /// Backward pass of the convolutional layer.
+    /// </summary>
+    /// <param name="dAin">
+    /// Error gradient from the next layer.
+    /// </param>
+    /// <param name="layerInputFromForward">
+    /// Output from the forward pass of the layer.
+    /// </param>
+    /// <param name="layerOutputBeforeActivation">
+    /// Not activated output from the forward pass of the layer.
+    /// </param>
+    /// <param name="learningRate">
+    /// Learning rate of the neural network.
+    /// </param>
+    /// <returns>
+    /// Error gradient to be passed to the previous layer.
+    /// </returns>
     Matrix[] ILayer.Backward(Matrix[] dAin, Matrix[] layerInputFromForward, Matrix[] layerOutputBeforeActivation, float learningRate)
     {
         Matrix[] dA = new Matrix[inputDepth];
@@ -215,6 +279,12 @@ public class ConvolutionLayer : ILayer
         return dA;
     }
 
+    /// <summary>
+    /// Updates the weights and biases of the layer.
+    /// </summary>
+    /// <param name="batchSize">
+    /// size of the batch used for training.
+    /// </param>
     void ILayer.UpdateWeightsAndBiases(int batchSize)
     {
         float multiplier = 1.0f / batchSize;
