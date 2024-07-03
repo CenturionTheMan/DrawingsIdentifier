@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace ImagesProcessor;
 
-public class DataReader
+public static class DataReader
 {
     private static Random random = new Random();
 

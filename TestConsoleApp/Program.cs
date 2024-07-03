@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using NeuralNetworkLibrary;
-using ImagesProcessor;
 using static NeuralNetworkLibrary.MatrixExtender;
 using Accord.IO;
 using System.Diagnostics;
@@ -17,17 +16,16 @@ internal class Program
         var tester = new NNTrainingTests();
         tester.RunTests();
 
-
-        // TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        // {
-        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-        //     LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
-        //     LayerTemplate.CreatePoolingLayer(poolSize: 2, stride: 2),
-        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
-        //     LayerTemplate.CreateDropoutLayer(dropoutRate: 0.5f),
-        //     LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        // }));
+        //TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        //{
+        //    LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //    LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
+        //    LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateDropoutLayer(dropoutRate: 0.5f),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //}));
     }
 
     private static void TestNN(NeuralNetwork nn)
@@ -39,7 +37,7 @@ internal class Program
             Console.WriteLine(
                             $"Epoch: {epoch + 1}\n" +
                             $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
-                            $"Batch error: {error.ToString("0.000")}\n" + 
+                            $"Batch error: {error.ToString("0.000")}\n" +
                             $"Learning rate: {nn.LearningRate}\n");
         };
 
@@ -50,7 +48,7 @@ internal class Program
 
         Console.WriteLine("Training...");
 
-        const float learningRate = 0.01f;        
+        const float learningRate = 0.01f;
         const int epochAmount = 3;
         const int batchSize = 50;
 
@@ -58,28 +56,23 @@ internal class Program
         nn.Train(trainData, learningRate, epochAmount, batchSize);
         stopwatch.Stop();
 
-        Console.WriteLine($"\n Elapsed time: {stopwatch.Elapsed.TotalSeconds.ToString("0.00")}s\n Avg time per sample: {(stopwatch.Elapsed.TotalSeconds / (trainData.Length*epochAmount) ).ToString("0.0000")}s\n");
-
+        Console.WriteLine($"\n Elapsed time: {stopwatch.Elapsed.TotalSeconds.ToString("0.00")}s\n Avg time per sample: {(stopwatch.Elapsed.TotalSeconds / (trainData.Length * epochAmount)).ToString("0.0000")}s\n");
 
         Console.WriteLine("FINAL Testing...");
         var correctness = nn.CalculateCorrectness(testData);
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
-
-
         nn.SaveToXmlFile("./../../../nn.xml");
         var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
-        Console.WriteLine($"Loaded NN correctness: {nnLod.CalculateCorrectness(testData).ToString("0.00")}%");
+        Console.WriteLine($"Loaded NN correctness: {nnLod!.CalculateCorrectness(testData).ToString("0.00")}%");
 
         //nn.SaveFeatureMaps(testData[0].input, "./../../../");
     }
 
-    
-
     private static (Matrix[] inputChannels, Matrix expectedOutput)[] GetMnistDataMatrix(bool flatten, params string[] paths)
     {
         var results = new List<(Matrix[], Matrix)>();
-        int[] filter = []; //TODO remove after testing
+        int[] filter = [];
         foreach (var path in paths)
         {
             var data = FilesCreatorHelper.ReadInputFromCSV(path, ',').Skip(1);
@@ -92,7 +85,7 @@ internal class Program
                 int numer = int.Parse(item[0]);
                 expected[numer] = 1;
 
-                if(filter.Contains(numer)) continue;
+                if (filter.Contains(numer)) continue;
 
                 Matrix tmpOut = new Matrix(expected);
 
@@ -104,7 +97,7 @@ internal class Program
                     }
                 }
 
-                if(flatten)
+                if (flatten)
                     results.Add(([MatrixExtender.FlattenMatrix(tmpIn)], tmpOut));
                 else
                     results.Add(([tmpIn], tmpOut));

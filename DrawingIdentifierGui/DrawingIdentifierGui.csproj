@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ImagesProcessor\ImagesProcessor.csproj" />
     <ProjectReference Include="..\NeuralNetworkLibrary\NeuralNetworkLibrary.csproj" />
   </ItemGroup>
 

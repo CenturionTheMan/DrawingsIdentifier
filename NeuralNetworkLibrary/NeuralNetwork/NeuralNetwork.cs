@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SixLabors.ImageSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -127,6 +128,7 @@ public class NeuralNetwork
                     layers.Add(dropoutLayer);
                     layersDropoutRates.Add(dropoutLayer, currentTemplate.DropoutRate);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -138,8 +140,8 @@ public class NeuralNetwork
     /// <summary>
     /// Create reshape layer based on the input parameters
     /// </summary>
-    /// <param name="featureToClassification"> 
-    /// If true will be created layer which reshapes feature layer into classification 
+    /// <param name="featureToClassification">
+    /// If true will be created layer which reshapes feature layer into classification
     /// </param>
     /// <param name="rows">from layer height</param>
     /// <param name="columns">from layer width</param>
@@ -175,7 +177,6 @@ public class NeuralNetwork
     {
         return Task.Run(() => Train(data, learningRate, epochAmount, batchSize, cancellationToken), cancellationToken);
     }
-
 
     /// <summary>
     /// Trains the neural network using the provided data.
@@ -216,7 +217,7 @@ public class NeuralNetwork
 
                     Backpropagation(batchSamples[i].output, prediction, outputsBeforeActivation);
 
-                    OnTrainingIteration?.Invoke(epoch, batchBeginIndex + i, error);
+                    OnTrainingIteration?.Invoke(epoch + 1, batchBeginIndex + i, error);
                 });
 
                 if (cancellationToken.IsCancellationRequested)
@@ -231,15 +232,14 @@ public class NeuralNetwork
                 }
 
                 float epochPercentFinish = 100 * batchBeginIndex / (float)data.Length;
-                OnBatchTrainingIteration?.Invoke(epoch, epochPercentFinish, batchErrorSum / batchSize);
+                OnBatchTrainingIteration?.Invoke(epoch + 1, epochPercentFinish, batchErrorSum / batchSize);
 
                 batchBeginIndex += batchSize;
             }
 
-            int toTake = data.Length < 1000 ? data.Length : 1000;
-            float correctness = CalculateCorrectness(data.Take(toTake).OrderBy(x => random.Next()).ToArray());
+            float correctness = CalculateCorrectness(data.Take(1000).OrderBy(x => random.Next()).ToArray());
             this.LastTrainCorrectness = correctness;
-            OnEpochTrainingIteration?.Invoke(epoch, correctness);
+            OnEpochTrainingIteration?.Invoke(epoch + 1, correctness);
         }
 
         OnTrainingFinished?.Invoke();
@@ -312,7 +312,8 @@ public class NeuralNetwork
                 for (int j = 0; j < currentInput.Length; j++)
                 {
                     var featureMap = currentInput[j];
-                    ImagesProcessor.DataReader.SaveToImage(featureMap.ToArray(), directoryPath + $"featureMap_{i}_{j}.png");
+
+                    featureMap.SaveAsPng(directoryPath + $"featureMap_{i}_{j}.png");
                 }
             }
         }
@@ -478,7 +479,7 @@ public class NeuralNetwork
     /// Feeds the input channels through the neural network and returns the output.
     /// </summary>
     /// <param name="inputChannels"> Data sample (its channels) </param>
-    /// <returns> 
+    /// <returns>
     /// Tuple with output matrix and array of layers outputs before activation functions
     /// </returns>
     /// <exception cref="InvalidOperationException"></exception>
