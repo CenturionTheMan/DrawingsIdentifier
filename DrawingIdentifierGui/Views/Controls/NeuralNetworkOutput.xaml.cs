@@ -1,19 +1,9 @@
-﻿using DrawingIdentifierGui.MVVM;
-using System;
-using System.Collections.Generic;
+﻿using NeuralNetworkLibrary;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Matrix = NeuralNetworkLibrary.Matrix;
 
 namespace DrawingIdentifierGui.Views.Controls;
 
@@ -68,42 +58,15 @@ public partial class NeuralNetworkOutput : UserControl
         singleNNNodes = this.HolderGrid.Children.OfType<SingleNNOutput>().ToArray();
     }
 
-    public void UpdatePrecidtions(double[] nnInput)
+    public void UpdatePrecidtions(Matrix mat)
     {
-        double[]? preditions = null;
-
-        switch (NeuralNetworkType)
-        {
-            case 0:
-                {
-                    preditions = App.FeedForwardNN.Predict(nnInput);
-                    //ImagesProcessor.DataReader.SaveToImage(nnInput, "D:\\GoogleDriveMirror\\Studia\\Inzynierka\\text.png");
-
-                    Debug.WriteLine($"[BASE-NN PREDICTION]: {Array.IndexOf(preditions, preditions.Max())}");
-
-                    break;
-                }
-            case 1:
-                {
-                    //TODO
-                    break;
-                }
-            default:
-                {
-                    MessageBox.Show("There is no neural network type: " + NeuralNetworkType);
-                    return;
-                }
-        }
-
-        if (preditions == null)
-            return;
+        Matrix predition = App.NeuralNetworks[NeuralNetworkType].Predict(mat);
 
         for (int i = 0; i < singleNNNodes.Length; i++)
         {
-            singleNNNodes[i].SetPredictionValue(preditions[i], DefaultNodeBg);
+            singleNNNodes[i].SetPredictionValue(predition[i, 0], DefaultNodeBg);
         }
 
-        double max = preditions.Max();
-        singleNNNodes[Array.IndexOf(preditions, max)].ActivateBest(ActiveNodeBg);
+        singleNNNodes[predition.IndexOfMax()].ActivateBest(ActiveNodeBg);
     }
 }

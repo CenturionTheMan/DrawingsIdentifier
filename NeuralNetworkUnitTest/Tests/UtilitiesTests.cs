@@ -14,12 +14,12 @@ public class UtilitiesTests
         // Arrange
         Matrix[] matrices = new Matrix[]
         {
-            new Matrix(new double[,] { { 1, 2 }, { 3, 4 } }),
-            new Matrix(new double[,] { { 5, 6 }, { 7, 8 } })
+            new Matrix(new float[,] { { 1, 2 }, { 3, 4 } }),
+            new Matrix(new float[,] { { 5, 6 }, { 7, 8 } })
         };
 
         // Act
-        Matrix flattenedMatrix = Utilities.FlattenMatrix(matrices);
+        Matrix flattenedMatrix = MatrixExtender.FlattenMatrix(matrices);
 
         Matrix expectedResult = new Matrix([1, 2, 3, 4, 5, 6, 7, 8]);
         // Assert
@@ -34,12 +34,12 @@ public class UtilitiesTests
         int matrixSize = 2;
 
         // Act
-        Matrix[] matrices = Utilities.UnflattenMatrix(flattenedMatrix, matrixSize);
+        Matrix[] matrices = MatrixExtender.UnflattenMatrix(flattenedMatrix, matrixSize);
 
         Matrix[] expectedMatrices = new Matrix[]
         {
-            new Matrix(new double[,] { { 1, 2 }, { 3, 4 } }),
-            new Matrix(new double[,] { { 5, 6 }, { 7, 8 } })
+            new Matrix(new float[,] { { 1, 2 }, { 3, 4 } }),
+            new Matrix(new float[,] { { 5, 6 }, { 7, 8 } })
         };
 
         // Assert
@@ -55,18 +55,18 @@ public class UtilitiesTests
         // Arrange
         Matrix[] matricesList = new Matrix[]
         {
-            new Matrix(new double[,] {
+            new Matrix(new float[,] {
                 { 1, 2, 3 },
                 { 4, 5, 6 } }),
 
-            new Matrix(new double[,] {
+            new Matrix(new float[,] {
                 { 7,8,9},
                 { 10, 11, 12 } })
         };
         Matrix flattened = new Matrix([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
-        Matrix testFlatten = Utilities.FlattenMatrix(matricesList);
-        Matrix[] testUnFlatten = Utilities.UnflattenMatrix(flattened, 2, 3);
+        Matrix testFlatten = MatrixExtender.FlattenMatrix(matricesList);
+        Matrix[] testUnFlatten = MatrixExtender.UnflattenMatrix(flattened, 2, 3);
 
         Assert.True(flattened.Equals(testFlatten));
         for (int i = 0; i < matricesList.Length; i++)

@@ -7,7 +7,7 @@ public class MatrixTests
     [Fact]
     public void Constructor_SingleColumnValues_CreatesCorrectMatrix()
     {
-        var matrix = new Matrix(new double[] { 1, 2, 3 });
+        var matrix = new Matrix(new float[] { 1, 2, 3 });
 
         Assert.Equal(1, matrix[0, 0]);
         Assert.Equal(2, matrix[1, 0]);
@@ -17,7 +17,7 @@ public class MatrixTests
     [Fact]
     public void Constructor_2DArray_CreatesCorrectMatrix()
     {
-        var matrix = new Matrix(new double[,] { { 1, 2 }, { 3, 4 } });
+        var matrix = new Matrix(new float[,] { { 1, 2 }, { 3, 4 } });
 
         Assert.Equal(1, matrix[0, 0]);
         Assert.Equal(2, matrix[0, 1]);
@@ -36,9 +36,9 @@ public class MatrixTests
     [Fact]
     public void Enumerator_ValidMatrix_ReturnsCorrectValues()
     {
-        var matrix = new Matrix(new double[,] {
-            { 1.0, 2.0 },
-            { 3.0, 4.0 } });
+        var matrix = new Matrix(new float[,] {
+            { 1.0f, 2.0f },
+            { 3.0f, 4.0f } });
         var enumerator = matrix.GetEnumerator();
 
         Assert.True(enumerator.MoveNext());
@@ -59,11 +59,11 @@ public class MatrixTests
     [Fact]
     public void Equals_ValidMatrices_ReturnsCorrect()
     {
-        Matrix matrix1 = new Matrix(new double[,]
+        Matrix matrix1 = new Matrix(new float[,]
         {
             { 1, 2 },
             { 3, 4 } });
-        Matrix matrix2 = new Matrix(new double[,] {
+        Matrix matrix2 = new Matrix(new float[,] {
             { 1, 2 },
             { 3, 4 } });
 
@@ -73,11 +73,11 @@ public class MatrixTests
     [Fact]
     public void Equals_InvalidMatrices_ReturnsCorrect()
     {
-        Matrix matrix1 = new Matrix(new double[,]
+        Matrix matrix1 = new Matrix(new float[,]
         {
             { 1, 2 },
             { 3, 4 } });
-        Matrix matrix2 = new Matrix(new double[,]
+        Matrix matrix2 = new Matrix(new float[,]
         {
             { 1, 2 },
             { 3, 5 } });
@@ -88,7 +88,7 @@ public class MatrixTests
     [Fact]
     public void Copy_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var matrix = new Matrix(new double[,]
+        var matrix = new Matrix(new float[,]
         {
                 { 1, 2 },
                 { 3, 4 } });
@@ -104,10 +104,10 @@ public class MatrixTests
     [Fact]
     public void DotProductMatrices_ValidMatrices_ReturnsCorrectMatrix()
     {
-        var matrix1 = new Matrix(new double[,] {
+        var matrix1 = new Matrix(new float[,] {
                 { 1, 2 },
                 { 3, 4 } });
-        var matrix2 = new Matrix(new double[,] {
+        var matrix2 = new Matrix(new float[,] {
                 { 2, 0 },
                 { 1, 2 } });
 
@@ -131,10 +131,10 @@ public class MatrixTests
     [Fact]
     public void ElementWiseMultiplyMatrices_ValidMatrices_ReturnsCorrectMatrix()
     {
-        var matrix1 = new Matrix(new double[,] {
+        var matrix1 = new Matrix(new float[,] {
                 { 1, 2 },
                 { 3, 4 } });
-        var matrix2 = new Matrix(new double[,] {
+        var matrix2 = new Matrix(new float[,] {
                 { 2, 3 },
                 { 4, 5 } });
 
@@ -158,11 +158,11 @@ public class MatrixTests
     [Fact]
     public void ElementWiseAddMatrices_ValidMatrices_ReturnsCorrectMatrix()
     {
-        var matrix1 = new Matrix(new double[,]
+        var matrix1 = new Matrix(new float[,]
         {
                 { 1, 2 },
                 { 3, 4 } });
-        var matrix2 = new Matrix(new double[,]
+        var matrix2 = new Matrix(new float[,]
         {
                 { 2, 3 },
                 { 4, 5 } });
@@ -187,11 +187,11 @@ public class MatrixTests
     [Fact]
     public void ElementWiseSubtractMatrices_ValidMatrices_ReturnsCorrectMatrix()
     {
-        var matrix1 = new Matrix(new double[,]
+        var matrix1 = new Matrix(new float[,]
         {
                 { 1, 2 },
                 { 3, 4 } });
-        var matrix2 = new Matrix(new double[,]
+        var matrix2 = new Matrix(new float[,]
         {
                 { 2, 3 },
                 { 4, 5 } });
@@ -216,11 +216,11 @@ public class MatrixTests
     [Fact]
     public void MultiplyOperator_ValidMatrices_ReturnsCorrectMatrix()
     {
-        var matrix1 = new Matrix(new double[,]
+        var matrix1 = new Matrix(new float[,]
         {
                 { 1, 2 },
                 { 3, 4 } });
-        double numer = 2.5;
+        float numer = 2.5f;
 
         var result = matrix1 * numer;
 
@@ -233,11 +233,11 @@ public class MatrixTests
     [Fact]
     public void PlusOperator_ValidMatrices_ReturnsCorrectMatrix()
     {
-        var matrix1 = new Matrix(new double[,]
+        var matrix1 = new Matrix(new float[,]
         {
                 { 1, 2 },
                 { 3, 4 } });
-        double numer = 15;
+        float numer = 15;
 
         var result = matrix1 + numer;
 
@@ -254,7 +254,7 @@ public class MatrixTests
     [Fact]
     public void ConvolutionFull_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var input = new Matrix(new double[,]
+        var input = new Matrix(new float[,]
         {
             {1, 2, 4, 3},
             {2, 1, 3, 5},
@@ -262,7 +262,7 @@ public class MatrixTests
             {2, 3, 4, 9}
         });
 
-        var kernel = new Matrix(new double[,]
+        var kernel = new Matrix(new float[,]
         {
             {1,2,3 },
             {-4,3,-6 },
@@ -270,7 +270,7 @@ public class MatrixTests
         });
         int stride = 1;
 
-        var expectedResult = new Matrix(new double[,]
+        var expectedResult = new Matrix(new float[,]
         {
             { 1, 4, 11, 17, 18, 9},
             { -2, 0, -5, 2, 4, -3},
@@ -288,7 +288,7 @@ public class MatrixTests
     [Fact]
     public void ConvolutionValid_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var input = new Matrix(new double[,]
+        var input = new Matrix(new float[,]
         {
             {1, 2, 4, 3},
             {2, 1, 3, 5},
@@ -296,7 +296,7 @@ public class MatrixTests
             {2, 3, 4, 9}
         });
 
-        var kernel = new Matrix(new double[,]
+        var kernel = new Matrix(new float[,]
         {
             {1,2,3 },
             {-4,3,-6 },
@@ -304,7 +304,7 @@ public class MatrixTests
         });
         int stride = 1;
 
-        var expectedResult = new Matrix(new double[,]
+        var expectedResult = new Matrix(new float[,]
         {
             { -4, -2 },
             { 7, -5 }
@@ -318,7 +318,7 @@ public class MatrixTests
     [Fact]
     public void CrossCorrelationFull_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var input = new Matrix(new double[,]
+        var input = new Matrix(new float[,]
         {
             {1, 2, 4, 3},
             {2, 1, 3, 5},
@@ -326,7 +326,7 @@ public class MatrixTests
             {2, 3, 4, 9}
         });
 
-        var kernel = new Matrix(new double[,]
+        var kernel = new Matrix(new float[,]
         {
             {1,2,3 },
             {-4,3,-6 },
@@ -334,7 +334,7 @@ public class MatrixTests
         });
         int stride = 1;
 
-        var expectedResult = new Matrix(new double[,]
+        var expectedResult = new Matrix(new float[,]
         {
             { 3, 4, 9, 3, -2, 3},
             { 0, -10, -13, -4, -14, -7},
@@ -352,7 +352,7 @@ public class MatrixTests
     [Fact]
     public void CrossCorrelationValid_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var input = new Matrix(new double[,]
+        var input = new Matrix(new float[,]
         {
             {1, 2, 4, 3},
             {2, 1, 3, 5},
@@ -360,7 +360,7 @@ public class MatrixTests
             {2, 3, 4, 9}
         });
 
-        var kernel = new Matrix(new double[,]
+        var kernel = new Matrix(new float[,]
         {
             {1,2,3 },
             {-4,3,-6 },
@@ -368,7 +368,7 @@ public class MatrixTests
         });
         int stride = 1;
 
-        var expectedResult = new Matrix(new double[,]
+        var expectedResult = new Matrix(new float[,]
         {
             {-4, 12 },
             {9,3 }
@@ -382,14 +382,14 @@ public class MatrixTests
     [Fact]
     public void Rotate180_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var matrix = new Matrix(new double[,]
+        var matrix = new Matrix(new float[,]
         {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9}
         });
 
-        var expectedResult = new Matrix(new double[,]
+        var expectedResult = new Matrix(new float[,]
         {
             {9, 8, 7},
             {6, 5, 4},
@@ -412,7 +412,7 @@ public class MatrixTests
     [Fact]
     public void IndexOfMax_InvalidMatrix_ThrowsArgumentException()
     {
-        var matrix = new Matrix(new double[,]
+        var matrix = new Matrix(new float[,]
         {
             { 1, 2, 3 },
             { 4, 5, 30 },
@@ -425,14 +425,14 @@ public class MatrixTests
     [Fact]
     public void Transpose_ValidMatrix_ReturnsCorrectMatrix()
     {
-        var matrix = new Matrix(new double[,]
+        var matrix = new Matrix(new float[,]
         {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9}
         });
 
-        var expectedResult = new Matrix(new double[,]
+        var expectedResult = new Matrix(new float[,]
         {
             {1, 4, 7},
             {2, 5, 8},

@@ -2,6 +2,7 @@
 using DrawingIdentifierGui.MVVM;
 using Microsoft.Win32;
 using NeuralNetworkLibrary;
+using NeuralNetworkLibrary.QuickDrawHandler;
 using System.Diagnostics;
 using System.Windows;
 
@@ -14,7 +15,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             Task.Factory.StartNew(InitializeLearning);
         });
 
-        private NeuralNetworkConfig? learningConfig;
+        private NeuralNetworkConfigModel? learningConfig;
 
         private string titleName = "Unknown";
         public string TitleName
@@ -53,58 +54,33 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             set { corectness = value; OnPropertyChanged(); }
         }
 
-        public int EpochAmount { get => App.FeedForwardNNConfig.EpochAmount; }
+        public int EpochAmount { get => learningConfig!.EpochAmount; }
 
-        private INeuralNetwork? neuralNetwork;
+        private NeuralNetwork? neuralNetwork;
 
         public SingleNetworkLearnigViewModel(string name)
         {
-            string tmp = name.Replace("Neural_Network", "");
-            TitleName = tmp.Replace("_", " ").Trim() + Environment.NewLine + "Neural Network";
-            TypeOfNN = name.Contains("Convo") ? 1 : 0;
+            TitleName = "";
+            var split = name.Split("_");
+            for (int i = 0; i < split.Length - 1; i++)
+            {
+                TitleName += split[i] + " ";
+            }
 
-            RefreshNN(TypeOfNN, false);
+            TypeOfNN = int.Parse(split[^1]);
+
+            RefreshNN(TypeOfNN);
 
             FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
         }
 
-        private void RefreshNN(int nnType, bool createNewInstance)
+        private void RefreshNN(int nnType)
         {
-            learningConfig = nnType switch
-            {
-                0 => App.FeedForwardNNConfig,
-                1 => App.ConvolutionalNNConfig,
-                _ => throw new Exception("Unknown neural network type")
-            };
-
-            switch (nnType)
-            {
-                case 0:
-                    {
-                        if (createNewInstance)
-                        {
-                            var ctorData = learningConfig!.GetLayersAsCtorData();
-                            App.FeedForwardNN = new FeedForwardNeuralNetwork(ctorData.layersSize, ctorData.activationFunctions);
-                        }
-                        neuralNetwork = App.FeedForwardNN;
-                        break;
-                    }
-                case 1:
-                    {
-                        neuralNetwork = null; //here assign convolutional neural network
-                        break;
-                    }
-                default:
-                    throw new NotImplementedException("Unknown nn type");
-            }
-
-            if (neuralNetwork == null)
-            {
-                return;
-            }
+            learningConfig = App.NeuralNetworkConfigModels[nnType];
+            neuralNetwork = App.NeuralNetworks[nnType];
 
             double batchErr = double.MaxValue;
-            neuralNetwork!.OnLearningIteration = (epoch, epochPercentFinish, batchError) =>
+            neuralNetwork!.OnBatchTrainingIteration = (epoch, epochPercentFinish, batchError) =>
             {
                 FinishedEpochs = epoch;
                 EpochPercentFinish = epochPercentFinish;
@@ -130,11 +106,12 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             return files;
         }
 
+        //TODO manage files / data loading -> variable for storing i model
         private void RunLearning(string[] files)
         {
             Task.Factory.StartNew(() =>
             {
-                var quickDrawData = ImagesProcessor.DataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig!.SamplesAmountToLoadPerFile);
+                var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig!.SamplesPerFile);
                 if (quickDrawData == null)
                 {
                     return;
@@ -142,7 +119,10 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
                 (var trainData, var testData) = quickDrawData.SplitIntoTrainTest();
 
-                neuralNetwork!.Train(trainData, learningConfig!.LearningRate, learningConfig.EpochAmount, learningConfig.BatchSize, learningConfig.ExpectedMaxError);
+                var nn = App.NeuralNetworks[TypeOfNN];
+                var trainer = App.NeuralNetworkConfigModels[TypeOfNN].CreateTrainer(nn);
+                (var task, var cts) = trainer.RunTrainingOnTask();
+                task.Wait();
 
                 Debug.WriteLine("Finished learning");
 
@@ -152,10 +132,10 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 {
                     var prediction = neuralNetwork!.Predict(item.inputs);
                     var max = prediction.Max();
-                    int indexOfMaxPrediction = prediction.ToList().IndexOf(max);
+                    int indexOfMaxPrediction = prediction.IndexOfMax();
 
                     var expectedMax = item.outputs.Max();
-                    int indexOfMaxExpected = item.outputs.ToList().IndexOf(expectedMax);
+                    int indexOfMaxExpected = item.outputs.IndexOfMax();
 
                     if (indexOfMaxPrediction == indexOfMaxExpected)
                     {
@@ -187,7 +167,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             }
 
             // refresh neural network config
-            RefreshNN(this.TypeOfNN, true);
+            RefreshNN(this.TypeOfNN);
 
             // run learing
             RunLearning(files);

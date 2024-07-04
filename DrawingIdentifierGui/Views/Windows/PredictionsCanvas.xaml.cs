@@ -1,16 +1,12 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using static ImagesProcessor.BitmapCustomExtender;
 using static DrawingIdentifierGui.Utilities.CanvasHelper;
 using System.Drawing.Printing;
 using System.Diagnostics;
 using DrawingIdentifierGui.ViewModels.Windows;
 using System.Reflection;
+using NeuralNetworkLibrary;
 
 namespace DrawingIdentifierGui.Views.Windows;
 
@@ -65,15 +61,22 @@ public partial class PredictionsCanvas : UserControl
         var bitmap = drawingCanvas.GetBitmap();
         var imageTask = new Task(() =>
         {
-            var input = bitmap.ToBlackWhite().CropWhite(50).Resize(28, 28).RValueToFlatDoubleArray(reverse: false);
+            Matrix mat = new Matrix(bitmap.Height, bitmap.Width);
+            for (int i = 0; i < bitmap.Height; i++)
+            {
+                for (int j = 0; j < bitmap.Width; j++)
+                {
+                    mat[i, j] = bitmap.GetPixel(i, j).R;
+                }
+            }
 
             //to remove
-            //ImagesProcessor.DataReader.SaveToImage(input, "./../../../../UserDrawing.png", 28, 28);
+            mat.SaveAsPng("./../../../../UserDrawing.png");
 
             RunMethodOnCurrentThread(() =>
             {
-                BaseNNOutput.UpdatePrecidtions(input);
-                ConvolutionalNNOutput.UpdatePrecidtions(input);
+                NN1Output.UpdatePrecidtions(mat);
+                NN2Output.UpdatePrecidtions(mat);
             });
         });
         imageTask.Start();

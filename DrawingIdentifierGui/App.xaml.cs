@@ -13,32 +13,61 @@ namespace DrawingIdentifierGui
     ///
     public partial class App : Application
     {
-        public static FeedForwardNeuralNetwork FeedForwardNN = new FeedForwardNeuralNetwork([784, 16, 16, 10], [ActivationFunction.ReLU, ActivationFunction.ReLU, ActivationFunction.Softmax]);
+        //TODO neural network aren t changing -> assign it somewhere (methods done in model)
+        public static NeuralNetwork[] NeuralNetworks = [
+            new NeuralNetwork(786,
+                [
+                    LayerTemplate.CreateFullyConnectedLayer(16, ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(16, ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(10, ActivationFunction.Softmax),
+                ]
+            ),
 
-        public static NeuralNetworkConfig FeedForwardNNConfig = new NeuralNetworkConfig()
-        {
-            Data = null,
-            SamplesAmountToLoadPerFile = 5000,
-            LearningRate = 0.01,
-            EpochAmount = 30,
-            BatchSize = 50,
-            ExpectedMaxError = 0.01,
-            NeuralNetworkLayers = new()
+            new NeuralNetwork(1, 28, 28,
+                [
+                    LayerTemplate.CreateConvolutionLayer(5, 12, 1, ActivationFunction.ReLU),
+                    LayerTemplate.CreateMaxPoolingLayer(2, 2),
+                    LayerTemplate.CreateFullyConnectedLayer(64, ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(64, ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(10, ActivationFunction.Softmax),
+                ]
+            ),
+        ];
+
+        public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels = [
+            new NeuralNetworkConfigModel()
             {
-                new NNLayerConfig { LayerName="Input Layer", Size=784, ActivationFunction=ActivationFunction.ReLU, IsSizeEnable=false },
-                new NNLayerConfig { LayerName="Hidden Layer", Size=16, ActivationFunction=ActivationFunction.ReLU },
-                new NNLayerConfig { LayerName="Hidden Layer", Size=16, ActivationFunction=ActivationFunction.Softmax, IsActivationFunctionEnable=false },
-                new NNLayerConfig { LayerName="Output Layer", Size=10, ActivationFunction=null, IsSizeEnable=false, IsActivationFunctionEnable=false },
-            }
-        };
-
-        public static NeuralNetworkConfig ConvolutionalNNConfig = new NeuralNetworkConfig()
-        {
-            Data = null,
-            LearningRate = 0.01,
-            EpochAmount = 30,
-            BatchSize = 50,
-            ExpectedMaxError = 0.01
-        };
+                TrainData = null,
+                TestData = null,
+                SamplesPerFile = 5000,
+                InitialLearningRate = 0.01f,
+                MinLearningRate = 0.001f,
+                EpochAmount = 30,
+                BatchSize = 50,
+                NeuralNetworkLayers = new()
+                {
+                    new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
+                    new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
+                }
+            },
+            new NeuralNetworkConfigModel()
+            {
+                TrainData = null,
+                TestData = null,
+                SamplesPerFile = 5000,
+                InitialLearningRate = 0.01f,
+                MinLearningRate = 0.001f,
+                EpochAmount = 30,
+                BatchSize = 50,
+                NeuralNetworkLayers = new()
+                {
+                    new LayerModel() { LayerType = LayerType.Convolution, KernelSize = 5, KernelDepth = 8},
+                    new LayerModel() { LayerType = LayerType.MaxPooling, PoolSize = 2, PoolStride = 2},
+                    new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
+                    new LayerModel() { LayerType = LayerType.Dropout, DropoutRate = 0.5f},
+                    new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
+                }
+            },
+        ];
     }
 }

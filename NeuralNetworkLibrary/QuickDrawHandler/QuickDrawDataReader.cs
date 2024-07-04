@@ -68,7 +68,7 @@ public static class QuickDrawDataReader
             if (randomlyShift)
             {
                 float background = colorReverse ? 1.0f : 0.0f;
-                tmp = ImageEditor.RandomShiftMatrixImage(tmp, 0.9f, 1.1f, -45f, 45f, background);
+                tmp = ImageEditor.RandomShiftMatrixImage(tmp, 0.95f, 1.05f, -30f, 30f, background);
             }
 
             if (tmp.RowsAmount != 28 || tmp.ColumnsAmount != 28)

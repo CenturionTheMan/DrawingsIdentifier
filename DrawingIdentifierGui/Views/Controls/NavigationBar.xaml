@@ -28,6 +28,11 @@
                 Click="Button3_Click"
                 Style="{DynamicResource NavigationNavigationRadioButton}"
                 ImageMargin="5" />
+
+            <components:NavigationRadioButton
+                Click="Button4_Click"
+                Style="{DynamicResource NavigationNavigationRadioButton}"
+                ImageMargin="5" />
         </StackPanel>
     </Grid>
 </UserControl>

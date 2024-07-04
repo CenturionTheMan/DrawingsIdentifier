@@ -15,6 +15,7 @@ internal class Program
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
         var tester = new NNTrainingTests();
         tester.RunTests();
+        throw new Exception("END");
 
         //TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
         //{
@@ -26,6 +27,7 @@ internal class Program
         //    LayerTemplate.CreateDropoutLayer(dropoutRate: 0.5f),
         //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         //}));
+
     }
 
     private static void TestNN(NeuralNetwork nn)

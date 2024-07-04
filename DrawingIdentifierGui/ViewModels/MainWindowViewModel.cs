@@ -20,7 +20,8 @@ namespace DrawingIdentifierGui.ViewModels
 
         public RelayCommand ShowPredictionCanvasCommnad => new RelayCommand(parameter => SelectedViewModel = new PredictionsCanvasViewModel());
         public RelayCommand ShowNeuralNetworkLearningCommand => new RelayCommand(parameter => SelectedViewModel = new NeuralNetworkLearnigViewModel());
-        public RelayCommand ShowFeedForwardNNConfigCommand => new RelayCommand(parameter => SelectedViewModel = new FeedForwardConfigViewModel());
+        public RelayCommand ShowNeuralNetwork1ConfigCommand => new RelayCommand(parameter => SelectedViewModel = new NeuralNetworkConfigViewModel(0));
+        public RelayCommand ShowNeuralNetwork2ConfigCommand => new RelayCommand(parameter => SelectedViewModel = new NeuralNetworkConfigViewModel(1));
 
         public RelayCommand ExitCommand => new RelayCommand(parameter => MainWindow.Instance.Close());
         public RelayCommand MinimalizeCommand => new RelayCommand(parameter => MainWindow.Instance.WindowState = System.Windows.WindowState.Minimized);

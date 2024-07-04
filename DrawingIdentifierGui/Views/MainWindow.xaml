@@ -31,8 +31,8 @@
         <DataTemplate DataType="{x:Type viewModelsWindows:NeuralNetworkLearnigViewModel}">
             <windows:NeuralNetworkLearning />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModelsWindows:FeedForwardConfigViewModel}">
-            <windows:FeedForwardConfig />
+        <DataTemplate DataType="{x:Type viewModelsWindows:NeuralNetworkConfigViewModel}">
+            <windows:NeuralNetworkConfigView />
         </DataTemplate>
     </Window.Resources>
 
@@ -94,7 +94,8 @@
                 Grid.Row="1"
                 Button1Command="{Binding ShowPredictionCanvasCommnad}"
                 Button2Command="{Binding ShowNeuralNetworkLearningCommand}"
-                Button3Command="{Binding ShowFeedForwardNNConfigCommand}" />
+                Button3Command="{Binding ShowNeuralNetwork1ConfigCommand}"
+                Button4Command="{Binding ShowNeuralNetwork2ConfigCommand}" />
 
             <!--Content-->
             <ContentControl Grid.Row="1"
@@ -102,11 +103,6 @@
                             Content="{Binding SelectedViewModel}"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch" />
-
-            <!--<controls:PredictionsCanvas
-                Grid.Column="1"
-                Grid.Row="1"
-                />-->
         </Grid>
     </Border>
 </Window>
