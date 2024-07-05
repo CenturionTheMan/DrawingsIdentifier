@@ -19,8 +19,8 @@ namespace DrawingIdentifierGui.Models
         public float InitialIgnore { get; set; }
         public float Patience { get; set; }
 
-        public (Matrix[] inputs, Matrix outputs)[]? TrainData { get; set; }
-        public (Matrix[] inputs, Matrix outputs)[]? TestData { get; set; }
+        public (Matrix[] inputs, Matrix outputs)[] TrainData { get; set; } = new (Matrix[] inputs, Matrix outputs)[0];
+        public (Matrix[] inputs, Matrix outputs)[] TestData { get; set; } = new (Matrix[] inputs, Matrix outputs)[0];
 
         public int SamplesPerFile { get; set; }
         public float InitialLearningRate { get; set; }
@@ -30,15 +30,15 @@ namespace DrawingIdentifierGui.Models
 
         public ObservableCollection<LayerModel> NeuralNetworkLayers { get; set; }
 
-        public NeuralNetwork CreateNeuralNetwork()
+        public static NeuralNetwork CreateNeuralNetwork(LayerModel[] layers)
         {
             int channels = 1;
-            int rows = NeuralNetworkLayers[0].LayerType == LayerType.FullyConnected ? 28 * 28 : 28;
-            int columns = NeuralNetworkLayers[0].LayerType == LayerType.FullyConnected ? 1 : 28;
+            int rows = 28;
+            int columns = 28;
 
             List<LayerTemplate> layerTemplates = new();
 
-            foreach (var layer in NeuralNetworkLayers)
+            foreach (var layer in layers)
             {
                 switch (layer.LayerType)
                 {
@@ -62,6 +62,11 @@ namespace DrawingIdentifierGui.Models
             layerTemplates.Add(LayerTemplate.CreateFullyConnectedLayer(10, ActivationFunction.Softmax));
 
             return new NeuralNetwork(channels, rows, columns, layerTemplates.ToArray());
+        }
+
+        public NeuralNetwork CreateNeuralNetwork()
+        {
+            return NeuralNetworkConfigModel.CreateNeuralNetwork(NeuralNetworkLayers.ToArray());
         }
 
         public Trainer CreateTrainer(NeuralNetwork neuralNetwork)

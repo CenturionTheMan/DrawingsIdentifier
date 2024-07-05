@@ -20,6 +20,8 @@ public struct QuickDrawSample
 
 public class QuickDrawSet
 {
+    private static Random random = new();
+
     public static readonly Dictionary<string, int> categories = new Dictionary<string, int>{
         { "axe", 0},
         { "cactus", 1},
@@ -38,7 +40,7 @@ public class QuickDrawSet
     public QuickDrawSet(IEnumerable<QuickDrawSample> samples, bool shuffleData = true)
     {
         if (shuffleData)
-            this.samples = samples.OrderBy(x => Guid.NewGuid());
+            this.samples = samples.OrderBy(x => random.Next());
         else
             this.samples = samples;
     }

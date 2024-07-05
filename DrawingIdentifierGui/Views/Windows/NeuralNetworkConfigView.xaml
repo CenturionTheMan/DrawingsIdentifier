@@ -74,129 +74,139 @@
                                 Grid.ColumnSpan="4" />
 
                     <!--BASIC-->
-                    <StackPanel x:Name="stackPanel1" Grid.Row="1"
+                    <ScrollViewer HorizontalAlignment="Stretch"
+                                  Background="{StaticResource colorDark2}"
+                                  VerticalAlignment="Top"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Grid.Column="0"
+                                  Grid.Row="1"
+                                  Grid.ColumnSpan="2"
+                                  Grid.RowSpan="4">
+
+                        <StackPanel x:Name="stackPanel1" Grid.Row="1"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
                                 Grid.RowSpan="4"
-                                VerticalAlignment="Center"
+                                VerticalAlignment="Stretch"
                                 HorizontalAlignment="Stretch"
                                 Margin="10 10 20 10">
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type Grid}">
-                                <Setter Property="Margin" Value="0,10,0,0" />
-                            </Style>
-                        </StackPanel.Resources>
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Setter Property="Margin" Value="0,10,0,0" />
+                                </Style>
+                            </StackPanel.Resources>
 
-                        <!--Samples per file-->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <!--Samples per file-->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Samples per file: "
+                                <TextBlock Text="Samples per file: "
                                        Grid.Column="0"
                                        Foreground="{StaticResource colorWhite}"
                                        FontSize="20"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center" />
-                            <TextBox Background="{StaticResource colorWhite}"
+                                <TextBox Background="{StaticResource colorWhite}"
                                      Text="{Binding Path=NeuralNetworkConfig.SamplesPerFile, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
-                        </Grid>
+                            </Grid>
 
-                        <!--Initial Learning rate-->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <!--Initial Learning rate-->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Initial learning rate: "
+                                <TextBlock Text="Initial learning rate: "
                                        Grid.Column="0"
                                        Foreground="{StaticResource colorWhite}"
                                        FontSize="20"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center" />
-                            <TextBox Background="{StaticResource colorWhite}"
+                                <TextBox Background="{StaticResource colorWhite}"
                                      Text="{Binding Path=NeuralNetworkConfig.InitialLearningRate, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
-                        </Grid>
+                            </Grid>
 
-                        <!--Min Learning rate-->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <!--Min Learning rate-->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Min learning rate: "
+                                <TextBlock Text="Min learning rate: "
                                        Grid.Column="0"
                                        Foreground="{StaticResource colorWhite}"
                                        FontSize="20"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center" />
-                            <TextBox Background="{StaticResource colorWhite}"
+                                <TextBox Background="{StaticResource colorWhite}"
                                      Text="{Binding Path=NeuralNetworkConfig.MinLearningRate, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
-                        </Grid>
+                            </Grid>
 
-                        <!--Epochs-->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <!--Epochs-->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Epochs amount: "
+                                <TextBlock Text="Epochs amount: "
                                        Grid.Column="0"
                                        Foreground="{StaticResource colorWhite}"
                                        FontSize="20"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center" />
-                            <TextBox Background="{StaticResource colorWhite}"
+                                <TextBox Background="{StaticResource colorWhite}"
                                      Text="{Binding Path=NeuralNetworkConfig.EpochAmount, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
-                        </Grid>
+                            </Grid>
 
-                        <!--Batch size-->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <!--Batch size-->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Batch size: "
+                                <TextBlock Text="Batch size: "
                                        Grid.Column="0"
                                        Foreground="{StaticResource colorWhite}"
                                        FontSize="20"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center" />
-                            <TextBox Background="{StaticResource colorWhite}"
+                                <TextBox Background="{StaticResource colorWhite}"
                                      Text="{Binding Path=NeuralNetworkConfig.BatchSize, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
-                        </Grid>
-                    </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
 
                     <!--PATIENCE-->
                     <CheckBox Grid.Column="2"
@@ -316,8 +326,9 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="0.16*" />
-                        <RowDefinition Height="0.42*" />
-                        <RowDefinition Height="0.42*" />
+                        <RowDefinition Height="0.28*" />
+                        <RowDefinition Height="0.28*" />
+                        <RowDefinition Height="0.28*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.05*" />
@@ -339,7 +350,7 @@
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Grid.Row="1"
-                                Grid.RowSpan="2">
+                                Grid.RowSpan="3">
                         <TextBlock Text="I" FontSize="25" HorizontalAlignment="Center" Foreground="{StaticResource colorHighlight2}" />
                         <TextBlock Text="N" FontSize="25" HorizontalAlignment="Center" Foreground="{StaticResource colorHighlight2}" />
                         <TextBlock Text="P" FontSize="25" HorizontalAlignment="Center" Foreground="{StaticResource colorHighlight2}" />
@@ -351,7 +362,7 @@
                                 VerticalAlignment="Center"
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Grid.RowSpan="2">
+                                Grid.RowSpan="3">
                         <TextBlock Text="O" FontSize="25" HorizontalAlignment="Center" Foreground="{StaticResource colorHighlight2}" />
                         <TextBlock Text="U" FontSize="25" HorizontalAlignment="Center" Foreground="{StaticResource colorHighlight2}" />
                         <TextBlock Text="T" FontSize="25" HorizontalAlignment="Center" Foreground="{StaticResource colorHighlight2}" />
@@ -362,11 +373,11 @@
 
                     <!--Layers List-->
                     <ListView Name="LayersListView"
-                              ItemsSource="{Binding Path=NeuralNetworkConfig.NeuralNetworkLayers}"
+                              ItemsSource="{Binding Path=NeuralNetworkLayers}"
                               SelectedItem="{Binding Path=SelectedLayer, Mode=TwoWay}"
                               Grid.Row="1"
                               Grid.Column="1"
-                              Grid.RowSpan="2"
+                              Grid.RowSpan="3"
 
                               Background="{StaticResource colorLight1}"
                               VerticalContentAlignment="Top"
@@ -523,7 +534,7 @@
                             BorderBrush="{StaticResource colorDark1}" />
 
                     <Button Grid.Column="3"
-                            Grid.Row="3"
+                            Grid.Row="2"
                             Margin="15"
                             Padding="0"
                             Content="Remove Layer"
@@ -532,6 +543,17 @@
                             Foreground="{StaticResource colorWhite}"
                             Command="{Binding Path=RemoveLayerCommand}"
                             BorderBrush="{StaticResource colorDark1}" />
+
+                    <Button Grid.Column="3"
+                            Grid.Row="3"
+                            Margin="10"
+                            Content="SAVE NN"
+                            FontSize="25"
+                            BorderBrush="{StaticResource colorDark1}"
+                            Background="{StaticResource colorHighlight1}"
+                            FontWeight="Bold"
+                            Command="{Binding Path=SaveChangesToNN}"/>
+
                 </Grid>
             </Border>
         </Grid>

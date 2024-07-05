@@ -63,14 +63,14 @@
 
             <!--Predictions-->
             <controls:NeuralNetworkOutput x:Name="NN1Output"
-                                          NeuralNetworkType="1"
+                                          NeuralNetworkType="0"
                                           HeaderText="Neural Network I"
                                           Grid.Column="2"
                                           Margin="5 10 2.5 10"
                                           DefaultNodeBg="{StaticResource colorLight2}"
                                           ActiveNodeBg="{StaticResource colorHighlight1}" />
             <controls:NeuralNetworkOutput x:Name="NN2Output"
-                                          NeuralNetworkType="2"
+                                          NeuralNetworkType="1"
                                           HeaderText="Neural Network II"
                                           Grid.Column="4"
                                           Margin="2.5 10 5 10"

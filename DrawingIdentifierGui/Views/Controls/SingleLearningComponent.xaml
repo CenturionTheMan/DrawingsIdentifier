@@ -33,10 +33,16 @@
                        Grid.Row="0" />
 
             <!--LOADED NETWORK INFO-->
-            <Label Grid.Row="1"
+            <TextBlock Grid.Row="1"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       Foreground="{StaticResource colorWhite}"
+                       Text="{Binding Info}"
+                       FontSize="20"/>
+            <!--<Label Grid.Row="1"
                Content="{Binding Correctness}"
                Foreground="{StaticResource colorWhite}"
-                   FontSize="20" />
+                   FontSize="20" />-->
 
             <!--LEARNING INFO-->
             <Grid Grid.Row="2">
@@ -98,6 +104,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -105,36 +113,56 @@
                 </Grid.RowDefinitions>
 
                 <Button Grid.Column="0"
+                        Grid.ColumnSpan="2"
                         Content="Load Network"
-                        Command=""
                         Background="{StaticResource colorLight2}"
                         Foreground="{StaticResource colorWhite}"
                         BorderBrush="{StaticResource colorDark1}"
                         BorderThickness="1"
                         Margin="1"
-                        FontSize="20" />
+                        FontSize="20" 
+                        Command="{Binding LoadNeuralNetwork}"
+                        IsEnabled="{Binding IsTrainingNotInProgress}"
+                        />
 
-                <Button Grid.Column="1"
+                <Button Grid.Column="2"
+                        Grid.ColumnSpan="2"
                         Content="Save Network"
-                        Command=""
                         Background="{StaticResource colorLight2}"
                         Foreground="{StaticResource colorWhite}"
                         BorderBrush="{StaticResource colorDark1}"
                         BorderThickness="1"
                         Margin="1"
-                        FontSize="20" />
+                        FontSize="20" 
+                        Command="{Binding SaveNeuralNetwork}"
+                        IsEnabled="{Binding IsTrainingNotInProgress}"
+                        />
 
                 <Button Grid.Column="0"
-                        Grid.ColumnSpan="2"
+                        Grid.ColumnSpan="3"
                         Grid.Row="1"
-                        Content="Initialize Network Learning"
+                        Content="Initialize Training"
                         Command="{Binding StartLearningCommand}"
                         Background="{StaticResource colorHighlight2}"
                         Foreground="{StaticResource colorWhite}"
                         BorderBrush="{StaticResource colorDark1}"
                         BorderThickness="1"
                         Margin="1"
+                        IsEnabled="{Binding IsTrainingNotInProgress}"
                         FontSize="20" />
+                
+                <Button Grid.Column="3"
+                        Grid.Row="1"
+                        Content="Stop"
+                        Command="{Binding StopTrainingCommand}"
+                        Background="{StaticResource colorRed}"
+                        Foreground="{StaticResource colorWhite}"
+                        BorderBrush="{StaticResource colorDark1}"
+                        BorderThickness="1"
+                        Margin="1"
+                        IsEnabled="{Binding IsTrainingInProgress}"
+                        FontSize="20" />
+
             </Grid>
         </Grid>
     </Border>

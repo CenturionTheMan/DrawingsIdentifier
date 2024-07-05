@@ -13,7 +13,7 @@ public static class QuickDrawDataReader
 {
     private static Random random = new Random();
 
-    public static QuickDrawSet LoadQuickDrawSamplesFromFiles(string[] filePaths, int amountToLoadFromEachFile = 2000, bool randomlyShift = true, bool colorReverse = true, float maxValue = 255.0f)
+    public static QuickDrawSet? LoadQuickDrawSamplesFromFiles(string[] filePaths, int amountToLoadFromEachFile = 2000, bool randomlyShift = true, bool colorReverse = true, float maxValue = 255.0f, CancellationToken ct = default, Action<int>? onFileLoaded = null)
     {
         var files = filePaths;
 
@@ -24,24 +24,32 @@ public static class QuickDrawDataReader
         int count = 0;
         foreach (var filePath in files)
         {
-            var quickDrawSet = LoadDataFromNpyFile(filePath, amountToLoadFromEachFile, randomlyShift, colorReverse, maxValue);
+            if (ct.IsCancellationRequested)
+                return null;
+
+            var quickDrawSet = LoadDataFromNpyFile(filePath, amountToLoadFromEachFile, randomlyShift, colorReverse, maxValue, ct);
+
+            if (ct.IsCancellationRequested)
+                return null;
+
             samples.AddRange(quickDrawSet);
 
             count++;
             Debug.WriteLine($"[LOADING SETS] Loaded {count}/{files.Length} files");
+            onFileLoaded?.Invoke(count);
         }
 
         return new QuickDrawSet(samples);
     }
 
-    public static QuickDrawSet LoadQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool randomlyShift = true, bool colorReverse = true, float maxValue = 255.0f)
+    public static QuickDrawSet? LoadQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool randomlyShift = true, bool colorReverse = true, float maxValue = 255.0f, CancellationToken ct = default, Action<int>? onFileLoaded = null)
     {
         var files = Directory.GetFiles(directoryPath, "*.npy");
 
-        return LoadQuickDrawSamplesFromFiles(files, amountToLoadFromEachFile, randomlyShift, colorReverse, maxValue);
+        return LoadQuickDrawSamplesFromFiles(files, amountToLoadFromEachFile, randomlyShift, colorReverse, maxValue, ct, onFileLoaded);
     }
 
-    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad, bool randomlyShift, bool colorReverse = true, float maxValue = 255.0f)
+    private static IEnumerable<QuickDrawSample> LoadDataFromNpyFile(string path, int amountToLoad, bool randomlyShift, bool colorReverse = true, float maxValue = 255.0f, CancellationToken ct = default)
     {
         NDArray npArray = np.load(path);
         float[,] array = (float[,])npArray.ToMuliDimArray<float>();
@@ -53,8 +61,14 @@ public static class QuickDrawDataReader
 
         float factor = 1 / maxValue;
 
-        Parallel.For(0, upperBound, i =>
+        Parallel.For(0, upperBound, (i, loopState) =>
         {
+            if (ct.IsCancellationRequested)
+            {
+                loopState.Stop();
+                return;
+            }
+
             int sampleIndex = random.Next(array.GetLength(0));
             float[] data = new float[array.GetLength(1)];
             for (int j = 0; j < array.GetLength(1); j++)

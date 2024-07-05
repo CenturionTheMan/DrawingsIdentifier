@@ -66,17 +66,22 @@ public partial class PredictionsCanvas : UserControl
             {
                 for (int j = 0; j < bitmap.Width; j++)
                 {
-                    mat[i, j] = bitmap.GetPixel(i, j).R;
+                    mat[i, j] = bitmap.GetPixel(j, i).R;
                 }
             }
 
+            float div = 1 / 255f;
+            var scaled = (mat * div).CutOffBorderToSquare((0.0f, 0.5f))?.ResizeSquare(28, 1f);
+            if(scaled == null) return;
+
             //to remove
-            mat.SaveAsPng("./../../../../UserDrawing.png");
+            scaled.SaveAsPng("./../../../../UserDrawing.png");
+
 
             RunMethodOnCurrentThread(() =>
             {
-                NN1Output.UpdatePrecidtions(mat);
-                NN2Output.UpdatePrecidtions(mat);
+                NN1Output.UpdatePrecidtions(scaled);
+                NN2Output.UpdatePrecidtions(scaled);
             });
         });
         imageTask.Start();

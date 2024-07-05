@@ -12,8 +12,40 @@ namespace DrawingIdentifierGui.ViewModels.Controls
     {
         public RelayCommand StartLearningCommand => new RelayCommand(dd =>
         {
-            Task.Factory.StartNew(InitializeLearning);
+            InitializeLearning();
         });
+
+        public RelayCommand StopTrainingCommand => new RelayCommand(dd =>
+        {
+            if (TrainingCts is not null)
+            {
+                TrainingCts.Cancel();
+            }
+        });
+
+        public RelayCommand SaveNeuralNetwork => new RelayCommand(dd =>
+        {
+            var dialog = new SaveFileDialog() {
+                AddExtension = true,
+                CheckFileExists = true,
+                Filter = "Xml files (*.xml)|*.xml",
+                DefaultExt = ".xml",
+                InitialDirectory = "./",
+            };
+
+            if(dialog.ShowDialog() == true)
+            {
+                neuralNetwork!.SaveToXmlFile(dialog.FileName);
+            }
+        });
+
+        public RelayCommand LoadNeuralNetwork => new RelayCommand(dd => {
+            //TODO
+            //load nn to nn object
+            //load nn to gui config
+            throw new NotImplementedException();
+        });
+
 
         private NeuralNetworkConfigModel? learningConfig;
 
@@ -43,15 +75,48 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         public string FinishedEpochText
         { get { return finishedEpochText; } set { finishedEpochText = value; OnPropertyChanged(); } }
 
-        private string batchError = "Min Batch error: ???";
+        private string batchError = "";
         public string BatchError
         { get => batchError; set { batchError = value; OnPropertyChanged(); } }
 
-        private string corectness = $"Achieved correctness: ???.??%";
-        public string Correctness
+        private string info = $"";
+        public string Info
         {
-            get { return corectness; }
-            set { corectness = value; OnPropertyChanged(); }
+            get { return info; }
+            set { info = value; OnPropertyChanged(); }
+        }
+
+        private CancellationTokenSource? trainingCts;
+        public CancellationTokenSource? TrainingCts 
+        {
+            get => trainingCts;
+            set { 
+                trainingCts = value;
+                IsTrainingInProgress = trainingCts != null;
+                IsTrainingNotInProgress = trainingCts == null;
+            }
+        }
+
+        private bool isTrainingInProgress;
+        public bool IsTrainingInProgress
+        {
+            get => isTrainingInProgress;
+            set 
+            {
+                isTrainingInProgress = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool isTrainingNotInProgress = true;
+        public bool IsTrainingNotInProgress
+        {
+            get => isTrainingNotInProgress;
+            set
+            {
+                isTrainingNotInProgress = value;
+                OnPropertyChanged();
+            }
         }
 
         public int EpochAmount { get => learningConfig!.EpochAmount; }
@@ -79,22 +144,19 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             learningConfig = App.NeuralNetworkConfigModels[nnType];
             neuralNetwork = App.NeuralNetworks[nnType];
 
-            double batchErr = double.MaxValue;
-            neuralNetwork!.OnBatchTrainingIteration = (epoch, epochPercentFinish, batchError) =>
+            neuralNetwork.OnBatchTrainingIteration = (epoch, epochPercentFinish, batchError) =>
             {
                 FinishedEpochs = epoch;
                 EpochPercentFinish = epochPercentFinish;
-                if (batchError < batchErr)
-                {
-                    batchErr = batchError;
-                    BatchError = $"Min Batch error: {batchError.ToString("0.00")}";
-                }
+                BatchError = $"Batch error: {batchError.ToString("0.0000")}";
                 FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
             };
         }
 
         private string[]? GetFilesForLearning()
         {
+            //TODO first try to find files in some defalut directory ...
+
             var folderDialog = new OpenFileDialog() { Filter = "Numpy files (*.npy)|*.npy", DefaultExt = ".npy", Multiselect = true };
 
             bool? isFile = folderDialog.ShowDialog();
@@ -106,54 +168,57 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             return files;
         }
 
-        //TODO manage files / data loading -> variable for storing i model
         private void RunLearning(string[] files)
         {
+            TrainingCts = new CancellationTokenSource();
+
             Task.Factory.StartNew(() =>
             {
-                var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig!.SamplesPerFile);
+                ForceMainThread(() =>
+                {
+                    Info = $"Loading files 0 / {files.Length} ...";
+                });
+
+                var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig.SamplesPerFile, true, true, 255, TrainingCts.Token, (i) =>
+                {
+                    ForceMainThread(() =>
+                    {
+                        Info = $"Loading files {i} / {files.Length} ...";
+                    });
+                });
+
                 if (quickDrawData == null)
                 {
+                    TrainingCts = null;
                     return;
                 }
 
                 (var trainData, var testData) = quickDrawData.SplitIntoTrainTest();
+                learningConfig.TrainData = trainData;
+                learningConfig.TestData = testData;
 
-                var nn = App.NeuralNetworks[TypeOfNN];
-                var trainer = App.NeuralNetworkConfigModels[TypeOfNN].CreateTrainer(nn);
-                (var task, var cts) = trainer.RunTrainingOnTask();
-                task.Wait();
-
-                Debug.WriteLine("Finished learning");
-
-                Debug.WriteLine("Testing...");
-                int guessed = 0;
-                foreach (var item in testData)
-                {
-                    var prediction = neuralNetwork!.Predict(item.inputs);
-                    var max = prediction.Max();
-                    int indexOfMaxPrediction = prediction.IndexOfMax();
-
-                    var expectedMax = item.outputs.Max();
-                    int indexOfMaxExpected = item.outputs.IndexOfMax();
-
-                    if (indexOfMaxPrediction == indexOfMaxExpected)
-                    {
-                        guessed++;
-                    }
-
-                    ForceMainThread(() =>
-                    {
-                        Correctness = $"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%";
-                    });
-                }
 
                 ForceMainThread(() =>
                 {
-                    Correctness = $"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%";
+                    Info = $"";
                 });
 
-                Debug.WriteLine($"Achieved predictions correctness: {((double)guessed * 100 / testData.Count()).ToString("0.00")}%");
+                neuralNetwork!.OnTrainingFinished += () =>
+                {
+                    Debug.WriteLine("Finished learning");
+
+                    Debug.WriteLine("Testing...");
+                    ForceMainThread(() =>
+                    {
+                        Info = $"Achieved predictions correctness: {neuralNetwork.CalculateCorrectness(learningConfig.TestData).ToString("0.00")}%";
+                    });
+
+                    TrainingCts = null;
+                };
+
+                var trainer = learningConfig.CreateTrainer(neuralNetwork!);
+                (var task, var ctsTrainer) = trainer.RunTrainingOnTask();
+                TrainingCts = ctsTrainer;
             });
         }
 
