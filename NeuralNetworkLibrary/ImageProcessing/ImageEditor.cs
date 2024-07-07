@@ -86,7 +86,7 @@ public static class ImageEditor
         if(top == int.MinValue || bottom == int.MaxValue || left == int.MaxValue || right == int.MinValue)
             return null;
 
-        int size = Math.Max(right - left + 1, bottom - top + 1);
+        int size = Math.Max(right - left + 1, top - bottom + 1);
         int offset = Math.Min(left, bottom);
 
         Matrix result = new Matrix(size, size);

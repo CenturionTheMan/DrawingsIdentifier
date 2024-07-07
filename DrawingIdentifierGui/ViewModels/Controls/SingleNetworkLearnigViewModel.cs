@@ -1,10 +1,14 @@
 ﻿using DrawingIdentifierGui.Models;
 using DrawingIdentifierGui.MVVM;
+using DrawingIdentifierGui.ViewModels.Windows;
 using Microsoft.Win32;
 using NeuralNetworkLibrary;
 using NeuralNetworkLibrary.QuickDrawHandler;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
+using System.Xml.Linq;
 
 namespace DrawingIdentifierGui.ViewModels.Controls
 {
@@ -19,6 +23,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         {
             if (TrainingCts is not null)
             {
+                Info = "Stopping ...";
                 TrainingCts.Cancel();
             }
         });
@@ -27,23 +32,52 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         {
             var dialog = new SaveFileDialog() {
                 AddExtension = true,
-                CheckFileExists = true,
                 Filter = "Xml files (*.xml)|*.xml",
                 DefaultExt = ".xml",
-                InitialDirectory = "./",
+                //InitialDirectory = Directory.GetCurrentDirectory(),
             };
 
-            if(dialog.ShowDialog() == true)
+            var res = dialog.ShowDialog();
+
+            if(res is not null && res.Value == true)
             {
                 neuralNetwork!.SaveToXmlFile(dialog.FileName);
+                MessageBox.Show("Neural Network saved.");
             }
         });
 
         public RelayCommand LoadNeuralNetwork => new RelayCommand(dd => {
-            //TODO
-            //load nn to nn object
-            //load nn to gui config
-            throw new NotImplementedException();
+            var dialog = new OpenFileDialog()
+            {
+                AddExtension = true,
+                CheckFileExists = true,
+                Filter = "Xml files (*.xml)|*.xml",
+                DefaultExt = ".xml",
+                //InitialDirectory = Directory.GetCurrentDirectory(),
+            };
+
+            if(dialog.ShowDialog() == true)
+            {
+                var nn = NeuralNetwork.LoadFromXmlFile(dialog.FileName);
+                ObservableCollection<LayerModel> nnConfigLayers;
+
+
+                try
+                {
+                    nnConfigLayers = NeuralNetworkConfigModel.CreateLayerModelsFromFile(dialog.FileName);
+                }
+                catch
+                {
+                    return;
+                }
+
+                if(nn is null) return;
+
+                App.NeuralNetworks[typeOfNN] = nn;
+                App.NeuralNetworkConfigModels[typeOfNN].NeuralNetworkLayers = nnConfigLayers;
+
+                MessageBox.Show("Neural Network loaded.");
+            }
         });
 
 
@@ -190,6 +224,11 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 if (quickDrawData == null)
                 {
                     TrainingCts = null;
+
+                    ForceMainThread(() =>
+                    {
+                        Info = $"";
+                    });
                     return;
                 }
 

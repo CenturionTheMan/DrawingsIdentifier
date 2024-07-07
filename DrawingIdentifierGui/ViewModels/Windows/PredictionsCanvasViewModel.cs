@@ -36,5 +36,7 @@ internal class PredictionsCanvasViewModel : ViewModelBase
     {
         predictionsCanvas.Cursor = Cursors.Cross;
         predictionsCanvas.drawingCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+        predictionsCanvas.drawingCanvas.DefaultDrawingAttributes.Height = 50;
+        predictionsCanvas.drawingCanvas.DefaultDrawingAttributes.Width = 50;
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DrawingIdentifierGui.ViewModels.Windows
 {
@@ -48,11 +49,16 @@ namespace DrawingIdentifierGui.ViewModels.Windows
 
                 App.NeuralNetworkConfigModels[type].NeuralNetworkLayers = NeuralNetworkLayers;
                 App.NeuralNetworks[type] = nn;
+
+                MessageBox.Show("Neural Network config saved. Learning progress lost.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //TODO show info that nn can not be created
-                return;
+
+                NeuralNetworkLayers = App.NeuralNetworkConfigModels[type].NeuralNetworkLayers;
+
+                MessageBox.Show(ex.Message);
             }
         });
 
@@ -155,8 +161,27 @@ namespace DrawingIdentifierGui.ViewModels.Windows
         public NeuralNetworkConfigViewModel(int type)
         {
             this.type = type;
-            neuralNetworkLayers = new(App.NeuralNetworkConfigModels[type].NeuralNetworkLayers);
-            selectedLayer = NeuralNetworkLayers.First();
+            NeuralNetworkLayers = new();
+            foreach (var item in App.NeuralNetworkConfigModels[type].NeuralNetworkLayers)
+            {
+                var copy = new LayerModel() { 
+                    ActivationFunction = item.ActivationFunction,
+                    DropoutRate = item.DropoutRate,
+                    IsActivationFunctionVisable = item.IsActivationFunctionVisable,
+                    IsDropoutRateVisable = item.IsDropoutRateVisable,
+                    IsLayerSizeVisable = item.IsLayerSizeVisable,
+                    IsPoolStrideVisable = item.IsPoolStrideVisable,
+                    KernelDepth = item.KernelDepth,
+                    KernelSize = item.KernelSize,
+                    LayerSize = item.LayerSize,
+                    LayerType = item.LayerType,
+                    PoolSize = item.PoolSize,
+                    PoolStride = item.PoolStride
+                };
+                NeuralNetworkLayers.Add(copy);
+            }
+
+            SelectedLayer = NeuralNetworkLayers.First();
         }
     }
 }

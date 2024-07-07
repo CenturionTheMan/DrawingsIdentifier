@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DrawingIdentifierGui.Models
 {
@@ -32,6 +33,11 @@ namespace DrawingIdentifierGui.Models
 
         public static NeuralNetwork CreateNeuralNetwork(LayerModel[] layers)
         {
+            if (layers[^1].LayerType != LayerType.FullyConnected || layers[^1].LayerSize != 10 || layers[^1].ActivationFunction != ActivationFunction.Softmax)
+            {
+                throw new ArgumentException("Last layer must be of type Fully Connected. It also need to have size of 10 and softmax as activation function");
+            }
+
             int channels = 1;
             int rows = 28;
             int columns = 28;
@@ -50,7 +56,7 @@ namespace DrawingIdentifierGui.Models
                         layerTemplates.Add(LayerTemplate.CreateConvolutionLayer(layer.KernelSize, layer.KernelDepth, 1, layer.ActivationFunction));
                         break;
 
-                    case LayerType.MaxPooling:
+                    case LayerType.Pooling:
                         layerTemplates.Add(LayerTemplate.CreateMaxPoolingLayer(layer.PoolSize, layer.PoolStride));
                         break;
 
@@ -59,7 +65,6 @@ namespace DrawingIdentifierGui.Models
                         break;
                 }
             }
-            layerTemplates.Add(LayerTemplate.CreateFullyConnectedLayer(10, ActivationFunction.Softmax));
 
             return new NeuralNetwork(channels, rows, columns, layerTemplates.ToArray());
         }
@@ -67,6 +72,95 @@ namespace DrawingIdentifierGui.Models
         public NeuralNetwork CreateNeuralNetwork()
         {
             return NeuralNetworkConfigModel.CreateNeuralNetwork(NeuralNetworkLayers.ToArray());
+        }
+
+        public static ObservableCollection<LayerModel> CreateLayerModelsFromFile(string filePath)
+        {
+            ObservableCollection<LayerModel> res = new();
+
+            XDocument xml = XDocument.Load(filePath);
+            var root = xml.Root!;
+
+            var head = root.Elements("LayersHead");
+            foreach (var layerHead in head.First().Elements())
+            {
+                var layerTypeStr = layerHead.Attribute("LayerType")!.Value;
+                LayerType layerType = Enum.Parse<LayerType>(layerTypeStr);
+
+                switch (layerType)
+                {
+                    case LayerType.Convolution:
+                        string? depthStr = layerHead.Element("depth")?.Value;
+                        string? kernelSizeStr = layerHead.Element("kernelSize")?.Value;
+                        string? strideStr = layerHead.Element("stride")?.Value;
+                        string? activationFunctionStr = layerHead.Element("activationFunction")?.Value;
+
+
+                        if (!int.TryParse(depthStr, out int depth) || !int.TryParse(kernelSizeStr, out int kernelSize) || !int.TryParse(strideStr, out int stride) || !Enum.TryParse<ActivationFunction>(activationFunctionStr, out ActivationFunction activationFunction))
+                            throw new Exception();
+
+                        res.Add(new LayerModel()
+                        {
+                            ActivationFunction = activationFunction,
+                            KernelDepth = depth,
+                            KernelSize = kernelSize,
+                            LayerType = LayerType.Convolution,
+                        });
+                        break;
+                    case LayerType.Pooling:
+                        string? poolSizeStr = layerHead.Element("PoolSize")?.Value;
+                        string? stridePoolStr = layerHead.Element("Stride")?.Value;
+                        if (!int.TryParse(poolSizeStr, out int poolSize) || !int.TryParse(stridePoolStr, out int stridePool))
+                            throw new Exception();
+
+                        res.Add(new LayerModel()
+                        {
+                            LayerType = LayerType.Pooling,
+                            PoolSize = poolSize,
+                            PoolStride = stridePool,
+                        });
+                        break;
+                    case LayerType.FullyConnected:
+                        string? layerSizeStr = layerHead.Element("layerSize")?.Value;
+                        string? activationFunctionFullStr = layerHead.Element("activationFunction")?.Value;
+
+
+                        if (!int.TryParse(layerSizeStr, out int layerSize) || !Enum.TryParse<ActivationFunction>(activationFunctionFullStr, out ActivationFunction activationFunctionFull))
+                            throw new Exception();
+
+                        res.Add(new LayerModel()
+                        {
+                            LayerSize = layerSize,
+                            ActivationFunction = activationFunctionFull,
+                            LayerType = LayerType.FullyConnected,
+                        });
+
+                        break;
+                    case LayerType.Dropout:
+                        string? inputHeightStr = layerHead.Element("InputHeight")?.Value;
+                        string? inputWidthStr = layerHead.Element("InputWidth")?.Value;
+                        string? dropoutRateStr = layerHead.Element("DropoutRate")?.Value;
+
+                        if (!int.TryParse(inputHeightStr, out int inputHeight) || !int.TryParse(inputWidthStr, out int inputWidth) || !float.TryParse(dropoutRateStr, out float dropoutRate))
+                        {
+                            throw new Exception();
+                        }
+
+                        res.Add(new LayerModel()
+                        {
+                            DropoutRate = dropoutRate,
+                            LayerType = LayerType.Dropout,
+                        });
+
+                        break;
+                    case LayerType.Reshape:
+                        continue;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
+            return res;
         }
 
         public Trainer CreateTrainer(NeuralNetwork neuralNetwork)

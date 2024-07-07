@@ -30,6 +30,7 @@ namespace DrawingIdentifierGui
                     {
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
+                        new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 10, ActivationFunction = ActivationFunction.Softmax},
                     }
                 },
                 new NeuralNetworkConfigModel()
@@ -42,10 +43,11 @@ namespace DrawingIdentifierGui
                     NeuralNetworkLayers = new()
                     {
                         new LayerModel() { LayerType = LayerType.Convolution, KernelSize = 5, KernelDepth = 8},
-                        new LayerModel() { LayerType = LayerType.MaxPooling, PoolSize = 2, PoolStride = 2},
+                        new LayerModel() { LayerType = LayerType.Pooling, PoolSize = 2, PoolStride = 2},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
                         new LayerModel() { LayerType = LayerType.Dropout, DropoutRate = 0.5f},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
+                        new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 10, ActivationFunction = ActivationFunction.Softmax},
                     }
                 },
             ];

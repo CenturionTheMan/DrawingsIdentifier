@@ -9,14 +9,6 @@ using System.Windows;
 
 namespace DrawingIdentifierGui.Models
 {
-    public enum LayerType
-    {
-        Convolution,
-        MaxPooling,
-        FullyConnected,
-        Dropout,
-    }
-
     public class LayerModel : ViewModelBase
     {
         public IEnumerable<ActivationFunction> ActivationFunctions
@@ -34,7 +26,7 @@ namespace DrawingIdentifierGui.Models
             get
             {
                 yield return LayerType.Convolution;
-                yield return LayerType.MaxPooling;
+                yield return LayerType.Pooling;
                 yield return LayerType.FullyConnected;
                 yield return LayerType.Dropout;
             }
@@ -58,7 +50,7 @@ namespace DrawingIdentifierGui.Models
                         IsActivationFunctionVisable = Visibility.Visible;
                         break;
 
-                    case LayerType.MaxPooling:
+                    case LayerType.Pooling:
                         IsPoolSizeVisable = Visibility.Visible;
                         IsPoolStrideVisable = Visibility.Visible;
                         break;

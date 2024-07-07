@@ -33,8 +33,8 @@
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes x:Name="strokeAtrib"
                                            Color="Black"
-                                           Width="20"
-                                           Height="20" />
+                                           Width="50"
+                                           Height="50" />
                     </InkCanvas.DefaultDrawingAttributes>
                 </InkCanvas>
             </Grid>

@@ -13,7 +13,7 @@ public enum ActivationFunction
     Softmax,
 }
 
-internal enum LayerType
+public enum LayerType
 {
     Convolution,
     Pooling,
