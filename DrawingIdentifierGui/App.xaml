@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/NavigationRadioButton.xaml"/>
+                <ResourceDictionary Source="Styles/CustomEnablingButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="colorDark1" Color="#202020" />
