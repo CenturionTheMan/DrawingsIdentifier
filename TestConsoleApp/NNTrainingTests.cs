@@ -147,7 +147,7 @@ internal class NNTrainingTests
     {
         Console.WriteLine($"Test {++counter}");
 
-        trainer.SetLogSaving("./../../../../LearningLogs/GROUP_TEST_1/", saveNN: true, out string outputDir);
+        trainer.SetLogSaving("./../../../../LearningLogs/GROUP_TEST_1/", saveNN: true, testData: testData, out string outputDir);
 
         var samples = testData.OrderBy(x => random.Next()).Take(1000).ToArray();
         float sampleCorrectness = trainer.NeuralNetwork.CalculateCorrectness(samples);

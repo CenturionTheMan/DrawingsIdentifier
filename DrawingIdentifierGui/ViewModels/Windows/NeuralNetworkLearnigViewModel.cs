@@ -14,5 +14,19 @@ namespace DrawingIdentifierGui.ViewModels.Windows;
 
 internal class NeuralNetworkLearnigViewModel : ViewModelBase
 {
+    private bool isLearning;
+    public bool IsLearning 
+    { 
+        get => isLearning; 
+        set
+        {
+            isLearning = value;
+            OnPropertyChanged();
+        }
+    }
 
+    public NeuralNetworkLearnigViewModel()
+    {
+        
+    }
 }

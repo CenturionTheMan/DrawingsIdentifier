@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace DrawingIdentifierGui.Views.Components;
+namespace DrawingIdentifierGui.Components;
 
 public class NavigationRadioButton : RadioButton
 {

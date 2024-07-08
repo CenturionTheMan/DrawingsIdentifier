@@ -30,6 +30,8 @@ namespace DrawingIdentifierGui.Models
         public int BatchSize { get; set; }
 
         public ObservableCollection<LayerModel> NeuralNetworkLayers { get; set; }
+        public float? TestCorrectness { get; set; }
+        public float? TrainCorrectness { get; set; }
 
         public static NeuralNetwork CreateNeuralNetwork(LayerModel[] layers)
         {
@@ -74,7 +76,7 @@ namespace DrawingIdentifierGui.Models
             return NeuralNetworkConfigModel.CreateNeuralNetwork(NeuralNetworkLayers.ToArray());
         }
 
-        public static ObservableCollection<LayerModel> CreateLayerModelsFromFile(string filePath)
+        public void LoadDataFromFile(string filePath)
         {
             ObservableCollection<LayerModel> res = new();
 
@@ -160,7 +162,22 @@ namespace DrawingIdentifierGui.Models
                 }
             }
 
-            return res;
+            NeuralNetworkLayers = res;
+
+            var config = root.Element("Config");
+            if (config == null) throw new Exception("File damaged");
+
+            var tmp = config.Element("TestCorrectness");
+            if(tmp != null && float.TryParse(tmp.Value, out float correctness))
+            {
+                this.TestCorrectness = correctness; 
+            }
+            
+            tmp = config.Element("LastTrainCorrectness");
+            if(tmp != null && float.TryParse(tmp.Value, out correctness))
+            { 
+                this.TrainCorrectness = correctness;
+            }
         }
 
         public Trainer CreateTrainer(NeuralNetwork neuralNetwork)
@@ -179,7 +196,7 @@ namespace DrawingIdentifierGui.Models
 
             if (SaveToLog)
             {
-                trainer = trainer.SetLogSaving(SaveDirectoryPath, SaveNeuralNetwork, out _);
+                trainer = trainer.SetLogSaving(SaveDirectoryPath, SaveNeuralNetwork, testData: TestData, out _);
             }
 
             return trainer;

@@ -1,10 +1,11 @@
 ﻿using DrawingIdentifierGui.MVVM;
 using DrawingIdentifierGui.ViewModels.Windows;
 using NeuralNetworkLibrary;
+using System.Runtime.CompilerServices;
 
 namespace DrawingIdentifierGui.ViewModels
 {
-    internal class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase
     {
         private ViewModelBase selectedViewModel = new PredictionsCanvasViewModel();
 
@@ -25,5 +26,36 @@ namespace DrawingIdentifierGui.ViewModels
 
         public RelayCommand ExitCommand => new RelayCommand(parameter => MainWindow.Instance.Close());
         public RelayCommand MinimalizeCommand => new RelayCommand(parameter => MainWindow.Instance.WindowState = System.Windows.WindowState.Minimized);
+
+
+        private int trainingsAmount = 0;
+        private bool isNotTraining = true;
+        public bool IsNotTraining
+        { 
+            get { return isNotTraining; } 
+            set { isNotTraining = value; OnPropertyChanged();}
+        }
+
+        internal void NotifyOnTrainingEnd()
+        {
+            trainingsAmount--;
+            if(trainingsAmount == 0)
+            {
+                IsNotTraining = true;
+            }
+        }
+
+        internal void NotifyOnTrainingBegin()
+        {
+            IsNotTraining = false;
+            trainingsAmount++;
+        }
+
+
+        public static MainWindowViewModel? Instance;
+        public MainWindowViewModel()
+        {
+            MainWindowViewModel.Instance = this;
+        }
     }
 }

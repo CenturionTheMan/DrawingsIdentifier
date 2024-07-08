@@ -64,7 +64,7 @@ internal class Program
         var correctness = nn.CalculateCorrectness(testData);
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
-        nn.SaveToXmlFile("./../../../nn.xml");
+        nn.SaveToXmlFile("./../../../nn.xml", null);
         var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
         Console.WriteLine($"Loaded NN correctness: {nnLod!.CalculateCorrectness(testData).ToString("0.00")}%");
 

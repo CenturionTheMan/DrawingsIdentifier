@@ -41,7 +41,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
             if(res is not null && res.Value == true)
             {
-                neuralNetwork!.SaveToXmlFile(dialog.FileName);
+                float? cor = (neuralNetwork is null || learningConfig is null)? null : neuralNetwork!.CalculateCorrectness(learningConfig!.TestData.Take(1000).ToArray());
+                neuralNetwork!.SaveToXmlFile(dialog.FileName, testCorrectness: cor);
                 MessageBox.Show("Neural Network saved.");
             }
         });
@@ -59,24 +60,23 @@ namespace DrawingIdentifierGui.ViewModels.Controls
             if(dialog.ShowDialog() == true)
             {
                 var nn = NeuralNetwork.LoadFromXmlFile(dialog.FileName);
-                ObservableCollection<LayerModel> nnConfigLayers;
-
+                if (nn is null) return;
 
                 try
                 {
-                    nnConfigLayers = NeuralNetworkConfigModel.CreateLayerModelsFromFile(dialog.FileName);
+                    App.NeuralNetworkConfigModels[typeOfNN].LoadDataFromFile(dialog.FileName);
+                    App.NeuralNetworks[typeOfNN] = nn;
+
+                    string testCorStr = learningConfig!.TestCorrectness is null ? "unknown" : $"{learningConfig!.TestCorrectness.Value.ToString("0.00")}%";
+                    string trainCorStr = learningConfig!.TrainCorrectness is null ? "unknown" : $"{learningConfig!.TrainCorrectness.Value.ToString("0.00")}%";
+                    Info = $"Test correctness: {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
+
+                    MessageBox.Show("Neural Network loaded.");
                 }
-                catch
+                catch (Exception ex)
                 {
-                    return;
+                    MessageBox.Show(ex.Message);
                 }
-
-                if(nn is null) return;
-
-                App.NeuralNetworks[typeOfNN] = nn;
-                App.NeuralNetworkConfigModels[typeOfNN].NeuralNetworkLayers = nnConfigLayers;
-
-                MessageBox.Show("Neural Network loaded.");
             }
         });
 
@@ -168,15 +168,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
             TypeOfNN = int.Parse(split[^1]);
 
-            RefreshNN(TypeOfNN);
-
-            FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
-        }
-
-        private void RefreshNN(int nnType)
-        {
-            learningConfig = App.NeuralNetworkConfigModels[nnType];
-            neuralNetwork = App.NeuralNetworks[nnType];
+            learningConfig = App.NeuralNetworkConfigModels[TypeOfNN];
+            neuralNetwork = App.NeuralNetworks[TypeOfNN];
 
             neuralNetwork.OnBatchTrainingIteration = (epoch, epochPercentFinish, batchError) =>
             {
@@ -185,12 +178,17 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 BatchError = $"Batch error: {batchError.ToString("0.0000")}";
                 FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
             };
+
+            string testCorStr = learningConfig!.TestCorrectness is null? "unknown" : $"{learningConfig!.TestCorrectness.Value.ToString("0.00")}%";
+            string trainCorStr = learningConfig!.TrainCorrectness is null? "unknown" : $"{learningConfig!.TrainCorrectness.Value.ToString("0.00")}%";
+            Info = $"Test correctness: {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
+
+            FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
         }
+
 
         private string[]? GetFilesForLearning()
         {
-            //TODO first try to find files in some defalut directory ...
-
             var folderDialog = new OpenFileDialog() { Filter = "Numpy files (*.npy)|*.npy", DefaultExt = ".npy", Multiselect = true };
 
             bool? isFile = folderDialog.ShowDialog();
@@ -204,6 +202,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
         private void RunLearning(string[] files)
         {
+            MainWindowViewModel.Instance!.NotifyOnTrainingBegin();
+
             TrainingCts = new CancellationTokenSource();
 
             Task.Factory.StartNew(() =>
@@ -229,6 +229,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                     {
                         Info = $"";
                     });
+
+                    MainWindowViewModel.Instance!.NotifyOnTrainingEnd();
                     return;
                 }
 
@@ -253,6 +255,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                     });
 
                     TrainingCts = null;
+                    MainWindowViewModel.Instance!.NotifyOnTrainingEnd();
                 };
 
                 var trainer = learningConfig.CreateTrainer(neuralNetwork!);
@@ -270,8 +273,6 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 return;
             }
 
-            // refresh neural network config
-            RefreshNN(this.TypeOfNN);
 
             // run learing
             RunLearning(files);

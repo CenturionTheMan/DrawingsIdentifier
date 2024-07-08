@@ -353,8 +353,9 @@ public class NeuralNetwork
     /// Saves the neural network to an XML file.
     /// </summary>
     /// <param name="path"> save file path </param>
+    /// <param name="testCorrectness"> Test correcntess. Can be left as null. </param>
     /// <returns> True if success, false otherwise </returns>
-    public bool SaveToXmlFile(string path)
+    public bool SaveToXmlFile(string path, float? testCorrectness)
     {
         var writer = FilesCreatorHelper.CreateXmlFile(path);
         if (writer == null)
@@ -366,6 +367,8 @@ public class NeuralNetwork
         writer.WriteElementString("LearningRate", LearningRate.ToString());
         writer.WriteElementString("LayersAmount", layers.Length.ToString());
         writer.WriteElementString("LastTrainCorrectness", LastTrainCorrectness.ToString());
+        if(testCorrectness != null)
+            writer.WriteElementString("TestCorrectness", testCorrectness!.ToString());
         writer.WriteEndElement();
 
         writer.WriteStartElement("LayersHead");

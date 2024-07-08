@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:components="clr-namespace:DrawingIdentifierGui.Views.Components"
+        xmlns:components="clr-namespace:DrawingIdentifierGui.Components"
         xmlns:viewModelsWindows="clr-namespace:DrawingIdentifierGui.ViewModels.Windows"
         xmlns:viewModels="clr-namespace:DrawingIdentifierGui.ViewModels"
         xmlns:windows="clr-namespace:DrawingIdentifierGui.Views.Windows"
@@ -90,6 +90,7 @@
 
             <!--Left Navigation-->
             <controls:NavigationBar
+                IsEnabled="{Binding IsNotTraining, Mode=OneWay}"
                 Grid.Column="0"
                 Grid.Row="1"
                 Button1Command="{Binding ShowPredictionCanvasCommnad}"

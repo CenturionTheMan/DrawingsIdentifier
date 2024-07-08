@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Accord.IO;
@@ -16,7 +17,7 @@ public static class ImageEditor
 {
     private static Random random = new Random();
 
-    public static Matrix? CutOffBorderToSquare(this Matrix matrix, (float min, float max) contentColor)
+    public static Matrix? CutOffBorderToSquare(this Matrix matrix, (float min, float max) contentColor, int padding, float bgColor = 1.0f)
     {
         int top = int.MinValue;
         int bottom = int.MaxValue;
@@ -86,8 +87,8 @@ public static class ImageEditor
         if(top == int.MinValue || bottom == int.MaxValue || left == int.MaxValue || right == int.MinValue)
             return null;
 
-        int size = Math.Max(right - left + 1, top - bottom + 1);
-        int offset = Math.Min(left, bottom);
+        int size = Math.Max(right - left + 1, top - bottom + 1) + padding *2;
+        int offset = Math.Min(left, bottom) - padding;
 
         Matrix result = new Matrix(size, size);
 
@@ -95,7 +96,9 @@ public static class ImageEditor
         {
             for (int x = 0; x < size; x++)
             {
-                result[y, x] = matrix[offset + y, offset + x];
+                int oldY = offset + y;
+                int oldX = offset + x;
+                result[y, x] = (oldY < matrix.RowsAmount && oldX < matrix.ColumnsAmount)? matrix[oldY, oldX] : bgColor;
             }
         }
 
@@ -208,7 +211,14 @@ public static class ImageEditor
             throw new ArgumentException("Matrix must be square", nameof(matrix));
 
         float scale = (float)desiredSize / matrix.RowsAmount;
-        return matrix.Scale(scale, bgColor);
+        var mat = matrix.Scale(scale, bgColor);
+
+        if(mat.RowsAmount < desiredSize || mat.ColumnsAmount < desiredSize)
+        {
+            mat = mat.AddPadding(desiredSize, desiredSize, bgColor);
+        }
+
+        return mat;
     }
 
     public static Matrix Scale(this Matrix matrix, float scale, float bgColor)

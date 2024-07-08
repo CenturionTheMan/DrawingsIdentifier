@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:DrawingIdentifierGui.Views.Controls"
+             xmlns:components="clr-namespace:DrawingIdentifierGui.Components"
              xmlns:local="clr-namespace:DrawingIdentifierGui.Views.Windows"
              mc:Ignorable="d"
              d:DesignHeight="720" d:DesignWidth="1080">
@@ -33,8 +34,8 @@
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes x:Name="strokeAtrib"
                                            Color="Black"
-                                           Width="50"
-                                           Height="50" />
+                                           Width="40"
+                                           Height="40" />
                     </InkCanvas.DefaultDrawingAttributes>
                 </InkCanvas>
             </Grid>
@@ -58,6 +59,11 @@
                                  Margin="5"
                                  GroupName="Tools"
                                  Command="{Binding EraserSelectedCommand}" />
+
+                    <Button Background="{StaticResource colorHighlight1}"
+                            Content="Clear"
+                            Command="{Binding ClearCanvasCommand}"
+                        />
                 </StackPanel>
             </Border>
 

@@ -13,10 +13,11 @@ using System.Windows.Input;
 
 namespace DrawingIdentifierGui.ViewModels.Windows;
 
-internal class PredictionsCanvasViewModel : ViewModelBase
+public class PredictionsCanvasViewModel : ViewModelBase
 {
     public RelayCommand PenSelectedCommand => new RelayCommand(PenSelected);
     public RelayCommand EraserSelectedCommand => new RelayCommand(EraserSelected);
+    public RelayCommand ClearCanvasCommand => new RelayCommand(ClearCanvas);
 
     private PredictionsCanvas predictionsCanvas;
 
@@ -24,6 +25,12 @@ internal class PredictionsCanvasViewModel : ViewModelBase
     {
         predictionsCanvas = PredictionsCanvas.Instance;
     }
+
+    public void ClearCanvas(object? tmp)
+    {
+        predictionsCanvas.drawingCanvas.Strokes.Clear();
+    }
+
 
     public void PenSelected(object? tmp)
     {
@@ -34,9 +41,11 @@ internal class PredictionsCanvasViewModel : ViewModelBase
 
     public void EraserSelected(object? tmp)
     {
+
         predictionsCanvas.Cursor = Cursors.Cross;
+        //predictionsCanvas.drawingCanvas.EraserShape
         predictionsCanvas.drawingCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
-        predictionsCanvas.drawingCanvas.DefaultDrawingAttributes.Height = 50;
-        predictionsCanvas.drawingCanvas.DefaultDrawingAttributes.Width = 50;
+        predictionsCanvas.drawingCanvas.DefaultDrawingAttributes.Height = 40;
+        predictionsCanvas.drawingCanvas.DefaultDrawingAttributes.Width = 40;
     }
 }

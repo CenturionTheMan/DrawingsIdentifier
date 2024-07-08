@@ -23,6 +23,7 @@ public class Trainer
 
     private bool saveToLog = false;
     private bool saveNN = false;
+    private (Matrix[] inputChannels, Matrix output)[]? testData;
     private string trainingLogDir = "";
     
     private record TrainingIterationData(int epoch, int dataIndex, float error, float learningRate, float elapsedSeconds);
@@ -118,12 +119,14 @@ public class Trainer
     /// <returns>
     /// Trainer instance.
     /// </returns>
-    public Trainer SetLogSaving(string outputDirPath, bool saveNN, out string trainingLogDirectory)
+    public Trainer SetLogSaving(string outputDirPath, bool saveNN, (Matrix[] inputChannels, Matrix output)[]? testData, out string trainingLogDirectory)
     {
         if(!Directory.Exists(outputDirPath))
             Directory.CreateDirectory(outputDirPath);
 
         this.trainingLogDir = outputDirPath + DateTime.Now.ToString("yyyy.MM.dd__HH-mm-ss");
+
+        this.testData = testData;
 
         if(!Directory.Exists(trainingLogDir))
             Directory.CreateDirectory(trainingLogDir);
@@ -304,7 +307,8 @@ public class Trainer
 
         if(saveNN)
         {
-            neuralNetwork.SaveToXmlFile(dirPath + "NeuralNetwork.xml");
+            float? cor = testData is null ? null : neuralNetwork.CalculateCorrectness(testData);
+            neuralNetwork.SaveToXmlFile(dirPath + "NeuralNetwork.xml", cor);
         }
 
         var xml = FilesCreatorHelper.CreateXmlFile(dirPath + "TrainerConfig.xml");
