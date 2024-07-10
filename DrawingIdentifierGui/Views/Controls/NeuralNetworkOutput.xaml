@@ -9,7 +9,7 @@
 
     <Border x:Name="PredictionsHolderBorder"
                 Grid.Column="3"
-                CornerRadius="5"
+                CornerRadius="{StaticResource radiusSmall}"
                 Background="{StaticResource colorDark2}"
                 BorderBrush="{StaticResource colorDark1}"
                 BorderThickness="1">

@@ -13,7 +13,7 @@
 
             <components:NavigationRadioButton
                 Click="Button1_Click"
-                Style="{DynamicResource NavigationNavigationRadioButton}"
+                Style="{DynamicResource NavigationRadioButton}"
                 ImageSource="../../Images/edit.png"
                 ImageMargin="5"
                 IsChecked="True"
@@ -21,17 +21,17 @@
 
             <components:NavigationRadioButton
                 Click="Button2_Click"
-                Style="{DynamicResource NavigationNavigationRadioButton}"
+                Style="{DynamicResource NavigationRadioButton}"
                 ImageMargin="5" />
 
             <components:NavigationRadioButton
                 Click="Button3_Click"
-                Style="{DynamicResource NavigationNavigationRadioButton}"
+                Style="{DynamicResource NavigationRadioButton}"
                 ImageMargin="5" />
 
             <components:NavigationRadioButton
                 Click="Button4_Click"
-                Style="{DynamicResource NavigationNavigationRadioButton}"
+                Style="{DynamicResource NavigationRadioButton}"
                 ImageMargin="5" />
         </StackPanel>
     </Grid>

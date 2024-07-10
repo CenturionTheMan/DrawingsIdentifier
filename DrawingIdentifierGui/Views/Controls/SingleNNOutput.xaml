@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="450">
 
     <Border Background ="{Binding Path=CustomBackground, RelativeSource={RelativeSource AncestorType=UserControl}}"
-        CornerRadius="5"
+        CornerRadius="{StaticResource radiusMiddle}"
         Margin="2">
 
         <Grid>

@@ -4,20 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:DrawingIdentifierGui.Views.Windows"
+             xmlns:components="clr-namespace:DrawingIdentifierGui.Components"
              mc:Ignorable="d"
              d:DesignHeight="720" d:DesignWidth="1080">
 
-    <Border x:Name="DrawingAreaBorder"
-        CornerRadius="15 0 15 0"
-        Background="{StaticResource colorLight2}"
-        BorderBrush="{StaticResource colorDark1}"
-        BorderThickness="1">
+    <Border
+            CornerRadius="{StaticResource radiusPage}"
+            Background="{StaticResource colorLight2}"
+            BorderBrush="{StaticResource colorDark1}"
+            BorderThickness="1">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.5*" />
                 <ColumnDefinition Width="0.5*" />
             </Grid.ColumnDefinitions>
-
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.1*" />
                 <RowDefinition Height="0.40*" />
@@ -28,7 +28,7 @@
             <Border Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Grid.Row="0"
-                    CornerRadius="15"
+                    CornerRadius="{StaticResource radiusSmall}"
                     Background="{StaticResource colorDark2}"
                     Margin="10 10 10 5">
                 <TextBlock Foreground="{StaticResource colorHighlight1}"
@@ -45,7 +45,7 @@
             <Border Grid.Row="1"
                     Grid.ColumnSpan="2"
                     Grid.Column="0"
-                    CornerRadius="15"
+                    CornerRadius="{StaticResource radiusSmall}"
                     Background="{StaticResource colorDark2}"
                     Margin="10 5 10 5"
                     Padding="10">
@@ -89,18 +89,13 @@
                                 Grid.RowSpan="4"
                                 VerticalAlignment="Stretch"
                                 HorizontalAlignment="Stretch"
-                                Margin="10 10 20 10">
-                            <StackPanel.Resources>
-                                <Style TargetType="{x:Type Grid}">
-                                    <Setter Property="Margin" Value="0,10,0,0" />
-                                </Style>
-                            </StackPanel.Resources>
+                                Margin="10 0 20 10">
 
                             <!--Samples per file-->
-                            <Grid>
+                            <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="0.7*" MaxWidth="200" />
+                                    <ColumnDefinition Width="0.3*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="Samples per file: "
@@ -119,10 +114,10 @@
                             </Grid>
 
                             <!--Initial Learning rate-->
-                            <Grid>
+                            <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="0.7*" MaxWidth="200" />
+                                    <ColumnDefinition Width="0.3*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="Initial learning rate: "
@@ -141,10 +136,10 @@
                             </Grid>
 
                             <!--Min Learning rate-->
-                            <Grid>
+                            <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="0.7*" MaxWidth="200" />
+                                    <ColumnDefinition Width="0.3*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="Min learning rate: "
@@ -163,10 +158,10 @@
                             </Grid>
 
                             <!--Epochs-->
-                            <Grid>
+                            <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="0.7*" MaxWidth="200" />
+                                    <ColumnDefinition Width="0.3*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="Epochs amount: "
@@ -187,8 +182,8 @@
                             <!--Batch size-->
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="0.7*" MaxWidth="200" />
+                                    <ColumnDefinition Width="0.3*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="Batch size: "
@@ -297,13 +292,17 @@
                                    VerticalAlignment="Center"
                                    Margin="10 0 10 0"
                                    IsReadOnly="True" />
-                        <Button Content="Browse"
-                                FontSize="20"
-                                Background="{StaticResource colorHighlight2}"
-                                Foreground="{StaticResource colorWhite}"
-                                Margin="10 0 10 0"
-                                BorderThickness="0"
-                                Command="{Binding Path=ChooseDirectoryForLogsCommand}" />
+                        <components:PrimaryButton Content="Browse"
+                                                FontSize="5"
+                                                Height="40"
+                                                  Radius="1"
+                                                  BorderThickness="1"
+                                                  BorderBrush="{StaticResource colorHighlight2}"
+                                                VerticalAlignment="Top"
+                                                Background="{StaticResource colorHighlight2}"
+                                                Foreground="{StaticResource colorWhite}"
+                                                Margin="10 0 10 0"
+                                                Command="{Binding Path=ChooseDirectoryForLogsCommand}" />
 
                         <CheckBox Content="Save Network"
                                   Foreground="{StaticResource colorWhite}"
@@ -320,7 +319,7 @@
                     Grid.ColumnSpan="2"
                     Background="{StaticResource colorDark2}"
                     Margin="10 5 10 10"
-                    CornerRadius="15"
+                    CornerRadius="{StaticResource radiusSmall}"
                     Padding="10 0 10 10">
 
                 <Grid>
@@ -334,7 +333,7 @@
                         <ColumnDefinition Width="0.05*" />
                         <ColumnDefinition Width="0.7*" />
                         <ColumnDefinition Width="0.05*" />
-                        <ColumnDefinition Width="0.2*" />
+                        <ColumnDefinition Width="0.2*" MaxWidth="250" />
                     </Grid.ColumnDefinitions>
 
                     <!--Title-->
@@ -372,188 +371,72 @@
                     </StackPanel>
 
                     <!--Layers List-->
-                    <ListView Name="LayersListView"
+                    <ListView ItemTemplate="{DynamicResource NNLayersListViewItem}"
+                              Style="{DynamicResource NNLayersListView}" Name="LayersListView"
                               ItemsSource="{Binding Path=NeuralNetworkLayers}"
                               SelectedItem="{Binding Path=SelectedLayer, Mode=TwoWay}"
                               Grid.Row="1"
                               Grid.Column="1"
                               Grid.RowSpan="3"
-
-                              Background="{StaticResource colorLight1}"
+                              Background="{StaticResource colorLight2}"
+                              BorderBrush="{StaticResource colorDark1}"
                               VerticalContentAlignment="Top"
                               HorizontalContentAlignment="Left"
-                              ScrollViewer.HorizontalScrollBarVisibility="Visible"
                               ScrollViewer.CanContentScroll="False">
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal" />
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{StaticResource colorDark2}"
-                                        CornerRadius="5"
-                                        Padding="10 0 10 10">
-                                    <StackPanel>
-
-                                        <!--Layer Type-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Layer Type:"
-                                               HorizontalContentAlignment="Left"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <ComboBox Name="LayerTypeComboBox"
-                                                  Background="{StaticResource colorLight1}"
-                                                  ItemsSource="{Binding LayerTypes}"
-                                                  SelectedItem="{Binding Path=LayerType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                  HorizontalContentAlignment="Center"
-                                                  VerticalContentAlignment="Center"
-                                                  Margin="10 0 10 0" />
-
-                                        <!--Fully connected-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Layer Size:"
-                                               HorizontalContentAlignment="Left"
-                                               Visibility="{Binding Path=IsLayerSizeVisable, Mode=OneWay}"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <TextBox Name="LayerSizeTextBox"
-                                                 Background="{StaticResource colorWhite}"
-                                                 Text="{Binding Path=LayerSize, UpdateSourceTrigger=PropertyChanged}"
-                                                 Visibility="{Binding Path=IsLayerSizeVisable, Mode=OneWay}"
-                                                 HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center"
-                                                 Margin="10 0 10 0" />
-
-                                        <!--Kernel Size-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Kernel Size:"
-                                               HorizontalContentAlignment="Left"
-                                               Visibility="{Binding Path=IsKernelSizeVisable, Mode=OneWay}"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <TextBox Name="KernelSizeTextBox"
-                                                 Background="{StaticResource colorWhite}"
-                                                 Text="{Binding Path=KernelSize, UpdateSourceTrigger=PropertyChanged}"
-                                                 Visibility="{Binding Path=IsKernelSizeVisable, Mode=OneWay}"
-                                                 HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center"
-                                                 Margin="10 0 10 0" />
-
-                                        <!--Kernel Depth-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Depth:"
-                                               HorizontalContentAlignment="Left"
-                                               Visibility="{Binding Path=IsKernelDepthVisable, Mode=OneWay}"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <TextBox x:Name="KernelDepthTextBox"
-                                                 Background="{StaticResource colorWhite}"
-                                                 Text="{Binding Path=KernelDepth, UpdateSourceTrigger=PropertyChanged}"
-                                                 Visibility="{Binding Path=IsKernelDepthVisable, Mode=OneWay}"
-                                                 HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center"
-                                                 Margin="10 0 10 0" />
-
-                                        <!--Pool size-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Pool Size:"
-                                               HorizontalContentAlignment="Left"
-                                               Visibility="{Binding Path=IsPoolSizeVisable, Mode=OneWay}"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <TextBox Name="PoolSizetextBox"
-                                                 Background="{StaticResource colorWhite}"
-                                                 Text="{Binding Path=PoolSize, UpdateSourceTrigger=PropertyChanged}"
-                                                 Visibility="{Binding Path=IsPoolSizeVisable, Mode=OneWay}"
-                                                 HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center"
-                                                 Margin="10 0 10 0" />
-
-                                        <!--Pool stride-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Pool Stride:"
-                                               HorizontalContentAlignment="Left"
-                                               Visibility="{Binding Path=IsPoolStrideVisable, Mode=OneWay}"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <TextBox Name="PoolStrideTextBox"
-                                                 Background="{StaticResource colorWhite}"
-                                                 Text="{Binding Path=PoolStride, UpdateSourceTrigger=PropertyChanged}"
-                                                 Visibility="{Binding Path=IsPoolStrideVisable, Mode=OneWay}"
-                                                 HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center"
-                                                 Margin="10 0 10 0" />
-
-                                        <!--Activation Function-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Activation Function:"
-                                               HorizontalContentAlignment="Left"
-                                               Margin="5 0 0 0"
-                                               Visibility="{Binding Path=IsActivationFunctionVisable, Mode=OneWay}"
-                                               FontSize="15" />
-                                        <ComboBox Name="ActivationFunctionComboBox"
-                                                  Background="{StaticResource colorLight1}"
-                                                  ItemsSource="{Binding ActivationFunctions}"
-                                                  SelectedItem="{Binding Path=ActivationFunction, UpdateSourceTrigger=PropertyChanged}"
-                                                  Visibility="{Binding Path=IsActivationFunctionVisable, Mode=OneWay}"
-                                                  HorizontalContentAlignment="Center"
-                                                  VerticalContentAlignment="Center"
-                                                  Margin="10 0 10 0" />
-
-                                        <!--Dropout Rate-->
-                                        <Label Foreground="{StaticResource colorWhite}"
-                                               Content="Dropout Rate:"
-                                               HorizontalContentAlignment="Left"
-                                               Visibility="{Binding Path=IsDropoutRateVisable, Mode=OneWay}"
-                                               Margin="5 0 0 0"
-                                               FontSize="15" />
-                                        <TextBox Name="DropoutRateTextBox"
-                                                 Background="{StaticResource colorWhite}"
-                                                 Text="{Binding Path=DropoutRate, UpdateSourceTrigger=PropertyChanged}"
-                                                 Visibility="{Binding Path=IsDropoutRateVisable, Mode=OneWay}"
-                                                 HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center"
-                                                 Margin="10 0 10 0" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
                     </ListView>
 
                     <!--Buttons-->
-                    <Button Grid.Column="3"
-                            Grid.Row="1"
-                            Padding="0"
-                            Margin="15"
-                            Content="Add Layer"
-                            FontSize="30"
-                            Background="{StaticResource colorHighlight2}"
-                            Foreground="{StaticResource colorWhite}"
-                            Command="{Binding Path=AddLayerCommand}"
-                            BorderBrush="{StaticResource colorDark1}" />
+                    <StackPanel Grid.Column="3"
+                                Grid.Row="1"
+                                Grid.RowSpan="2"
+                                VerticalAlignment="Stretch"
+                                HorizontalAlignment="Stretch">
 
-                    <Button Grid.Column="3"
-                            Grid.Row="2"
-                            Margin="15"
-                            Padding="0"
-                            Content="Remove Layer"
-                            FontSize="25"
-                            Background="{StaticResource colorRed}"
-                            Foreground="{StaticResource colorWhite}"
-                            Command="{Binding Path=RemoveLayerCommand}"
-                            BorderBrush="{StaticResource colorDark1}" />
+                        <components:PrimaryButton Padding="5"
+                                                  Margin="10 0 10 5"
+                                                  MinHeight="40"
+                                                  MaxHeight="60"
+                                                  Content="Add Layer"
+                                                  FontSize="30"
+                                                  Background="{StaticResource colorHighlight2}"
+                                                  Radius="{StaticResource radiusMiddle}"
+                                                  Foreground="{StaticResource colorDark1}"
+                                                  Command="{Binding Path=AddLayerCommand}"
+                                                  BorderBrush="{StaticResource colorDark1}" />
 
-                    <Button Grid.Column="3"
-                            Grid.Row="3"
-                            Margin="10"
-                            Content="SAVE NN"
-                            FontSize="25"
-                            BorderBrush="{StaticResource colorDark1}"
-                            Background="{StaticResource colorHighlight1}"
-                            FontWeight="Bold"
-                            Command="{Binding Path=SaveChangesToNN}"/>
+                        <components:PrimaryButton Margin="10 5 10 0"
+                                                  Padding="5"
+                                                  MinHeight="40"
+                                                  MaxHeight="60"
+                                                  Content="Remove Layer"
+                                                  FontSize="30"
+                                                  Radius="{StaticResource radiusMiddle}"
+                                                  Background="{StaticResource colorRed}"
+                                                  Foreground="{StaticResource colorDark1}"
+                                                  Command="{Binding Path=RemoveLayerCommand}"
+                                                  BorderBrush="{StaticResource colorDark1}" />
+                    </StackPanel>
 
+                    <components:PrimaryButton Grid.Column="3"
+                                              Grid.Row="3"
+                                              Margin="10 0 10 0"
+                                              VerticalAlignment="Bottom"
+                                              Content="SAVE"
+                                              Padding="5"
+                                              MinHeight="40"
+                                              MaxHeight="70"
+                                              Radius="{StaticResource radiusMiddle}"
+                                              FontSize="25"
+                                              Background="{StaticResource colorHighlight1}"
+                                              Foreground="{StaticResource colorDark1}"
+                                              BorderBrush="{StaticResource colorDark1}"
+                                              FontWeight="Bold"
+                                              Command="{Binding Path=SaveChangesToNN}" />
                 </Grid>
             </Border>
         </Grid>

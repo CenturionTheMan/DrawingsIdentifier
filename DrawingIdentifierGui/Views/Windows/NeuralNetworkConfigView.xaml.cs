@@ -24,5 +24,10 @@ namespace DrawingIdentifierGui.Views.Windows
         {
             InitializeComponent();
         }
+
+        private void CustomEnablingButton_Click()
+        {
+
+        }
     }
 }

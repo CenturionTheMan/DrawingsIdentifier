@@ -42,7 +42,7 @@
 
     <!--Container-->
     <Border x:Name="ContainerBorder"
-            CornerRadius="15"
+            CornerRadius="{StaticResource radiusMiddle}"
             Background="{StaticResource colorDark2}"
             BorderBrush="{StaticResource colorDark1}"
             BorderThickness="1">

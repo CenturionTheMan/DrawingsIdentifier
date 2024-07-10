@@ -11,6 +11,11 @@ namespace DrawingIdentifierGui.Models
 {
     public class LayerModel : ViewModelBase
     {
+        public LayerModel()
+        {
+            LayerType = LayerType.FullyConnected;
+        }
+
         public IEnumerable<ActivationFunction> ActivationFunctions
         {
             get

@@ -10,7 +10,7 @@
              d:DesignHeight="720" d:DesignWidth="1080">
 
     <Border x:Name="DrawingAreaBorder"
-            CornerRadius="15 0 15 0"
+            CornerRadius="{StaticResource radiusPage}"
             Background="{StaticResource colorLight2}"
             BorderBrush="{StaticResource colorDark1}"
             BorderThickness="1">
@@ -44,7 +44,7 @@
             <Border Grid.Column="1"
                     Background="{StaticResource colorLight1}"
                     Margin="0 10 0 10"
-                    CornerRadius="0 15 15 0">
+                    CornerRadius="0 5 5 0">
 
                 <StackPanel>
                     <RadioButton x:Name="PenRadioButton"
@@ -62,8 +62,7 @@
 
                     <Button Background="{StaticResource colorHighlight1}"
                             Content="Clear"
-                            Command="{Binding ClearCanvasCommand}"
-                        />
+                            Command="{Binding ClearCanvasCommand}" />
                 </StackPanel>
             </Border>
 

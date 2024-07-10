@@ -33,7 +33,7 @@
     <SolidColorBrush x:Key="NavigationRadioButton.Disabled.Border" Color="#FFBCBCBC" />
     <SolidColorBrush x:Key="NavigationRadioButton.Disabled.Glyph" Color="#FF707070" />-->
 
-    <Style x:Key="NavigationNavigationRadioButton" TargetType="{x:Type customComponents:NavigationRadioButton}">
+    <Style x:Key="NavigationRadioButton" TargetType="{x:Type customComponents:NavigationRadioButton}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource colorDark1}" />
@@ -51,7 +51,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             HorizontalAlignment="Stretch"
-                            CornerRadius="15"
+                            CornerRadius="{DynamicResource radiusMiddle}"
                             VerticalAlignment="Stretch">
 
                             <Image x:Name="image"

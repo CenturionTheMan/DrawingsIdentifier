@@ -5,11 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:DrawingIdentifierGui.Views.Controls"
              xmlns:controls="clr-namespace:DrawingIdentifierGui.ViewModels.Controls"
+             xmlns:components="clr-namespace:DrawingIdentifierGui.Components"
              d:DataContext="{d:DesignInstance Type=controls:SingleNetworkLearnigViewModel}"
              mc:Ignorable="d"
              d:DesignHeight="720" d:DesignWidth="500" Loaded="UserControl_Loaded">
     <Border Margin="10"
-        CornerRadius="15"
+        CornerRadius="{StaticResource radiusSmall}"
         Background="{StaticResource colorDark2}"
         Grid.Column="0"
         Padding="20">
@@ -38,7 +39,7 @@
                        VerticalAlignment="Stretch"
                        Foreground="{StaticResource colorWhite}"
                        Text="{Binding Info}"
-                       FontSize="20"/>
+                       FontSize="20" />
             <!--<Label Grid.Row="1"
                Content="{Binding Correctness}"
                Foreground="{StaticResource colorWhite}"
@@ -112,57 +113,52 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Button Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        Content="Load Network"
-                        Background="{StaticResource colorLight2}"
-                        Foreground="{StaticResource colorWhite}"
-                        BorderBrush="{StaticResource colorDark1}"
-                        BorderThickness="1"
-                        Margin="1"
-                        FontSize="20" 
-                        Command="{Binding LoadNeuralNetwork}"
-                        IsEnabled="{Binding IsTrainingNotInProgress}"
-                        />
+                <components:PrimaryButton Grid.Column="0"
+                                          Grid.ColumnSpan="2"
+                                          Content="Load Network"
+                                          Background="{StaticResource colorLight2}"
+                                          Foreground="{StaticResource colorWhite}"
+                                          BorderBrush="{StaticResource colorLight2}"
+                                          BorderThickness="1"
+                                          Margin="1"
+                                          Command="{Binding LoadNeuralNetwork}"
+                                          IsEnabled="{Binding IsTrainingNotInProgress}" />
 
-                <Button Grid.Column="2"
-                        Grid.ColumnSpan="2"
-                        Content="Save Network"
-                        Background="{StaticResource colorLight2}"
-                        Foreground="{StaticResource colorWhite}"
-                        BorderBrush="{StaticResource colorDark1}"
-                        BorderThickness="1"
-                        Margin="1"
-                        FontSize="20" 
-                        Command="{Binding SaveNeuralNetwork}"
-                        IsEnabled="{Binding IsTrainingNotInProgress}"
-                        />
+                <components:PrimaryButton Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        Content="Save Network"
+                                        Background="{StaticResource colorLight2}"
+                                        Foreground="{StaticResource colorWhite}"
+                                        BorderBrush="{StaticResource colorLight2}"
+                                        BorderThickness="1"
+                                        Margin="1"
+                                        Command="{Binding SaveNeuralNetwork}"
+                                        IsEnabled="{Binding IsTrainingNotInProgress}" />
 
-                <Button Grid.Column="0"
-                        Grid.ColumnSpan="3"
-                        Grid.Row="1"
-                        Content="Initialize Training"
-                        Command="{Binding StartLearningCommand}"
-                        Background="{StaticResource colorHighlight2}"
-                        Foreground="{StaticResource colorWhite}"
-                        BorderBrush="{StaticResource colorDark1}"
-                        BorderThickness="1"
-                        Margin="1"
-                        IsEnabled="{Binding IsTrainingNotInProgress}"
-                        FontSize="20" />
-                
-                <Button Grid.Column="3"
-                        Grid.Row="1"
-                        Content="Stop"
-                        Command="{Binding StopTrainingCommand}"
-                        Background="{StaticResource colorRed}"
-                        Foreground="{StaticResource colorWhite}"
-                        BorderBrush="{StaticResource colorDark1}"
-                        BorderThickness="1"
-                        Margin="1"
-                        IsEnabled="{Binding IsTrainingInProgress}"
-                        FontSize="20" />
+                <components:PrimaryButton Grid.Column="0"
+                                        Grid.ColumnSpan="3"
+                                        Grid.Row="1"
+                                        Content="Initialize Training"
+                                        Command="{Binding StartLearningCommand}"
+                                        Background="{StaticResource colorHighlight2}"
+                                        Foreground="{StaticResource colorWhite}"
+                                        BorderBrush="{StaticResource colorWhite}"
+                                        BorderThickness="1"
+                                        Margin="1"
+                                        IsEnabled="{Binding IsTrainingNotInProgress}"
+                                        FontSize="20" />
 
+                <components:PrimaryButton Grid.Column="3"
+                                        Grid.Row="1"
+                                        Content="Stop"
+                                        Command="{Binding StopTrainingCommand}"
+                                        Background="{StaticResource colorRed}"
+                                        Foreground="{StaticResource colorWhite}"
+                                        BorderBrush="{StaticResource colorRed}"
+                                        BorderThickness="1"
+                                        Margin="1"
+                                        IsEnabled="{Binding IsTrainingInProgress}"
+                                        FontSize="20" />
             </Grid>
         </Grid>
     </Border>
