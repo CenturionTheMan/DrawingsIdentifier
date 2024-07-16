@@ -13,7 +13,8 @@
             CornerRadius="{StaticResource radiusPage}"
             Background="{StaticResource colorLight2}"
             BorderBrush="{StaticResource colorDark1}"
-            BorderThickness="1">
+            BorderThickness="1"
+            Padding="0 0 4 0">
 
         <Grid x:Name="DrawingAreaGrid">
             <Grid.ColumnDefinitions>
@@ -34,8 +35,8 @@
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes x:Name="strokeAtrib"
                                            Color="Black"
-                                           Width="40"
-                                           Height="40" />
+                                           Width="30"
+                                           Height="30" />
                     </InkCanvas.DefaultDrawingAttributes>
                 </InkCanvas>
             </Grid>
@@ -62,6 +63,8 @@
 
                     <Button Background="{StaticResource colorHighlight1}"
                             Content="Clear"
+                            Height="30"
+                            Margin="5"
                             Command="{Binding ClearCanvasCommand}" />
                 </StackPanel>
             </Border>

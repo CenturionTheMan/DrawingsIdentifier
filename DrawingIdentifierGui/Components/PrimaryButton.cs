@@ -46,4 +46,13 @@ public class PrimaryButton : Button
 
     public static readonly DependencyProperty RadiusProperty =
         DependencyProperty.Register("Radius", typeof(CornerRadius), typeof(PrimaryButton), new PropertyMetadata(new CornerRadius(5)));
+
+    public Thickness OnMouseOverBorderThickness
+    {
+        get { return (Thickness)GetValue(OnMouseOverBorderThicknessProperty); }
+        set { SetValue(OnMouseOverBorderThicknessProperty, value); }
+    }
+
+    public static readonly DependencyProperty OnMouseOverBorderThicknessProperty =
+        DependencyProperty.Register("OnMouseOverBorderThickness", typeof(Thickness), typeof(PrimaryButton), new PropertyMetadata(new Thickness(5)));
 }

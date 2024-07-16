@@ -16,12 +16,14 @@ namespace DrawingIdentifierGui
         public static NeuralNetwork[] NeuralNetworks;
         public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels;
 
+        public static (Matrix[] inputs, Matrix outputs)[] TrainData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
+        public static (Matrix[] inputs, Matrix outputs)[] TestData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
+
         static App()
         {
             NeuralNetworkConfigModels = [
                 new NeuralNetworkConfigModel()
                 {
-                    SamplesPerFile = 5000,
                     InitialLearningRate = 0.01f,
                     MinLearningRate = 0.001f,
                     EpochAmount = 30,
@@ -35,7 +37,6 @@ namespace DrawingIdentifierGui
                 },
                 new NeuralNetworkConfigModel()
                 {
-                    SamplesPerFile = 5000,
                     InitialLearningRate = 0.01f,
                     MinLearningRate = 0.001f,
                     EpochAmount = 30,
@@ -59,6 +60,4 @@ namespace DrawingIdentifierGui
             }
         }
     }
-
-
 }

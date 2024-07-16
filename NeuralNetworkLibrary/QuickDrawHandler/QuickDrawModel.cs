@@ -22,7 +22,7 @@ public class QuickDrawSet
 {
     private static Random random = new();
 
-    public static readonly Dictionary<string, int> categories = new Dictionary<string, int>{
+    public static readonly Dictionary<string, int> CategoryToIndex = new Dictionary<string, int>{
         { "axe", 0},
         { "cactus", 1},
         { "cat", 2},
@@ -34,6 +34,8 @@ public class QuickDrawSet
         { "stairs", 8},
         { "sword", 9},
     };
+
+    public static readonly Dictionary<int, string> IndexToCategory = CategoryToIndex.ToDictionary(x => x.Value, x => x.Key);
 
     public readonly IEnumerable<QuickDrawSample> samples;
 
@@ -48,7 +50,7 @@ public class QuickDrawSet
     private Matrix OutputForNN(string category)
     {
         float[] output = new float[10];
-        output[categories[category]] = 1;
+        output[CategoryToIndex[category]] = 1;
 
         return new Matrix(output);
     }

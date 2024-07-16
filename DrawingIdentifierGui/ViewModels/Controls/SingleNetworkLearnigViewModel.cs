@@ -30,7 +30,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
         public RelayCommand SaveNeuralNetwork => new RelayCommand(dd =>
         {
-            var dialog = new SaveFileDialog() {
+            var dialog = new SaveFileDialog()
+            {
                 AddExtension = true,
                 Filter = "Xml files (*.xml)|*.xml",
                 DefaultExt = ".xml",
@@ -39,15 +40,16 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
             var res = dialog.ShowDialog();
 
-            if(res is not null && res.Value == true)
+            if (res is not null && res.Value == true)
             {
-                float? cor = (neuralNetwork is null || learningConfig is null)? null : neuralNetwork!.CalculateCorrectness(learningConfig!.TestData.Take(1000).ToArray());
+                float? cor = (neuralNetwork is null || learningConfig is null) ? null : neuralNetwork!.CalculateCorrectness(App.TestData.Take(1000).ToArray());
                 neuralNetwork!.SaveToXmlFile(dialog.FileName, testCorrectness: cor);
                 MessageBox.Show("Neural Network saved.");
             }
         });
 
-        public RelayCommand LoadNeuralNetwork => new RelayCommand(dd => {
+        public RelayCommand LoadNeuralNetwork => new RelayCommand(dd =>
+        {
             var dialog = new OpenFileDialog()
             {
                 AddExtension = true,
@@ -57,7 +59,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 //InitialDirectory = Directory.GetCurrentDirectory(),
             };
 
-            if(dialog.ShowDialog() == true)
+            if (dialog.ShowDialog() == true)
             {
                 var nn = NeuralNetwork.LoadFromXmlFile(dialog.FileName);
                 if (nn is null) return;
@@ -69,7 +71,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
                     string testCorStr = learningConfig!.TestCorrectness is null ? "unknown" : $"{learningConfig!.TestCorrectness.Value.ToString("0.00")}%";
                     string trainCorStr = learningConfig!.TrainCorrectness is null ? "unknown" : $"{learningConfig!.TrainCorrectness.Value.ToString("0.00")}%";
-                    Info = $"Test correctness: {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
+                    Info = $"Test correctness:  {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
 
                     MessageBox.Show("Neural Network loaded.");
                 }
@@ -79,7 +81,6 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 }
             }
         });
-
 
         private NeuralNetworkConfigModel? learningConfig;
 
@@ -121,10 +122,11 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         }
 
         private CancellationTokenSource? trainingCts;
-        public CancellationTokenSource? TrainingCts 
+        public CancellationTokenSource? TrainingCts
         {
             get => trainingCts;
-            set { 
+            set
+            {
                 trainingCts = value;
                 IsTrainingInProgress = trainingCts != null;
                 IsTrainingNotInProgress = trainingCts == null;
@@ -135,7 +137,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         public bool IsTrainingInProgress
         {
             get => isTrainingInProgress;
-            set 
+            set
             {
                 isTrainingInProgress = value;
                 OnPropertyChanged();
@@ -179,71 +181,34 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
             };
 
-            string testCorStr = learningConfig!.TestCorrectness is null? "unknown" : $"{learningConfig!.TestCorrectness.Value.ToString("0.00")}%";
-            string trainCorStr = learningConfig!.TrainCorrectness is null? "unknown" : $"{learningConfig!.TrainCorrectness.Value.ToString("0.00")}%";
+            string testCorStr = learningConfig!.TestCorrectness is null ? "unknown" : $"{learningConfig!.TestCorrectness.Value.ToString("0.00")}%";
+            string trainCorStr = learningConfig!.TrainCorrectness is null ? "unknown" : $"{learningConfig!.TrainCorrectness.Value.ToString("0.00")}%";
             Info = $"Test correctness: {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
 
             FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
         }
 
+        //private string[]? GetFilesForLearning()
+        //{
+        //    var folderDialog = new OpenFileDialog() { Filter = "Numpy files (*.npy)|*.npy", DefaultExt = ".npy", Multiselect = true };
 
-        private string[]? GetFilesForLearning()
+        //    bool? isFile = folderDialog.ShowDialog();
+        //    if (isFile is null || isFile == false)
+        //    {
+        //        return null;
+        //    }
+        //    var files = folderDialog.FileNames;
+        //    return files;
+        //}
+
+        private void RunLearning()
         {
-            var folderDialog = new OpenFileDialog() { Filter = "Numpy files (*.npy)|*.npy", DefaultExt = ".npy", Multiselect = true };
-
-            bool? isFile = folderDialog.ShowDialog();
-            if (isFile is null || isFile == false)
-            {
-                return null;
-            }
-            var files = folderDialog.FileNames;
-            return files;
-        }
-
-        private void RunLearning(string[] files)
-        {
-            MainWindowViewModel.Instance!.NotifyOnTrainingBegin();
+            MainWindowViewModel.Instance!.NotifyOnLongProcessBegin();
 
             TrainingCts = new CancellationTokenSource();
 
             Task.Factory.StartNew(() =>
             {
-                ForceMainThread(() =>
-                {
-                    Info = $"Loading files 0 / {files.Length} ...";
-                });
-
-                var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromFiles(files, learningConfig.SamplesPerFile, true, true, 255, TrainingCts.Token, (i) =>
-                {
-                    ForceMainThread(() =>
-                    {
-                        Info = $"Loading files {i} / {files.Length} ...";
-                    });
-                });
-
-                if (quickDrawData == null)
-                {
-                    TrainingCts = null;
-
-                    ForceMainThread(() =>
-                    {
-                        Info = $"";
-                    });
-
-                    MainWindowViewModel.Instance!.NotifyOnTrainingEnd();
-                    return;
-                }
-
-                (var trainData, var testData) = quickDrawData.SplitIntoTrainTest();
-                learningConfig.TrainData = trainData;
-                learningConfig.TestData = testData;
-
-
-                ForceMainThread(() =>
-                {
-                    Info = $"";
-                });
-
                 neuralNetwork!.OnTrainingFinished += () =>
                 {
                     Debug.WriteLine("Finished learning");
@@ -251,14 +216,14 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                     Debug.WriteLine("Testing...");
                     ForceMainThread(() =>
                     {
-                        Info = $"Achieved predictions correctness: {neuralNetwork.CalculateCorrectness(learningConfig.TestData).ToString("0.00")}%";
+                        Info = $"Achieved predictions correctness: {neuralNetwork.CalculateCorrectness(App.TestData).ToString("0.00")}%";
                     });
 
                     TrainingCts = null;
-                    MainWindowViewModel.Instance!.NotifyOnTrainingEnd();
+                    MainWindowViewModel.Instance!.NotifyOnLongProcessEnd();
                 };
 
-                var trainer = learningConfig.CreateTrainer(neuralNetwork!);
+                var trainer = learningConfig!.CreateTrainer(neuralNetwork!);
                 (var task, var ctsTrainer) = trainer.RunTrainingOnTask();
                 TrainingCts = ctsTrainer;
             });
@@ -266,16 +231,14 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
         private void InitializeLearning()
         {
-            // get files
-            var files = GetFilesForLearning();
-            if (files == null)
+            if (App.TestData.Length == 0 || App.TrainData.Length == 0)
             {
+                MessageBox.Show("No data loaded... Load data first.");
                 return;
             }
 
-
             // run learing
-            RunLearning(files);
+            RunLearning();
         }
 
         private void ForceMainThread(Action action)

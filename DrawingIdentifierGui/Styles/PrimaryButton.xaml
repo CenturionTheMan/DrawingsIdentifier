@@ -18,7 +18,8 @@
         <Setter Property="Background" Value="{DynamicResource colorHighlight1}" />
         <Setter Property="BorderBrush" Value="{DynamicResource colorDark2}" />
         <Setter Property="Foreground" Value="{DynamicResource colorDark2}" />
-        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="OnMouseOverBorderThickness" Value="2" />
         <Setter Property="Radius" Value="{DynamicResource radiusSmall}" />
         <Setter Property="DisableBackgroundColour" Value="{DynamicResource colorDark1}" />
         <Setter Property="DisableBorderColour" Value="{DynamicResource colorDark2}" />
@@ -49,6 +50,7 @@
                         </Trigger>-->
                         <Trigger Property="IsMouseOver" Value="true">
                             <Setter Property="BorderBrush" TargetName="border" Value="{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                            <Setter Property="BorderThickness" TargetName="border" Value="{Binding OnMouseOverBorderThickness, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                             <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                             <Setter Property="Background" TargetName="border" Value="{DynamicResource Button.Transparent}" />
                         </Trigger>

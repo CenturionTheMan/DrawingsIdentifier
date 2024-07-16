@@ -81,7 +81,8 @@
                                   Grid.Column="0"
                                   Grid.Row="1"
                                   Grid.ColumnSpan="2"
-                                  Grid.RowSpan="4">
+                                  Grid.RowSpan="4"
+                                  Margin="0 20 0 0">
 
                         <StackPanel x:Name="stackPanel1" Grid.Row="1"
                                 Grid.Column="0"
@@ -90,28 +91,6 @@
                                 VerticalAlignment="Stretch"
                                 HorizontalAlignment="Stretch"
                                 Margin="10 0 20 10">
-
-                            <!--Samples per file-->
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.7*" MaxWidth="200" />
-                                    <ColumnDefinition Width="0.3*" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="Samples per file: "
-                                       Grid.Column="0"
-                                       Foreground="{StaticResource colorWhite}"
-                                       FontSize="20"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" />
-                                <TextBox Background="{StaticResource colorWhite}"
-                                     Text="{Binding Path=NeuralNetworkConfig.SamplesPerFile, Mode=TwoWay}"
-                                     Grid.Column="1"
-                                     FontSize="20"
-                                     HorizontalAlignment="Stretch"
-                                     VerticalAlignment="Center"
-                                     Margin="10 0 10 0" />
-                            </Grid>
 
                             <!--Initial Learning rate-->
                             <Grid Margin="0 0 0 10">
@@ -130,6 +109,7 @@
                                      Text="{Binding Path=NeuralNetworkConfig.InitialLearningRate, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
+                                         BorderBrush="{StaticResource colorDark1}"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
@@ -152,6 +132,7 @@
                                      Text="{Binding Path=NeuralNetworkConfig.MinLearningRate, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
+                                         BorderBrush="{StaticResource colorDark1}"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
@@ -174,6 +155,7 @@
                                      Text="{Binding Path=NeuralNetworkConfig.EpochAmount, Mode=TwoWay}"
                                      Grid.Column="1"
                                      FontSize="20"
+                                         BorderBrush="{StaticResource colorDark1}"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
                                      Margin="10 0 10 0" />
@@ -195,6 +177,7 @@
                                 <TextBox Background="{StaticResource colorWhite}"
                                      Text="{Binding Path=NeuralNetworkConfig.BatchSize, Mode=TwoWay}"
                                      Grid.Column="1"
+                                         BorderBrush="{StaticResource colorDark1}"
                                      FontSize="20"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Center"
@@ -236,6 +219,7 @@
                         <TextBox Background="{StaticResource colorWhite}"
                                  Text="{Binding Path=NeuralNetworkConfig.InitialIgnore, Mode=TwoWay}"
                                  FontSize="20"
+                                 BorderBrush="{StaticResource colorDark1}"
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Center"
                                  Margin="10 0 10 0" />
@@ -250,6 +234,8 @@
                         <TextBox Background="{StaticResource colorWhite}"
                                  Text="{Binding Path=NeuralNetworkConfig.Patience, Mode=TwoWay}"
                                  FontSize="20"
+                                 BorderBrush="{StaticResource colorDark1}"
+
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Center"
                                  Margin="10 0 10 0" />
@@ -288,6 +274,7 @@
                         <TextBox Background="{StaticResource colorWhite}"
                                    Text="{Binding Path=SaveDirectoryPath, Mode=TwoWay}"
                                    FontSize="20"
+                                 BorderBrush="{StaticResource colorDark1}"
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Center"
                                    Margin="10 0 10 0"
@@ -296,8 +283,8 @@
                                                 FontSize="5"
                                                 Height="40"
                                                   Radius="1"
-                                                  BorderThickness="1"
-                                                  BorderBrush="{StaticResource colorHighlight2}"
+                                                  BorderThickness="0"
+                                                  OnMouseOverBorderThickness="1"
                                                 VerticalAlignment="Top"
                                                 Background="{StaticResource colorHighlight2}"
                                                 Foreground="{StaticResource colorWhite}"
@@ -399,27 +386,25 @@
 
                         <components:PrimaryButton Padding="5"
                                                   Margin="10 0 10 5"
-                                                  MinHeight="40"
-                                                  MaxHeight="60"
+                                                  MinHeight="65"
+                                                  MaxHeight="80"
                                                   Content="Add Layer"
                                                   FontSize="30"
                                                   Background="{StaticResource colorHighlight2}"
                                                   Radius="{StaticResource radiusMiddle}"
                                                   Foreground="{StaticResource colorDark1}"
-                                                  Command="{Binding Path=AddLayerCommand}"
-                                                  BorderBrush="{StaticResource colorDark1}" />
+                                                  Command="{Binding Path=AddLayerCommand}" />
 
                         <components:PrimaryButton Margin="10 5 10 0"
                                                   Padding="5"
-                                                  MinHeight="40"
-                                                  MaxHeight="60"
+                                                  MinHeight="65"
+                                                  MaxHeight="80"
                                                   Content="Remove Layer"
                                                   FontSize="30"
                                                   Radius="{StaticResource radiusMiddle}"
                                                   Background="{StaticResource colorRed}"
                                                   Foreground="{StaticResource colorDark1}"
-                                                  Command="{Binding Path=RemoveLayerCommand}"
-                                                  BorderBrush="{StaticResource colorDark1}" />
+                                                  Command="{Binding Path=RemoveLayerCommand}" />
                     </StackPanel>
 
                     <components:PrimaryButton Grid.Column="3"
@@ -428,13 +413,12 @@
                                               VerticalAlignment="Bottom"
                                               Content="SAVE"
                                               Padding="5"
-                                              MinHeight="40"
-                                              MaxHeight="70"
+                                              MinHeight="65"
+                                              MaxHeight="80"
                                               Radius="{StaticResource radiusMiddle}"
                                               FontSize="25"
                                               Background="{StaticResource colorHighlight1}"
                                               Foreground="{StaticResource colorDark1}"
-                                              BorderBrush="{StaticResource colorDark1}"
                                               FontWeight="Bold"
                                               Command="{Binding Path=SaveChangesToNN}" />
                 </Grid>

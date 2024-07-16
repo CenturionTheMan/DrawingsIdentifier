@@ -118,9 +118,8 @@
                                           Content="Load Network"
                                           Background="{StaticResource colorLight2}"
                                           Foreground="{StaticResource colorWhite}"
-                                          BorderBrush="{StaticResource colorLight2}"
-                                          BorderThickness="1"
                                           Margin="1"
+                                          OnMouseOverBorderThickness="1"
                                           Command="{Binding LoadNeuralNetwork}"
                                           IsEnabled="{Binding IsTrainingNotInProgress}" />
 
@@ -129,9 +128,8 @@
                                         Content="Save Network"
                                         Background="{StaticResource colorLight2}"
                                         Foreground="{StaticResource colorWhite}"
-                                        BorderBrush="{StaticResource colorLight2}"
-                                        BorderThickness="1"
                                         Margin="1"
+                                          OnMouseOverBorderThickness="1"
                                         Command="{Binding SaveNeuralNetwork}"
                                         IsEnabled="{Binding IsTrainingNotInProgress}" />
 
@@ -142,8 +140,8 @@
                                         Command="{Binding StartLearningCommand}"
                                         Background="{StaticResource colorHighlight2}"
                                         Foreground="{StaticResource colorWhite}"
-                                        BorderBrush="{StaticResource colorWhite}"
-                                        BorderThickness="1"
+                                          BorderThickness="1"
+                                          BorderBrush="{StaticResource colorWhite}"
                                         Margin="1"
                                         IsEnabled="{Binding IsTrainingNotInProgress}"
                                         FontSize="20" />
@@ -151,11 +149,10 @@
                 <components:PrimaryButton Grid.Column="3"
                                         Grid.Row="1"
                                         Content="Stop"
+                                          OnMouseOverBorderThickness="1"
                                         Command="{Binding StopTrainingCommand}"
                                         Background="{StaticResource colorRed}"
                                         Foreground="{StaticResource colorWhite}"
-                                        BorderBrush="{StaticResource colorRed}"
-                                        BorderThickness="1"
                                         Margin="1"
                                         IsEnabled="{Binding IsTrainingInProgress}"
                                         FontSize="20" />
