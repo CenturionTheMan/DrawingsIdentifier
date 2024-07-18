@@ -32,7 +32,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
             IsLoadingData = true;
             IsNotLoadingData = false;
 
-            ProgressBarText = "Loading data: 0/10";
+            ProgressBarText = $"Loading data: 0/{App.CLASSES_AMOUNT}";
 
             Task.Factory.StartNew(() =>
             {
@@ -53,14 +53,24 @@ namespace DrawingIdentifierGui.ViewModels.Windows
                 }
                 else
                 {
+                    ProgressBarText = "Parsing data ...";
+
                     (var trainData, var testData) = quickDrawData.SplitIntoTrainTest();
+
+                    var trainFlat = trainData.Select(i => (new Matrix[] { MatrixExtender.FlattenMatrix(i.inputs) }, i.outputs));
+                    var testFlat = testData.Select(i => (new Matrix[] { MatrixExtender.FlattenMatrix(i.inputs) }, i.outputs));
+
                     App.TestData = testData;
                     App.TrainData = trainData;
+                    App.TrainDataFlat = trainFlat.ToArray();
+                    App.TestDataFlat = testFlat.ToArray();
 
                     ForceMainThread(() =>
                     {
                         ClassDrawingImagesModels = GetImages();
                     });
+
+                    ProgressBarText = "Data loaded";
                 }
 
                 cancellationTokenSource = null;
@@ -75,7 +85,10 @@ namespace DrawingIdentifierGui.ViewModels.Windows
         public RelayCommand StopLoadingDataCommand => new RelayCommand(parameter =>
         {
             if (cancellationTokenSource != null)
+            {
                 cancellationTokenSource.Cancel();
+                ProgressBarText = "Stopping...";
+            }
         });
 
         private ObservableCollection<ClassDrawingImagesModel> classDrawingImagesModels = new ObservableCollection<ClassDrawingImagesModel>();
@@ -124,7 +137,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
             }
         }
 
-        private int loadedFilesAmount = App.TestData.Length == 0 ? 0 : 10;
+        private int loadedFilesAmount = App.TestData.Length == 0 ? 0 : App.CLASSES_AMOUNT;
         public int LoadedFilesAmount
         {
             get => loadedFilesAmount;
@@ -136,12 +149,8 @@ namespace DrawingIdentifierGui.ViewModels.Windows
                 {
                     ProgressBarText = "No data loaded";
                 }
-                else if (value == 10)
-                {
-                    ProgressBarText = "Data loaded";
-                }
                 else
-                    ProgressBarText = $"Loading data: {value}/10";
+                    ProgressBarText = $"Loading data: {value}/{App.CLASSES_AMOUNT}";
 
                 OnPropertyChanged();
             }
@@ -166,7 +175,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
         private ObservableCollection<ClassDrawingImagesModel> GetImages()
         {
             var res = new ObservableCollection<ClassDrawingImagesModel>();
-            int classesAmount = 10;
+            int classesAmount = App.CLASSES_AMOUNT;
             int samplesAmount = 10;
 
             if (App.TrainData.Length == 0)

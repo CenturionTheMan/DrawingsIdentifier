@@ -75,20 +75,26 @@
 
                 <Button x:Name="ExitButton"
                         Grid.Column="2"
-                        Width="auto"
-                        Height="auto"
                         Command="{Binding ExitCommand}"
                         CommandParameter=""
                         Margin="4"
-                        Background="{StaticResource colorRed}" />
+                        Background="{StaticResource colorRed}">
+                    <Button.Content>
+                        <Image Source="../Images/app-exit.png"
+                               Stretch="UniformToFill" />
+                    </Button.Content>
+                </Button>
 
                 <Button x:Name="MinimalizeButton"
                         Grid.Column="1"
-                        Width="auto"
-                        Height="auto"
                         Margin="4"
                         Background="{StaticResource colorLight2}"
-                        Command="{Binding MinimalizeCommand}" />
+                        Command="{Binding MinimalizeCommand}">
+                    <Button.Content>
+                        <Image Source="../Images/app-hide.png"
+                               Stretch="UniformToFill" />
+                    </Button.Content>
+                </Button>
             </Grid>
 
             <!--Left Navigation-->

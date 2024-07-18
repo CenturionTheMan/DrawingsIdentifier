@@ -9,7 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\app-exit.png" />
+    <None Remove="Images\app-hide.png" />
     <None Remove="Images\edit.png" />
+    <None Remove="Images\nav-data.png" />
+    <None Remove="Images\nav-learning.png" />
+    <None Remove="Images\nav-one.png" />
+    <None Remove="Images\nav-painting.png" />
+    <None Remove="Images\nav-two.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +28,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Images\edit.png" />
+    <Resource Include="Images\app-exit.png" />
+    <Resource Include="Images\app-hide.png" />
+    <Resource Include="Images\nav-data.png" />
+    <Resource Include="Images\nav-learning.png" />
+    <Resource Include="Images\nav-one.png" />
+    <Resource Include="Images\nav-painting.png" />
+    <Resource Include="Images\nav-two.png" />
   </ItemGroup>
 
 </Project>

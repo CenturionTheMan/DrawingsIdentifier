@@ -15,7 +15,7 @@ namespace DrawingIdentifierGui.Views.Windows;
 /// </summary>
 public partial class PredictionsCanvas : UserControl
 {
-    public static PredictionsCanvas Instance;
+    public static PredictionsCanvas? Instance;
 
     private bool isDrawing = false;
 
@@ -42,8 +42,9 @@ public partial class PredictionsCanvas : UserControl
                 action();
             });
         }
-        catch
+        catch (Exception e)
         {
+            Debug.WriteLine(e.Message);
         }
     }
 
@@ -77,7 +78,6 @@ public partial class PredictionsCanvas : UserControl
 
             //to remove
             scaled.SaveAsPng("./../../../../UserDrawing.png");
-
 
             RunMethodOnCurrentThread(() =>
             {

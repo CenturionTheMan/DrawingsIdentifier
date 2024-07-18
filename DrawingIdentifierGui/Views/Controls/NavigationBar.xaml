@@ -14,29 +14,32 @@
             <components:NavigationRadioButton
                 Click="Button1_Click"
                 Style="{DynamicResource NavigationRadioButton}"
-                ImageSource="../../Images/edit.png"
+                ImageSource="../../Images/nav-painting.png"
                 ImageMargin="5"
-                IsChecked="True"
-                Margin="5 5 5 5" />
+                IsChecked="True" />
 
             <components:NavigationRadioButton
                 Click="Button2_Click"
                 Style="{DynamicResource NavigationRadioButton}"
-                ImageMargin="5" />
+                ImageSource="../../Images/nav-learning.png"
+                ImageMargin="2" />
 
             <components:NavigationRadioButton
                 Click="Button3_Click"
                 Style="{DynamicResource NavigationRadioButton}"
-                ImageMargin="5" />
+                ImageSource="../../Images/nav-one.png"
+                ImageMargin="6" />
 
             <components:NavigationRadioButton
                 Click="Button4_Click"
                 Style="{DynamicResource NavigationRadioButton}"
-                ImageMargin="5" />
+                ImageSource="../../Images/nav-two.png"
+                ImageMargin="6" />
 
             <components:NavigationRadioButton
                 Click="Button5_Click"
                 Style="{DynamicResource NavigationRadioButton}"
+                ImageSource="../../Images/nav-data.png"
                 ImageMargin="5" />
         </StackPanel>
     </Grid>

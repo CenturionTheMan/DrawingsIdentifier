@@ -13,11 +13,16 @@ namespace DrawingIdentifierGui
     ///
     public partial class App : Application
     {
+        public const int CLASSES_AMOUNT = 10;
+
         public static NeuralNetwork[] NeuralNetworks;
         public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels;
 
         public static (Matrix[] inputs, Matrix outputs)[] TrainData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
         public static (Matrix[] inputs, Matrix outputs)[] TestData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
+
+        public static (Matrix[] inputs, Matrix outputs)[] TrainDataFlat { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
+        public static (Matrix[] inputs, Matrix outputs)[] TestDataFlat { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
 
         static App()
         {
@@ -32,7 +37,7 @@ namespace DrawingIdentifierGui
                     {
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
-                        new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 10, ActivationFunction = ActivationFunction.Softmax},
+                        new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = App.CLASSES_AMOUNT, ActivationFunction = ActivationFunction.Softmax},
                     }
                 },
                 new NeuralNetworkConfigModel()
@@ -48,15 +53,15 @@ namespace DrawingIdentifierGui
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
                         new LayerModel() { LayerType = LayerType.Dropout, DropoutRate = 0.5f},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
-                        new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 10, ActivationFunction = ActivationFunction.Softmax},
+                        new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = App.CLASSES_AMOUNT, ActivationFunction = ActivationFunction.Softmax},
                     }
                 },
             ];
 
-            NeuralNetworks = new NeuralNetwork[NeuralNetworkConfigModels.Length];
+            App.NeuralNetworks = new NeuralNetwork[NeuralNetworkConfigModels.Length];
             for (int i = 0; i < NeuralNetworkConfigModels.Length; i++)
             {
-                NeuralNetworks[i] = NeuralNetworkConfigModels[i].CreateNeuralNetwork();
+                App.NeuralNetworks[i] = NeuralNetworkConfigModels[i].CreateNeuralNetwork();
             }
         }
     }

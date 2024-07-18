@@ -76,7 +76,6 @@ public class NeuralNetwork
         this.inputRowsAmount = inputRowsAmount;
         this.inputColumnsAmount = inputColumnsAmount;
 
-        bool isPrevFullyConnected = false;
         List<ILayer> layers = new List<ILayer>();
         var currentInput = (inputDepth, inputRowsAmount, inputColumnsAmount);
 
@@ -86,7 +85,7 @@ public class NeuralNetwork
             switch (currentTemplate.LayerType)
             {
                 case LayerType.Convolution:
-                    if (isPrevFullyConnected)
+                    if (layers.Count() > 0 && layers.Last().LayerType == LayerType.FullyConnected)
                     {
                         throw new InvalidOperationException("Convolution layer should be after another convolution layer or pooling layer");
                     }
@@ -98,7 +97,7 @@ public class NeuralNetwork
                     break;
 
                 case LayerType.Pooling:
-                    if (isPrevFullyConnected)
+                    if (layers.Count() > 0 && layers.Last().LayerType == LayerType.FullyConnected)
                     {
                         throw new InvalidOperationException("Pooling layer should be after another convolution layer or pooling layer");
                     }
@@ -110,7 +109,7 @@ public class NeuralNetwork
                     break;
 
                 case LayerType.FullyConnected:
-                    if (!isPrevFullyConnected)
+                    if (layers.Count() > 0 && layers.Last().LayerType != LayerType.FullyConnected)
                     {
                         var reshapeLayer = ReshapeInput(true, currentInput.inputRowsAmount, currentInput.inputColumnsAmount);
                         currentInput = (1, currentInput.inputRowsAmount * currentInput.inputColumnsAmount * currentInput.inputDepth, 1);
@@ -120,10 +119,13 @@ public class NeuralNetwork
                     var fullyConnectedLayer = new FullyConnectedLayer(currentInput.inputRowsAmount, currentTemplate.LayerSize, currentTemplate.ActivationFunction);
                     layers.Add(fullyConnectedLayer);
                     currentInput = (1, currentTemplate.LayerSize, 1);
-                    isPrevFullyConnected = true;
                     break;
 
                 case LayerType.Dropout:
+                    if (layers.Count() == 0)
+                    {
+                        throw new InvalidOperationException("Dropout layer can t be first in sequance.");
+                    }
                     var dropoutLayer = new DropoutLayer((currentInput.inputRowsAmount, currentInput.inputColumnsAmount), currentTemplate.DropoutRate);
                     layers.Add(dropoutLayer);
                     layersDropoutRates.Add(dropoutLayer, currentTemplate.DropoutRate);
@@ -249,6 +251,16 @@ public class NeuralNetwork
 
     #region INTERACTIONS
 
+    public bool IsConvolutional()
+    {
+        return layers.Any(x => x.LayerType == LayerType.Convolution || x.LayerType == LayerType.Pooling);
+    }
+
+    public (int depth, int rowsAmount, int columnsAmount) GetInputShape()
+    {
+        return (inputDepth, inputRowsAmount, inputColumnsAmount);
+    }
+
     /// <summary>
     /// Predicts the output based on the input channel.
     /// </summary>
@@ -367,8 +379,11 @@ public class NeuralNetwork
         writer.WriteElementString("LearningRate", LearningRate.ToString());
         writer.WriteElementString("LayersAmount", layers.Length.ToString());
         writer.WriteElementString("LastTrainCorrectness", LastTrainCorrectness.ToString());
-        if(testCorrectness != null)
+        if (testCorrectness != null)
             writer.WriteElementString("TestCorrectness", testCorrectness!.ToString());
+
+        writer.WriteElementString("InputShape", $"{inputDepth} {inputRowsAmount} {inputColumnsAmount}");
+
         writer.WriteEndElement();
 
         writer.WriteStartElement("LayersHead");
@@ -410,6 +425,14 @@ public class NeuralNetwork
         float learningRate = float.Parse(config.Element("LearningRate")!.Value);
         float lastTrainCorrectness = float.Parse(config.Element("LastTrainCorrectness")!.Value);
         int layersAmount = int.Parse(config.Element("LayersAmount")!.Value);
+
+        string? inputShapeStr = config.Element("InputShape")?.Value;
+        if (inputShapeStr == null)
+            return null;
+
+        string[] inputShape = inputShapeStr.Split(' ');
+        if (inputShape.Length != 3 || !int.TryParse(inputShape[0], out int inputDepth) || !int.TryParse(inputShape[1], out int inputHeight) || !int.TryParse(inputShape[2], out int inputWidth))
+            return null;
 
         var layersHead = root.Element("LayersHead")!.Elements();
         var layersData = root.Element("LayersData")!.Elements();
@@ -462,14 +485,6 @@ public class NeuralNetwork
 
             layers[i] = layer;
         }
-
-        var firstLayerHead = layersHead.ElementAt(0);
-        string? inputShapeStr = firstLayerHead.Element("inputShape")?.Value;
-        if (inputShapeStr == null)
-            return null;
-        string[] inputShape = inputShapeStr.Split(' ');
-        if (inputShape.Length != 3 || !int.TryParse(inputShape[0], out int inputDepth) || !int.TryParse(inputShape[1], out int inputHeight) || !int.TryParse(inputShape[2], out int inputWidth))
-            return null;
 
         return new NeuralNetwork(inputDepth, inputHeight, inputWidth, layers, learningRate, lastTrainCorrectness, layersDropoutRates);
     }

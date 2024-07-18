@@ -60,7 +60,8 @@ public partial class NeuralNetworkOutput : UserControl
 
     public void UpdatePrecidtions(Matrix mat)
     {
-        Matrix predition = App.NeuralNetworks[NeuralNetworkType].Predict(mat);
+        var input = App.NeuralNetworks[NeuralNetworkType].GetInputShape().columnsAmount == 1 && App.NeuralNetworks[NeuralNetworkType].GetInputShape().depth == 1 ? MatrixExtender.FlattenMatrix(mat) : mat;
+        Matrix predition = App.NeuralNetworks[NeuralNetworkType].Predict(input);
 
         for (int i = 0; i < singleNNNodes.Length; i++)
         {

@@ -25,20 +25,20 @@ namespace DrawingIdentifierGui.Models
         public int EpochAmount { get; set; }
         public int BatchSize { get; set; }
 
-        public ObservableCollection<LayerModel> NeuralNetworkLayers { get; set; }
+        public ObservableCollection<LayerModel>? NeuralNetworkLayers { get; set; }
         public float? TestCorrectness { get; set; }
         public float? TrainCorrectness { get; set; }
 
         public static NeuralNetwork CreateNeuralNetwork(LayerModel[] layers)
         {
-            if (layers[^1].LayerType != LayerType.FullyConnected || layers[^1].LayerSize != 10 || layers[^1].ActivationFunction != ActivationFunction.Softmax)
+            if (layers[^1].LayerType != LayerType.FullyConnected || layers[^1].LayerSize != App.CLASSES_AMOUNT || layers[^1].ActivationFunction != ActivationFunction.Softmax)
             {
-                throw new ArgumentException("Last layer must be of type Fully Connected. It also need to have size of 10 and softmax as activation function");
+                throw new ArgumentException($"Last layer must be of type Fully Connected. It also need to have size of {App.CLASSES_AMOUNT} and softmax as activation function");
             }
 
             int channels = 1;
-            int rows = 28;
-            int columns = 28;
+            int rows = layers[0].LayerType == LayerType.FullyConnected ? 784 : 28;
+            int columns = layers[0].LayerType == LayerType.FullyConnected ? 1 : 28;
 
             List<LayerTemplate> layerTemplates = new();
 
@@ -69,7 +69,7 @@ namespace DrawingIdentifierGui.Models
 
         public NeuralNetwork CreateNeuralNetwork()
         {
-            return NeuralNetworkConfigModel.CreateNeuralNetwork(NeuralNetworkLayers.ToArray());
+            return NeuralNetworkConfigModel.CreateNeuralNetwork(NeuralNetworkLayers!.ToArray());
         }
 
         public void LoadDataFromFile(string filePath)
@@ -185,7 +185,10 @@ namespace DrawingIdentifierGui.Models
                 throw new InvalidOperationException("TrainData is null");
             }
 
-            var trainer = new Trainer(neuralNetwork, App.TrainData, InitialLearningRate, MinLearningRate, EpochAmount, BatchSize);
+            var train = neuralNetwork.IsConvolutional() ? App.TrainData : App.TrainDataFlat;
+            var test = neuralNetwork.IsConvolutional() ? App.TestData : App.TestDataFlat;
+
+            var trainer = new Trainer(neuralNetwork, train, InitialLearningRate, MinLearningRate, EpochAmount, BatchSize);
 
             if (IsPatience)
             {
@@ -194,7 +197,7 @@ namespace DrawingIdentifierGui.Models
 
             if (SaveToLog)
             {
-                trainer = trainer.SetLogSaving(SaveDirectoryPath, SaveNeuralNetwork, testData: App.TestData, out _);
+                trainer = trainer.SetLogSaving(SaveDirectoryPath, SaveNeuralNetwork, testData: test, out _);
             }
 
             return trainer;

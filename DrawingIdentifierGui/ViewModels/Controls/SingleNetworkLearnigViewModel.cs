@@ -23,8 +23,8 @@ namespace DrawingIdentifierGui.ViewModels.Controls
         {
             if (TrainingCts is not null)
             {
-                Info = "Stopping ...";
                 TrainingCts.Cancel();
+                Info = "Stopping ...";
             }
         });
 
@@ -183,23 +183,10 @@ namespace DrawingIdentifierGui.ViewModels.Controls
 
             string testCorStr = learningConfig!.TestCorrectness is null ? "unknown" : $"{learningConfig!.TestCorrectness.Value.ToString("0.00")}%";
             string trainCorStr = learningConfig!.TrainCorrectness is null ? "unknown" : $"{learningConfig!.TrainCorrectness.Value.ToString("0.00")}%";
-            Info = $"Test correctness: {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
+            Info = $"Test correctness:  {testCorStr}{Environment.NewLine}Train correctness: {trainCorStr}";
 
             FinishedEpochText = $"{FinishedEpochs} / {learningConfig!.EpochAmount}";
         }
-
-        //private string[]? GetFilesForLearning()
-        //{
-        //    var folderDialog = new OpenFileDialog() { Filter = "Numpy files (*.npy)|*.npy", DefaultExt = ".npy", Multiselect = true };
-
-        //    bool? isFile = folderDialog.ShowDialog();
-        //    if (isFile is null || isFile == false)
-        //    {
-        //        return null;
-        //    }
-        //    var files = folderDialog.FileNames;
-        //    return files;
-        //}
 
         private void RunLearning()
         {
@@ -216,8 +203,22 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                     Debug.WriteLine("Testing...");
                     ForceMainThread(() =>
                     {
-                        Info = $"Achieved predictions correctness: {neuralNetwork.CalculateCorrectness(App.TestData).ToString("0.00")}%";
+                        Info = "Calculating correctness...";
                     });
+
+                    var testData = neuralNetwork.IsConvolutional() ? App.TestData : App.TestDataFlat;
+                    var trainData = neuralNetwork.IsConvolutional() ? App.TrainData : App.TrainDataFlat;
+
+                    var testCorrectness = neuralNetwork.CalculateCorrectness(testData);
+                    var trainCorrectness = neuralNetwork.CalculateCorrectness(trainData.Take(1000).ToArray());
+
+                    ForceMainThread(() =>
+                    {
+                        Info = $"Test correctness:  {testCorrectness}%{Environment.NewLine}Train correctness: {trainCorrectness}%";
+                    });
+
+                    learningConfig!.TrainCorrectness = trainCorrectness;
+                    learningConfig!.TestCorrectness = testCorrectness;
 
                     TrainingCts = null;
                     MainWindowViewModel.Instance!.NotifyOnLongProcessEnd();

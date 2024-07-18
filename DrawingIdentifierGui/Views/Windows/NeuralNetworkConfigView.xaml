@@ -369,7 +369,8 @@
                               BorderBrush="{StaticResource colorDark1}"
                               VerticalContentAlignment="Top"
                               HorizontalContentAlignment="Left"
-                              ScrollViewer.CanContentScroll="False">
+                              ScrollViewer.CanContentScroll="False"
+                              ScrollViewer.VerticalScrollBarVisibility="Disabled">
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal" />

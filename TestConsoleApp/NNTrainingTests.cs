@@ -26,41 +26,41 @@ internal class NNTrainingTests
 
 
         //! TEST 1 >> 2024.07.03__14-14-38__80.32
-        Single(
-            testData: testData,
+        //Single(
+        //    testData: testData,
 
-            trainer: new Trainer(
-                new NeuralNetwork(1, 28, 28,
-                [
-                    LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, stride: 1, activationFunction: ActivationFunction.ReLU),
-                    LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
-                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-                ]),
+        //    trainer: new Trainer(
+        //        new NeuralNetwork(1, 28, 28,
+        //        [
+        //            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, stride: 1, activationFunction: ActivationFunction.ReLU),
+        //            LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
+        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //        ]),
 
-                trainData, initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 30, batchSize: 50)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) =>  lr - 0.001f
-            )
-        );
+        //        trainData, initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 30, batchSize: 50)
+        //        .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) =>  lr - 0.001f
+        //    )
+        //);
 
-        //! TEST 2 >> 2024.07.03__15-42-54__81.51
-        Single(
-            testData: testData,
+        ////! TEST 2 >> 2024.07.03__15-42-54__81.51
+        //Single(
+        //    testData: testData,
 
-            trainer: new Trainer(
-                new NeuralNetwork(1, 28, 28,
-                [
-                    LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, stride: 1, activationFunction: ActivationFunction.ReLU),
-                    LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-                ]),
+        //    trainer: new Trainer(
+        //        new NeuralNetwork(1, 28, 28,
+        //        [
+        //            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, stride: 1, activationFunction: ActivationFunction.ReLU),
+        //            LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //        ]),
 
-                trainData, initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 30, batchSize: 50)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) =>  lr - 0.001f
-            )
-        );
+        //        trainData, initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 30, batchSize: 50)
+        //        .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) =>  lr - 0.001f
+        //    )
+        //);
 
         //! TEST 3
         Single(
@@ -130,12 +130,29 @@ internal class NNTrainingTests
                 [
                     LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
                     LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
                     LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
                 ]),
 
                 trainDataFlatten, initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 30, batchSize: 50)
                 .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) =>  lr - 0.001f
+            )
+        );
+
+        //! TEST 7 >> 
+        Single(
+            testData: testDataFlatten,
+
+            trainer: new Trainer(
+                new NeuralNetwork(28 * 28,
+                [
+                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+                    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+                ]),
+
+                trainDataFlatten, initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 30, batchSize: 50)
+                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.001f
             )
         );
     }

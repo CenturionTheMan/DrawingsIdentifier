@@ -56,7 +56,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
             {
                 //TODO show info that nn can not be created
 
-                NeuralNetworkLayers = App.NeuralNetworkConfigModels[type].NeuralNetworkLayers;
+                NeuralNetworkLayers = App.NeuralNetworkConfigModels[type]!.NeuralNetworkLayers!;
 
                 MessageBox.Show(ex.Message);
             }
@@ -75,7 +75,6 @@ namespace DrawingIdentifierGui.ViewModels.Windows
                 };
             }
         }
-
 
         private LayerModel selectedLayer;
         public LayerModel SelectedLayer
@@ -144,8 +143,8 @@ namespace DrawingIdentifierGui.ViewModels.Windows
         }
 
         private ObservableCollection<LayerModel> neuralNetworkLayers { get; set; }
-        public ObservableCollection<LayerModel> NeuralNetworkLayers 
-        { 
+        public ObservableCollection<LayerModel> NeuralNetworkLayers
+        {
             get
             {
                 return neuralNetworkLayers;
@@ -157,14 +156,14 @@ namespace DrawingIdentifierGui.ViewModels.Windows
             }
         }
 
-
         public NeuralNetworkConfigViewModel(int type)
         {
             this.type = type;
-            NeuralNetworkLayers = new();
-            foreach (var item in App.NeuralNetworkConfigModels[type].NeuralNetworkLayers)
+            neuralNetworkLayers = new();
+            foreach (var item in App.NeuralNetworkConfigModels[type]!.NeuralNetworkLayers!)
             {
-                var copy = new LayerModel() { 
+                var copy = new LayerModel()
+                {
                     ActivationFunction = item.ActivationFunction,
                     DropoutRate = item.DropoutRate,
                     IsActivationFunctionVisable = item.IsActivationFunctionVisable,
@@ -181,7 +180,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
                 NeuralNetworkLayers.Add(copy);
             }
 
-            SelectedLayer = NeuralNetworkLayers.First();
+            selectedLayer = NeuralNetworkLayers.First();
         }
     }
 }

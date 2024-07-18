@@ -68,4 +68,13 @@ public class QuickDrawSet
 
         return (train, test);
     }
+
+    public ((Matrix[] inputs, Matrix outputs)[] trainData, (Matrix[] inputs, Matrix outputs)[] testData) SplitIntoTrainTestFlattenInput(int testSizePercent = 20)
+    {
+        (var trainData, var testData) = SplitIntoTrainTest(testSizePercent);
+        var trainFlat = trainData.Select(i => (new Matrix[] { MatrixExtender.FlattenMatrix(i.inputs) }, i.outputs));
+        var testFlat = testData.Select(i => (new Matrix[] { MatrixExtender.FlattenMatrix(i.inputs) }, i.outputs));
+
+        return (trainFlat.ToArray(), testFlat.ToArray());
+    }
 }
