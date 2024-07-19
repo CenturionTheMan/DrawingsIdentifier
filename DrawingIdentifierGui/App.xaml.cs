@@ -13,7 +13,7 @@ namespace DrawingIdentifierGui
     ///
     public partial class App : Application
     {
-        public const int CLASSES_AMOUNT = 10;
+        public const int CLASSES_AMOUNT = 9;
 
         public static NeuralNetwork[] NeuralNetworks;
         public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels;

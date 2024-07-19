@@ -19,7 +19,7 @@ namespace DrawingIdentifierGui
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static MainWindow Instance;
+        public static MainWindow? Instance;
 
         public MainWindow()
         {

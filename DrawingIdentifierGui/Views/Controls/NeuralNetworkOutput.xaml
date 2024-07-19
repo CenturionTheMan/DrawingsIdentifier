@@ -26,7 +26,6 @@
                 <RowDefinition Height=".1*" />
                 <RowDefinition Height=".1*" />
                 <RowDefinition Height=".1*" />
-                <RowDefinition Height=".1*" />
             </Grid.RowDefinitions>
 
             <TextBlock x:Name="Header"
@@ -53,21 +52,18 @@
                                   Text="DIAMOND"
                                   CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <local:SingleNNOutput Grid.Row="5"
-                                  Text="FENCE"
-                                  CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <local:SingleNNOutput Grid.Row="6"
                                   Text="MOUSTACHE"
                                   CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <local:SingleNNOutput Grid.Row="7"
+            <local:SingleNNOutput Grid.Row="6"
                                   Text="PANTS"
                                   CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <local:SingleNNOutput Grid.Row="8"
+            <local:SingleNNOutput Grid.Row="7"
                                   Text="SNOWMAN"
                                   CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <local:SingleNNOutput Grid.Row="9"
+            <local:SingleNNOutput Grid.Row="8"
                                   Text="STAIRS"
                                   CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <local:SingleNNOutput Grid.Row="10"
+            <local:SingleNNOutput Grid.Row="9"
                                   Text="SWORD"
                                   CustomBackground="{Binding Path=DefaultNodeBg, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         </Grid>

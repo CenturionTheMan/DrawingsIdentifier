@@ -34,9 +34,7 @@ namespace DrawingIdentifierGui.Views.Windows
             var dataGrid = sender as DataGrid;
             if (dataGrid == null) return;
 
-            var items = dataGrid.Items.SourceCollection.Cast<ClassDrawingImagesModel>().ToList();
-
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < App.CLASSES_AMOUNT; i++)
             {
                 var bindingPath = $"ImagesCollection[{i}]";
                 var column = new DataGridTemplateColumn

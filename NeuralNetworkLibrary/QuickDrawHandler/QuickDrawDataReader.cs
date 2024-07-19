@@ -19,7 +19,7 @@ public static class QuickDrawDataReader
 
         Debug.WriteLine($"[LOADING SETS] Found {files.Length} files");
 
-        List<QuickDrawSample> samples = new List<QuickDrawSample>(filePaths.Length * amountToLoadFromEachFile);
+        List<IEnumerable<QuickDrawSample>> samples = new(filePaths.Length);
 
         int count = 0;
         foreach (var filePath in files)
@@ -32,14 +32,14 @@ public static class QuickDrawDataReader
             if (ct.IsCancellationRequested)
                 return null;
 
-            samples.AddRange(quickDrawSet);
+            samples.Add(quickDrawSet);
 
             count++;
             Debug.WriteLine($"[LOADING SETS] Loaded {count}/{files.Length} files");
             onFileLoaded?.Invoke(count);
         }
 
-        return new QuickDrawSet(samples);
+        return new QuickDrawSet(samples.ToArray());
     }
 
     public static QuickDrawSet? LoadQuickDrawSamplesFromDirectory(string directoryPath, int amountToLoadFromEachFile = 2000, bool randomlyShift = true, bool colorReverse = true, float maxValue = 255.0f, CancellationToken ct = default, Action<int>? onFileLoaded = null)
@@ -77,7 +77,7 @@ public static class QuickDrawDataReader
             }
 
             Matrix tmp = MatrixExtender.UnflattenMatrix(new Matrix(data), 28, 28)[0];
-            tmp = colorReverse? tmp.ApplyFunction(x => 1 - (x * factor)) : tmp * factor;
+            tmp = colorReverse ? tmp.ApplyFunction(x => 1 - (x * factor)) : tmp * factor;
 
             if (randomlyShift)
             {

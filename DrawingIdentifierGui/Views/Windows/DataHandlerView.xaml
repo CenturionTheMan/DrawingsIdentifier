@@ -158,7 +158,7 @@
                 <Grid>
                     <ProgressBar MaxHeight="80"
                                  Value="{Binding LoadedFilesAmount}"
-                                 Maximum="10"
+                                 Maximum="9"
                                  Margin="10"
                                  Background="{StaticResource colorLight2}"
                                  Foreground="{StaticResource colorHighlight2}"

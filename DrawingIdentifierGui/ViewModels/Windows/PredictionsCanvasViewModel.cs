@@ -23,14 +23,13 @@ public class PredictionsCanvasViewModel : ViewModelBase
 
     public PredictionsCanvasViewModel()
     {
-        predictionsCanvas = PredictionsCanvas.Instance;
+        predictionsCanvas = PredictionsCanvas.Instance!;
     }
 
     public void ClearCanvas(object? tmp)
     {
         predictionsCanvas.drawingCanvas.Strokes.Clear();
     }
-
 
     public void PenSelected(object? tmp)
     {
@@ -41,7 +40,6 @@ public class PredictionsCanvasViewModel : ViewModelBase
 
     public void EraserSelected(object? tmp)
     {
-
         predictionsCanvas.Cursor = Cursors.Cross;
         //predictionsCanvas.drawingCanvas.EraserShape
         predictionsCanvas.drawingCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;

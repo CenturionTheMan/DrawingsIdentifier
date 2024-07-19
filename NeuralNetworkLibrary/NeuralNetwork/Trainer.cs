@@ -25,10 +25,9 @@ public class Trainer
     private bool saveNN = false;
     private (Matrix[] inputChannels, Matrix output)[]? testData;
     private string trainingLogDir = "";
-    
+
     private record TrainingIterationData(int epoch, int dataIndex, float error, float learningRate, float elapsedSeconds);
     private record TrainingBatchData(int epoch, float avgBatchError, float learningRate, float elapsedSeconds);
-
 
     /// <summary>
     /// Create a new instance of the <see cref="Trainer"/> class.
@@ -88,7 +87,7 @@ public class Trainer
     {
         initialIgnore = Math.Clamp(initialIgnore, 0, 0.95f);
         patience = Math.Clamp(patience, 0, 1f);
-        
+
         this.userInitialIgnore = initialIgnore;
         this.userPatience = patience;
 
@@ -96,7 +95,7 @@ public class Trainer
         this.patienceAmount = (int)(data.Length * patience / batchSize);
         this.patienceAmount = Math.Max(1, patienceAmount);
 
-        if(learningRateModifier is not null)
+        if (learningRateModifier is not null)
             this.learningRateModifier = learningRateModifier;
 
         isPatience = true;
@@ -121,14 +120,14 @@ public class Trainer
     /// </returns>
     public Trainer SetLogSaving(string outputDirPath, bool saveNN, (Matrix[] inputChannels, Matrix output)[]? testData, out string trainingLogDirectory)
     {
-        if(!Directory.Exists(outputDirPath))
+        if (!Directory.Exists(outputDirPath))
             Directory.CreateDirectory(outputDirPath);
 
         this.trainingLogDir = outputDirPath + DateTime.Now.ToString("yyyy.MM.dd__HH-mm-ss");
 
         this.testData = testData;
 
-        if(!Directory.Exists(trainingLogDir))
+        if (!Directory.Exists(trainingLogDir))
             Directory.CreateDirectory(trainingLogDir);
         this.trainingLogDir += "/";
 
@@ -148,22 +147,21 @@ public class Trainer
 
         var cts = new CancellationTokenSource();
 
-
         Queue<TrainingIterationData> trainingIterationData = new(epochAmount * data.Length);
         Queue<TrainingBatchData> trainingBatchData = new(data.Length * epochAmount / batchSize);
 
-        List<(int, float)> trainCorrectness = new(epochAmount+1);
+        List<(int, float)> trainCorrectness = new(epochAmount + 1);
         Queue<(float error, float seconds)>? lastBatchErrors = new(patienceAmount);
 
         neuralNetwork.OnTrainingIteration += (epoch, dataIndex, error) =>
         {
-            if(saveToLog)
+            if (saveToLog)
             {
                 var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
                 trainingIterationData.Enqueue(new TrainingIterationData(epoch, dataIndex, error, neuralNetwork.LearningRate, (float)elapsedSeconds));
             }
 
-            if(float.IsNaN(error))
+            if (float.IsNaN(error))
             {
                 cts?.Cancel();
             }
@@ -171,36 +169,36 @@ public class Trainer
 
         neuralNetwork.OnBatchTrainingIteration += (epoch, epochPercentFinish, batchAvgError) =>
         {
-            if(isPatience)
+            if (isPatience)
             {
                 lastBatchErrors!.Enqueue((batchAvgError, (float)stopwatch.Elapsed.TotalSeconds));
                 HandlePatience(neuralNetwork, lastBatchErrors, epochPercentFinish, epoch);
             }
 
-            if(saveToLog)
+            if (saveToLog)
             {
                 var time = stopwatch.Elapsed.TotalSeconds;
                 trainingBatchData.Enqueue(new TrainingBatchData(epoch, batchAvgError, neuralNetwork.LearningRate, (float)time));
             }
         };
 
-
         trainCorrectness.Add((0, neuralNetwork.CalculateCorrectness(data.Take(1000).ToArray())));
         neuralNetwork.OnEpochTrainingIteration += (epoch, correctness) =>
         {
             trainCorrectness.Add((epoch, correctness));
 
-            if(neuralNetwork.LearningRate <= minLearningRate)
+            if (neuralNetwork.LearningRate <= minLearningRate)
             {
                 cts?.Cancel();
             }
         };
 
-        Thread consoleThread = new Thread(() => {
+        Thread consoleThread = new Thread(() =>
+        {
             while (cts!.IsCancellationRequested == false)
             {
                 var pressedKey = Console.ReadLine();
-                if(pressedKey?.ToLower() == "q")
+                if (pressedKey?.ToLower() == "q")
                 {
                     cts!.Cancel();
                 }
@@ -210,7 +208,7 @@ public class Trainer
 
         neuralNetwork.OnTrainingFinished += () =>
         {
-            if(saveToLog)
+            if (saveToLog)
                 SaveTrainingData(trainingLogDir, trainingIterationData.ToArray(), trainingBatchData.ToArray(), trainCorrectness.ToArray());
 
             stopwatch.Stop();
@@ -235,19 +233,19 @@ public class Trainer
     /// </param>
     private void HandlePatience(NeuralNetwork nn, Queue<(float, float)> lastAvgBatchErrors, float epochPercentFinish, int epoch)
     {
-        if(hasCrossedIgnoreThreshold == false || nn.LearningRate <= minLearningRate)
+        if (hasCrossedIgnoreThreshold == false || nn.LearningRate <= minLearningRate)
         {
-            if(epochPercentFinish >= initialIgnore)
+            if (epochPercentFinish >= initialIgnore)
                 hasCrossedIgnoreThreshold = true;
-            
+
             return;
         }
 
-        if(lastAvgBatchErrors.Count() < patienceAmount)return;
+        if (lastAvgBatchErrors.Count() < patienceAmount) return;
 
         (float slope, _) = Statistics.LinearRegression(lastAvgBatchErrors.ToArray());
 
-        if(slope >= 0)
+        if (slope >= 0)
         {
             nn.LearningRate = Math.Max(minLearningRate, learningRateModifier(nn.LearningRate, epoch));
         }
@@ -266,7 +264,7 @@ public class Trainer
     /// <param name="trainEpochCorrectness">
     /// Epoch correctness.
     /// </param>
-    private void SaveTrainingData(string dirPath, TrainingIterationData[] trainingIterationData, TrainingBatchData[] trainingBatchData, (int ,float)[] trainEpochCorrectness)
+    private void SaveTrainingData(string dirPath, TrainingIterationData[] trainingIterationData, TrainingBatchData[] trainingBatchData, (int, float)[] trainEpochCorrectness)
     {
         trainingIterationData = trainingIterationData.Where(x => x is not null).ToArray();
         trainingBatchData = trainingBatchData.Where(x => x is not null).ToArray();
@@ -287,32 +285,30 @@ public class Trainer
         FilesCreatorHelper.CreateCsvFile(data, dirPath + "BatchError.csv");
         data.Clear();
 
-
         data = [["Epoch", "Correctness", "AvgError", "MinError", "MaxError", "ElapsedSeconds"]];
         int dataLength = trainingIterationData.Length / trainEpochCorrectness.Length;
         for (int i = 0; i < trainEpochCorrectness.Length; i++)
         {
             var tmp = trainingIterationData.Where(x => x.epoch == i).ToArray();
 
-            string avgError = tmp.Count() > 0? tmp.Average(x => x.error).ToString() : "null";
-            string minError = tmp.Count() > 0? tmp.Min(x => x.error).ToString() : "null";
-            string maxError = tmp.Count() > 0? tmp.Max(x => x.error).ToString() : "null";
-            string elapsedSeconds = tmp.Count() > 0? tmp.Max(x => x.elapsedSeconds).ToString() : "0";
+            string avgError = tmp.Count() > 0 ? tmp.Average(x => x.error).ToString() : "null";
+            string minError = tmp.Count() > 0 ? tmp.Min(x => x.error).ToString() : "null";
+            string maxError = tmp.Count() > 0 ? tmp.Max(x => x.error).ToString() : "null";
+            string elapsedSeconds = tmp.Count() > 0 ? tmp.Max(x => x.elapsedSeconds).ToString() : "0";
 
             data.Add([i, trainEpochCorrectness[i].Item2, avgError, minError, maxError, elapsedSeconds]);
         }
         FilesCreatorHelper.CreateCsvFile(data, dirPath + "EpochError.csv");
         data.Clear();
-        
 
-        if(saveNN)
+        if (saveNN)
         {
             float? cor = testData is null ? null : neuralNetwork.CalculateCorrectness(testData);
             neuralNetwork.SaveToXmlFile(dirPath + "NeuralNetwork.xml", cor);
         }
 
         var xml = FilesCreatorHelper.CreateXmlFile(dirPath + "TrainerConfig.xml");
-        if(xml is not null)
+        if (xml is not null)
         {
             xml.WriteStartElement("Root");
             xml.WriteStartElement("BaseConfig");
@@ -321,7 +317,7 @@ public class Trainer
             xml.WriteElementString("BatchSize", batchSize.ToString());
             xml.WriteEndElement();
 
-            if(isPatience)
+            if (isPatience)
             {
                 xml.WriteStartElement("PatienceConfig");
                 xml.WriteElementString("InitialIgnore", userInitialIgnore.ToString());
@@ -331,6 +327,20 @@ public class Trainer
             xml.WriteEndElement();
             FilesCreatorHelper.CloseXmlFile(xml);
         }
-    }
 
+        data = [["ClassIndex", "ClassName", "TestCorrecntess", "TrainCorrectness"]];
+        int classesAmount = this.data.First().output.RowsAmount;
+        for (int i = 0; i < classesAmount; i++)
+        {
+            if (!QuickDrawHandler.QuickDrawSet.IndexToCategory.TryGetValue(i, out string? className))
+                className = "Unknown";
+
+            var testCorrectness = testData is null ? "null" : neuralNetwork.CalculateCorrectness(testData.Where(s => s.output[i, 0] == 1.0f).ToArray()).ToString("0.000") + "%";
+            var trainCorrectness = neuralNetwork.CalculateCorrectness(this.data.Where(s => s.output[i, 0] == 1.0f).Take(1000).ToArray()).ToString("0.000") + "%";
+
+            data.Add([i, className, testCorrectness, trainCorrectness]);
+        }
+        FilesCreatorHelper.CreateCsvFile(data, dirPath + "ClassCorrectness.csv");
+        data.Clear();
+    }
 }

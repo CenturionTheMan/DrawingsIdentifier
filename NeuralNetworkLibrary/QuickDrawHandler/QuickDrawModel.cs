@@ -27,29 +27,26 @@ public class QuickDrawSet
         { "cactus", 1},
         { "cat", 2},
         { "diamond", 3},
-        { "fence", 4},
-        { "moustache", 5},
-        { "pants", 6},
-        { "snowman", 7},
-        { "stairs", 8},
-        { "sword", 9},
+        { "moustache", 4},
+        { "pants", 5},
+        { "snowman", 6},
+        { "stairs", 7},
+        { "sword", 8},
     };
 
     public static readonly Dictionary<int, string> IndexToCategory = CategoryToIndex.ToDictionary(x => x.Value, x => x.Key);
 
-    public readonly IEnumerable<QuickDrawSample> samples;
+    public readonly IEnumerable<QuickDrawSample>[] SamplesByCategory;
+    public IEnumerable<QuickDrawSample> AllSamples => SamplesByCategory.SelectMany(x => x).OrderBy(x => random.Next());
 
-    public QuickDrawSet(IEnumerable<QuickDrawSample> samples, bool shuffleData = true)
+    internal QuickDrawSet(IEnumerable<QuickDrawSample>[] samples)
     {
-        if (shuffleData)
-            this.samples = samples.OrderBy(x => random.Next());
-        else
-            this.samples = samples;
+        this.SamplesByCategory = samples;
     }
 
     private Matrix OutputForNN(string category)
     {
-        float[] output = new float[10];
+        float[] output = new float[9];
         output[CategoryToIndex[category]] = 1;
 
         return new Matrix(output);
@@ -57,11 +54,24 @@ public class QuickDrawSet
 
     public ((Matrix[] inputs, Matrix outputs)[] trainData, (Matrix[] inputs, Matrix outputs)[] testData) SplitIntoTrainTest(int testSizePercent = 20)
     {
-        int testCount = (int)(samples.Count() * (testSizePercent / 100.0));
-        var shuffledData = samples.OrderBy(x => Guid.NewGuid()).ToList();
+        int allDataLen = SamplesByCategory[0].Count() * SamplesByCategory.Length;
+        int testCount = (int)(allDataLen * (testSizePercent / 100.0));
 
-        IEnumerable<QuickDrawSample> trainData = shuffledData.Skip(testCount);
-        IEnumerable<QuickDrawSample> testData = shuffledData.Take(testCount);
+        List<QuickDrawSample> trainData = new(allDataLen - testCount);
+        List<QuickDrawSample> testData = new(testCount);
+
+        foreach (var catSamples in SamplesByCategory)
+        {
+            int catTestCount = (int)(catSamples.Count() * (testSizePercent / 100.0));
+            var subTest = catSamples.Take(catTestCount);
+            var subTrain = catSamples.Skip(catTestCount);
+
+            trainData.AddRange(subTrain);
+            testData.AddRange(subTest);
+        }
+
+        trainData = trainData.OrderBy(x => random.Next()).ToList();
+        testData = testData.OrderBy(x => random.Next()).ToList();
 
         var train = trainData.Select(x => (x.data, OutputForNN(x.category))).ToArray();
         var test = testData.Select(x => (x.data, OutputForNN(x.category))).ToArray();
