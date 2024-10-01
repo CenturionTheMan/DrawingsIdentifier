@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access" MembersFormat="FullSignature">
+  <Class Name="NeuralNetworkLibrary.ActivationFunctionsHandler">
+    <Position X="12" Y="4.25" Width="6" />
+    <TypeIdentifier>
+      <HashCode>AAAAICAACAAAAAEAAAAAAAAAAAAAIABAAAAkQAAAAAA=</HashCode>
+      <FileName>Math\ActivationFunctionsHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkLibrary.Matrix">
+    <Position X="0.5" Y="0.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AIAAJACCEAABABEE6AAAAAAaAgAAAEQAAAQgAABCAAA=</HashCode>
+      <FileName>Math\Matrix.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkLibrary.MatrixExtender">
+    <Position X="6" Y="0.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAARAGAAQoIAAIREBAAACQAAhAAAAAAAgEAAQ=</HashCode>
+      <FileName>Math\MatrixExtender.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkLibrary.MatrixHelpers">
+    <Position X="12" Y="0.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAQAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Math\MatrixHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkLibrary.Statistics">
+    <Position X="12" Y="2.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Math\Statistics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

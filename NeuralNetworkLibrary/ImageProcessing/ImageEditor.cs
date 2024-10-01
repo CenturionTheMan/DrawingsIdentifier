@@ -29,9 +29,9 @@ public static class ImageEditor
         {
             for (int x = 0; x < matrix.ColumnsAmount; x++)
             {
-                if(matrix[y,x] < contentColor.min || matrix[y,x] > contentColor.max) continue;
+                if (matrix[y, x] < contentColor.min || matrix[y, x] > contentColor.max) continue;
 
-                if(y < bottom)
+                if (y < bottom)
                 {
                     bottom = y;
                     break;
@@ -44,9 +44,9 @@ public static class ImageEditor
         {
             for (int x = 0; x < matrix.ColumnsAmount; x++)
             {
-                if(matrix[y,x] < contentColor.min || matrix[y,x] > contentColor.max) continue;
+                if (matrix[y, x] < contentColor.min || matrix[y, x] > contentColor.max) continue;
 
-                if(y > top)
+                if (y > top)
                 {
                     top = y;
                     break;
@@ -59,9 +59,9 @@ public static class ImageEditor
         {
             for (int y = 0; y < matrix.RowsAmount; y++)
             {
-                if(matrix[y,x] < contentColor.min || matrix[y,x] > contentColor.max) continue;
+                if (matrix[y, x] < contentColor.min || matrix[y, x] > contentColor.max) continue;
 
-                if(x > right)
+                if (x > right)
                 {
                     right = x;
                     break;
@@ -74,20 +74,20 @@ public static class ImageEditor
         {
             for (int y = 0; y < matrix.RowsAmount; y++)
             {
-                if(matrix[y,x] < contentColor.min || matrix[y,x] > contentColor.max) continue;
+                if (matrix[y, x] < contentColor.min || matrix[y, x] > contentColor.max) continue;
 
-                if(x < left)
+                if (x < left)
                 {
                     left = x;
                     break;
                 }
             }
         }
-    
-        if(top == int.MinValue || bottom == int.MaxValue || left == int.MaxValue || right == int.MinValue)
+
+        if (top == int.MinValue || bottom == int.MaxValue || left == int.MaxValue || right == int.MinValue)
             return null;
 
-        int size = Math.Max(right - left + 1, top - bottom + 1) + padding *2;
+        int size = Math.Max(right - left + 1, top - bottom + 1) + padding * 2;
         int offset = Math.Min(left, bottom) - padding;
 
         Matrix result = new Matrix(size, size);
@@ -98,7 +98,7 @@ public static class ImageEditor
             {
                 int oldY = offset + y;
                 int oldX = offset + x;
-                result[y, x] = (oldY < matrix.RowsAmount && oldX < matrix.ColumnsAmount)? matrix[oldY, oldX] : bgColor;
+                result[y, x] = (oldY < matrix.RowsAmount && oldX < matrix.ColumnsAmount) ? matrix[oldY, oldX] : bgColor;
             }
         }
 
@@ -207,13 +207,13 @@ public static class ImageEditor
 
     public static Matrix ResizeSquare(this Matrix matrix, int desiredSize, float bgColor)
     {
-        if(matrix.RowsAmount != matrix.ColumnsAmount)
+        if (matrix.RowsAmount != matrix.ColumnsAmount)
             throw new ArgumentException("Matrix must be square", nameof(matrix));
 
         float scale = (float)desiredSize / matrix.RowsAmount;
         var mat = matrix.Scale(scale, bgColor);
 
-        if(mat.RowsAmount < desiredSize || mat.ColumnsAmount < desiredSize)
+        if (mat.RowsAmount < desiredSize || mat.ColumnsAmount < desiredSize)
         {
             mat = mat.AddPadding(desiredSize, desiredSize, bgColor);
         }

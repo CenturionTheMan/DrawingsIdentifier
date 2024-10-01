@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="NeuralNetworkLibrary.ConvolutionLayer" BaseTypeListCollapsed="true">
+    <Position X="12" Y="9" Width="8" />
+    <TypeIdentifier>
+      <HashCode>AhAAAASAEAQgABAAAAAAAQQAAAAAEAAAAoEEIAAAAIE=</HashCode>
+      <FileName>NeuralNetwork\Layers\ConvolutionLayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.137" Collapsed="true" />
+  </Class>
+  <Class Name="NeuralNetworkLibrary.DropoutLayer" BaseTypeListCollapsed="true">
+    <Position X="12" Y="14.75" Width="8.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAEAQgBAAAQAAAAQAAAAAAAAAAAgQAABAAgAE=</HashCode>
+      <FileName>NeuralNetwork\Layers\DropoutLayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NeuralNetworkLibrary.FullyConnectedLayer" BaseTypeListCollapsed="true">
+    <Position X="12" Y="0.5" Width="9.25" />
+    <TypeIdentifier>
+      <HashCode>AhAAAASAEAQgAACAAAAAAQAAAAAAQAAAAgAAAAAAAKE=</HashCode>
+      <FileName>NeuralNetwork\Layers\FullyConnectedLayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NeuralNetworkLibrary.PoolingLayer" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="17" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAEAQggAAAAAAAAQAAAAAAAAAAAgEAAAAAAAE=</HashCode>
+      <FileName>NeuralNetwork\Layers\PoolingLayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NeuralNetworkLibrary.ReshapeFeatureToClassificationLayer" BaseTypeListCollapsed="true">
+    <Position X="12" Y="5.25" Width="8.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAEAQgAAAAAAgAAQAAAAAAAAAAAgAAAAAAAAU=</HashCode>
+      <FileName>NeuralNetwork\Layers\ReshapeFeatureToClassificationLayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NeuralNetworkLibrary.LayerTemplate">
+    <Position X="12" Y="19.25" Width="7" />
+    <TypeIdentifier>
+      <HashCode>MJAAAACAAIAAgACAAIAAAAAgAAAAIQAgAAMEIBAABgA=</HashCode>
+      <FileName>NeuralNetwork\LayerTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkLibrary.NeuralNetwork">
+    <Position X="0.5" Y="0.5" Width="11.25" />
+    <TypeIdentifier>
+      <HashCode>EgCgDAAAAYAoABAAAAABABQAAACAAAACAAwABCAAEQw=</HashCode>
+      <FileName>NeuralNetwork\NeuralNetwork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkLibrary.Trainer">
+    <Position X="0.5" Y="7.75" Width="9" />
+    <TypeIdentifier>
+      <HashCode>AAAQIAgEgAAAAAggIAACAIQgEAAFAAAAQAAQACAGAAg=</HashCode>
+      <FileName>NeuralNetwork\Trainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="NeuralNetworkLibrary.ILayer">
+    <Position X="0.5" Y="14.25" Width="7.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAgAABgAAAAAAAAAAABAAAAAAI=</HashCode>
+      <FileName>NeuralNetwork\Layers\ILayer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
