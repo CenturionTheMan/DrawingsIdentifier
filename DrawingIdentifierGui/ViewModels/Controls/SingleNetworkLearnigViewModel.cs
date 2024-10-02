@@ -227,7 +227,7 @@ namespace DrawingIdentifierGui.ViewModels.Controls
                 var trainer = learningConfig!.CreateTrainer(neuralNetwork!);
                 (var task, var ctsTrainer) = trainer.RunTrainingOnTask();
                 TrainingCts = ctsTrainer;
-            });
+            }, TaskCreationOptions.LongRunning);
         }
 
         private void InitializeLearning()

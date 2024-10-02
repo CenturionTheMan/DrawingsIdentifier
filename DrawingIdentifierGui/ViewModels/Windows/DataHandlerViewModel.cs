@@ -100,7 +100,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
                 IsNotLoadingData = true;
 
                 MainWindowViewModel.Instance!.NotifyOnLongProcessEnd();
-            });
+            }, TaskCreationOptions.LongRunning);
         });
 
         public RelayCommand StopLoadingDataCommand => new RelayCommand(parameter =>
@@ -223,7 +223,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
 
         private void ForceMainThread(Action action)
         {
-            Application.Current.Dispatcher.Invoke(action);
+            Application.Current.Dispatcher.BeginInvoke(action);
         }
     }
 }
