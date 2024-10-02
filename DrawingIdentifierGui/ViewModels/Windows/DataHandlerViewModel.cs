@@ -1,6 +1,8 @@
 ﻿using DrawingIdentifierGui.Models;
 using DrawingIdentifierGui.MVVM;
+using Microsoft.Win32;
 using NeuralNetworkLibrary;
+using NeuralNetworkLibrary.QuickDrawHandler;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,13 +17,32 @@ namespace DrawingIdentifierGui.ViewModels.Windows
 {
     public class DataHandlerViewModel : ViewModelBase
     {
-        private string QuickDrawDataFolderPath = "./../../../../../Datasets/QuickDraw/";
-
         public RelayCommand StartLoadingDataCommand => new RelayCommand(parameter =>
         {
-            if (!Directory.Exists(QuickDrawDataFolderPath))
+            var openFolderDialog = new OpenFolderDialog() { Multiselect = false, Title = "Select QuickDraw data folder" };
+            var dialogResult = openFolderDialog.ShowDialog();
+
+            if (dialogResult is null || dialogResult == false)
+            {
+                MessageBox.Show("QuickDraw data folder not selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (!Directory.Exists(openFolderDialog.FolderName))
             {
                 MessageBox.Show("QuickDraw data folder not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var files = Directory.GetFiles(openFolderDialog.FolderName, "*.npy")
+                                 .Select(f => Path.GetFileNameWithoutExtension(f))
+                                 .Distinct()
+                                 .ToArray();
+
+            var classes = QuickDrawSet.CategoryToIndex.Keys.ToArray();
+            if (files.Length != classes.Length || !classes.All(files.Contains))
+            {
+                MessageBox.Show("QuickDraw data folder does not contain all classes.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -36,7 +57,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
 
             Task.Factory.StartNew(() =>
             {
-                var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromDirectory(QuickDrawDataFolderPath, SamplesPerFile, true, true, 255, cancellationTokenSource.Token, (i) =>
+                var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromDirectory(openFolderDialog.FolderName, SamplesPerFile, true, true, 255, cancellationTokenSource.Token, (i) =>
                 {
                     ForceMainThread(() =>
                     {
