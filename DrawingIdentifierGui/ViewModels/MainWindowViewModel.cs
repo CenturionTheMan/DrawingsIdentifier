@@ -2,6 +2,7 @@
 using DrawingIdentifierGui.ViewModels.Windows;
 using NeuralNetworkLibrary;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace DrawingIdentifierGui.ViewModels
 {
@@ -56,6 +57,8 @@ namespace DrawingIdentifierGui.ViewModels
         public MainWindowViewModel()
         {
             MainWindowViewModel.Instance = this;
+
+           
         }
     }
 }

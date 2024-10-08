@@ -15,8 +15,14 @@ namespace DrawingIdentifierGui
     {
         public const int CLASSES_AMOUNT = 9;
 
-        public static NeuralNetwork[] NeuralNetworks;
-        public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels;
+        private static string[] initNNPaths = new string[]
+        {
+            "NN1.xml",
+            "NN2.xml",
+        };
+
+        public static NeuralNetwork[] NeuralNetworks = new NeuralNetwork[2];
+        public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels = new NeuralNetworkConfigModel[2];
 
         public static (Matrix[] inputs, Matrix outputs)[] TrainData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
         public static (Matrix[] inputs, Matrix outputs)[] TestData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
@@ -24,10 +30,17 @@ namespace DrawingIdentifierGui
         public static (Matrix[] inputs, Matrix outputs)[] TrainDataFlat { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
         public static (Matrix[] inputs, Matrix outputs)[] TestDataFlat { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
 
+        public static bool IsExampleNN1Loaded;
+        public static bool IsExampleNN2Loaded;
+
         static App()
         {
-            NeuralNetworkConfigModels = [
-                new NeuralNetworkConfigModel()
+            App.IsExampleNN1Loaded = TryLoadInitialNN(0);
+            App.IsExampleNN2Loaded = TryLoadInitialNN(1);
+
+            if(!IsExampleNN1Loaded)
+            {
+                NeuralNetworkConfigModels[0] = new NeuralNetworkConfigModel()
                 {
                     InitialLearningRate = 0.01f,
                     MinLearningRate = 0.001f,
@@ -39,8 +52,14 @@ namespace DrawingIdentifierGui
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = App.CLASSES_AMOUNT, ActivationFunction = ActivationFunction.Softmax},
                     }
-                },
-                new NeuralNetworkConfigModel()
+                };
+
+                NeuralNetworks[0] = NeuralNetworkConfigModels[0].CreateNeuralNetwork();
+            }
+
+            if(!IsExampleNN2Loaded)
+            {
+                NeuralNetworkConfigModels[1] = new NeuralNetworkConfigModel()
                 {
                     InitialLearningRate = 0.01f,
                     MinLearningRate = 0.001f,
@@ -55,14 +74,31 @@ namespace DrawingIdentifierGui
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = App.CLASSES_AMOUNT, ActivationFunction = ActivationFunction.Softmax},
                     }
-                },
-            ];
+                };
 
-            App.NeuralNetworks = new NeuralNetwork[NeuralNetworkConfigModels.Length];
-            for (int i = 0; i < NeuralNetworkConfigModels.Length; i++)
+                NeuralNetworks[1] = NeuralNetworkConfigModels[1].CreateNeuralNetwork();
+            }
+
+            
+        }
+
+        private static bool TryLoadInitialNN(int index)
+        {
+            var nn = NeuralNetwork.LoadFromXmlFile(initNNPaths[index]);
+            if (nn is null) return false;
+
+            try
             {
-                App.NeuralNetworks[i] = NeuralNetworkConfigModels[i].CreateNeuralNetwork();
+                NeuralNetworkConfigModels[index] = new NeuralNetworkConfigModel();
+                NeuralNetworkConfigModels[index].LoadDataFromFile(initNNPaths[index]);
+                NeuralNetworks[index] = nn;
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
+
     }
 }

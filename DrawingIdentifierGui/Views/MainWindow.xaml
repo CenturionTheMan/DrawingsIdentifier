@@ -18,7 +18,7 @@
         ResizeMode="CanResizeWithGrip"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MinHeight="650"
-        MinWidth="800">
+        MinWidth="800" Loaded="Window_Loaded">
 
     <Window.Background>
         <SolidColorBrush Opacity="0" />

@@ -33,5 +33,26 @@ namespace DrawingIdentifierGui
         {
             this.DragMove();
         }
+        
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (App.IsExampleNN1Loaded == false && App.IsExampleNN2Loaded == false)
+            {
+                MessageBox.Show("App was unable to load example neural networks. Not trained networks are being used ...");
+            }
+            else if (App.IsExampleNN1Loaded == false)
+            {
+                MessageBox.Show("App was unable to load example neural network 1. Not trained network is being used ...");
+            }
+            else if (App.IsExampleNN2Loaded == false)
+            {
+                MessageBox.Show("App was unable to load example neural network 2. Not trained network is being used ...");
+            }
+            else
+            {
+                MessageBox.Show("App loaded example neural networks");
+            }
+        }
     }
 }

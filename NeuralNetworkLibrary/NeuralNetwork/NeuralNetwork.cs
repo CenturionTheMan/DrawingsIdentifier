@@ -413,6 +413,9 @@ public class NeuralNetwork
     /// <returns> New object of <see cref="NeuralNetwork"/> if success, null otherwise </returns>
     public static NeuralNetwork? LoadFromXmlFile(string path)
     {
+        if(File.Exists(path) == false)
+            return null;
+
         XDocument xml = XDocument.Load(path);
         var root = xml.Root!;
 
