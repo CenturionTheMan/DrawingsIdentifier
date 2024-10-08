@@ -17,6 +17,8 @@
     <None Remove="Images\nav-one.png" />
     <None Remove="Images\nav-painting.png" />
     <None Remove="Images\nav-two.png" />
+    <None Remove="Images\toolbar-pen.png" />
+    <None Remove="Images\toolbar-rubber.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +38,8 @@
     <Resource Include="Images\nav-one.png" />
     <Resource Include="Images\nav-painting.png" />
     <Resource Include="Images\nav-two.png" />
+    <Resource Include="Images\toolbar-pen.png" />
+    <Resource Include="Images\toolbar-rubber.png" />
   </ItemGroup>
 
 </Project>

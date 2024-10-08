@@ -16,6 +16,31 @@
             BorderThickness="1"
             Padding="0 0 4 0">
 
+        <Border.Resources>
+            <Style x:Key="CustomRadioButton" TargetType="RadioButton">
+                <Style.Triggers>
+                    <Trigger Property="IsChecked" Value="False">
+                        <Setter Property="Opacity" Value="0.4"/>
+                    </Trigger>
+                </Style.Triggers>
+
+                <Setter Property="BorderThickness" Value="2"/>
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="Transparent"
+                                CornerRadius="20">
+                                <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Border.Resources>
+
         <Grid x:Name="DrawingAreaGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.7*" />
@@ -46,27 +71,46 @@
                     Background="{StaticResource colorLight1}"
                     Margin="0 10 0 10"
                     CornerRadius="0 5 5 0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.8*"/>
+                        <RowDefinition Height="0.1*"/>
+                    </Grid.RowDefinitions>
 
-                <StackPanel>
-                    <RadioButton x:Name="PenRadioButton"
-                                 Content="Pen"
-                                 GroupName="Tools"
-                                 Margin="5"
-                                 IsChecked="True"
-                                 Command="{Binding PenSelectedCommand}" />
+                    <StackPanel>
+                        <RadioButton x:Name="PenRadioButton"
+                                     Content="../../Images/toolbar-pen.png"
+                                     GroupName="Tools"
+                                     Margin="5 30 5 5"
+                                     BorderThickness="0"
+                                     Height="50"
+                                     IsChecked="True"
+                                     Command="{Binding PenSelectedCommand}" 
+                                     Style="{StaticResource CustomRadioButton}" />
 
-                    <RadioButton x:Name="EraserRadioButton"
-                                 Content="Eraser"
-                                 Margin="5"
-                                 GroupName="Tools"
-                                 Command="{Binding EraserSelectedCommand}" />
+                        <RadioButton x:Name="EraserRadioButton"
+                                     Content="../../Images/toolbar-rubber.png"
+                                     Margin="5"
+                                     BorderThickness="0"
+                                     Height="50"
+                                     GroupName="Tools"
+                                     Command="{Binding EraserSelectedCommand}" 
+                                     Style="{StaticResource CustomRadioButton}" />
+                    </StackPanel>
 
-                    <Button Background="{StaticResource colorHighlight1}"
-                            Content="Clear"
-                            Height="30"
-                            Margin="5"
-                            Command="{Binding ClearCanvasCommand}" />
-                </StackPanel>
+                    <Button Background="{StaticResource colorHighlight2}"
+                            Grid.Row="1"
+                            Content="clear"
+                            FontSize="25"
+                            BorderThickness="0"
+                            Margin="5 5 5 15"
+                            Command="{Binding ClearCanvasCommand}" 
+                            VerticalAlignment="Bottom" 
+                            />
+
+                </Grid>
+
+                  
             </Border>
 
             <!--Predictions-->
