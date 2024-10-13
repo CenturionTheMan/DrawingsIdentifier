@@ -37,6 +37,9 @@
         <DataTemplate DataType="{x:Type viewModelsWindows:DataHandlerViewModel}">
             <windows:DataHandlerView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModelsWindows:UserGuideViewModel}">
+            <windows:UserGuide />
+        </DataTemplate>
     </Window.Resources>
 
     <!--<WindowChrome.WindowChrome>
@@ -106,7 +109,9 @@
                 Button2Command="{Binding ShowNeuralNetworkLearningCommand}"
                 Button3Command="{Binding ShowNeuralNetwork1ConfigCommand}"
                 Button4Command="{Binding ShowNeuralNetwork2ConfigCommand}"
-                Button5Command="{Binding ShowDataHandlerCommand}" />
+                Button5Command="{Binding ShowDataHandlerCommand}" 
+                Button6Command="{Binding ShowUserGuideCommand}"
+                />
 
             <!--Content-->
             <ContentControl Grid.Row="1"

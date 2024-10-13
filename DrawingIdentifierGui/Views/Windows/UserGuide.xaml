@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="DrawingIdentifierGui.Views.Windows.UserGuide"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DrawingIdentifierGui.Views.Windows"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border Background="{StaticResource colorLight2}"
+            CornerRadius="{StaticResource radiusPage}">
+
+        <Border Padding="10"
+                Background="{StaticResource colorDark2}"
+                Margin="10 10 10 10"
+                CornerRadius="{StaticResource radiusSmall}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.2*" />
+                    <ColumnDefinition Width="0.8*" />
+                </Grid.ColumnDefinitions>
+                
+                <!--FIRST-->
+                <Image Grid.Row="0"
+                       Grid.Column="0"
+                       Source="../../Images/nav-painting.png"
+                       Margin="10"
+                       />
+                <TextBlock Grid.Row="0"
+                           Grid.Column="1"
+                           Margin="10"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource colorLight1}" FontFamily="Arial Rounded MT Bold">
+                    The first view allows the user to create their own drawings which are identified by neural networks. The application attempts to initialize the networks on startup using two .xml files.
+                </TextBlock>
+
+                <!--SECOND-->
+                <Image Grid.Row="1"
+                       Grid.Column="0"
+                       Source="../../Images/nav-learning.png"
+                       Margin="10"
+                       />
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="10"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource colorLight1}" FontFamily="Arial Rounded MT Bold">
+                    The second view is for training, saving, and loading neural networks. It provides the ability to start and stop the training process at any time but the data must be loaded first (using the last panel).
+                </TextBlock>
+
+                <!--THIRD-->
+                <Image Grid.Row="2"
+                       Grid.Column="0"
+                       Source="../../Images/nav-one.png"
+                       Margin="10"
+                       />
+                <TextBlock Grid.Row="2"
+                           Grid.Column="1"
+                           Margin="10"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource colorLight1}" FontFamily="Arial Rounded MT Bold">
+                    The third view is for configuring the first neural network. In this section both training and network parameters can be adjusted. Changes to the training values are saved immediately without affecting the already trained data. However, changes to the model must be saved separately (using the included save button) and doing so resets the learning process.
+                </TextBlock>
+
+                <!--FOURTH-->
+                <Image Grid.Row="3"
+                       Grid.Column="0"
+                       Source="../../Images/nav-two.png"
+                       Margin="10"
+                       />
+                <TextBlock Grid.Row="3"
+                           Grid.Column="1"
+                           Margin="10"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource colorLight1}" FontFamily="Arial Rounded MT Bold">
+                    The fourth panel is the same as the third one but the configuration is applied to the second neural network.    
+                </TextBlock>
+
+                <!--FIFTH-->
+                <Image Grid.Row="4"
+                       Grid.Column="0"
+                       Source="../../Images/nav-data.png"
+                       Margin="10"
+                       />
+                <TextBlock Grid.Row="4"
+                           Grid.Column="1"
+                           Margin="10"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource colorLight1}" FontFamily="Arial Rounded MT Bold">
+                    The last view is responsible for loading data from the "Quick, Draw!" dataset. In this section the user can choose the folder to load data from and specify how many samples per file should be loaded. The data is included with the application and the program checks whether the provided files are correct.
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Border>
+</UserControl>

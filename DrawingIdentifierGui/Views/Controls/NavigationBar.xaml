@@ -41,6 +41,12 @@
                 Style="{DynamicResource NavigationRadioButton}"
                 ImageSource="../../Images/nav-data.png"
                 ImageMargin="5" />
+
+            <components:NavigationRadioButton
+                Click="Button6_Click"
+                Style="{DynamicResource NavigationRadioButton}"
+                ImageSource="../../Images/nav-question-mark.png"
+                ImageMargin="5" />
         </StackPanel>
     </Grid>
 </UserControl>
