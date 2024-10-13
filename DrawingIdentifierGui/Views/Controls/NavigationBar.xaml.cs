@@ -65,6 +65,17 @@ namespace DrawingIdentifierGui.Views.Controls
         public static readonly DependencyProperty Button5CommandProperty =
             DependencyProperty.Register("Button5Command", typeof(ICommand), typeof(NavigationBar), new PropertyMetadata(null));
 
+
+        public ICommand Button6Command
+        {
+            get { return (ICommand)GetValue(Button6CommandProperty); }
+            set { SetValue(Button6CommandProperty, value); }
+        }
+
+        public static readonly DependencyProperty Button6CommandProperty =
+            DependencyProperty.Register("Button6Command", typeof(ICommand), typeof(NavigationBar), new PropertyMetadata(null));
+
+
         public NavigationBar()
         {
             InitializeComponent();
@@ -93,6 +104,15 @@ namespace DrawingIdentifierGui.Views.Controls
         private void Button5_Click(object sender, RoutedEventArgs e)
         {
             Button5Command?.Execute(null);
+        }
+
+        private void Button6_Click(object sender, RoutedEventArgs e)
+        {
+            Button6Command?.Execute(null);
+        }
+        private void NavigationRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -25,9 +25,10 @@ namespace DrawingIdentifierGui.ViewModels
         public RelayCommand ShowNeuralNetwork1ConfigCommand => new RelayCommand(parameter => SelectedViewModel = new NeuralNetworkConfigViewModel(0));
         public RelayCommand ShowNeuralNetwork2ConfigCommand => new RelayCommand(parameter => SelectedViewModel = new NeuralNetworkConfigViewModel(1));
         public RelayCommand ShowDataHandlerCommand => new RelayCommand(parameter => SelectedViewModel = new DataHandlerViewModel());
+        public RelayCommand ShowUserGuideCommand => new RelayCommand(parameter => SelectedViewModel = new UserGuideViewModel());
 
-        public RelayCommand ExitCommand => new RelayCommand(parameter => MainWindow.Instance.Close());
-        public RelayCommand MinimalizeCommand => new RelayCommand(parameter => MainWindow.Instance.WindowState = System.Windows.WindowState.Minimized);
+        public RelayCommand ExitCommand => new RelayCommand(parameter => MainWindow.Instance?.Close());
+        public RelayCommand MinimalizeCommand => new RelayCommand(parameter => MainWindow.Instance!.WindowState = System.Windows.WindowState.Minimized);
 
         private int trainingsAmount = 0;
         private bool isNotTraining = true;
