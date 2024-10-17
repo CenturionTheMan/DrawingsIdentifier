@@ -16,16 +16,10 @@
     <None Remove="Images\nav-learning.png" />
     <None Remove="Images\nav-one.png" />
     <None Remove="Images\nav-painting.png" />
-    <None Remove="Images\nav-question-mark.png" />
-    <None Remove="Images\nav-question.png" />
     <None Remove="Images\nav-two.png" />
     <None Remove="Images\toolbar-clear.png" />
     <None Remove="Images\toolbar-pen.png" />
     <None Remove="Images\toolbar-rubber.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Images\nav-question-mark.png" />
   </ItemGroup>
 
   <ItemGroup>
