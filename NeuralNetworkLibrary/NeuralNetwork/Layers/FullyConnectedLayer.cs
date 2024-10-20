@@ -160,7 +160,7 @@ public class FullyConnectedLayer : ILayer
     /// <exception cref="NotImplementedException">
     /// Exception thrown when activation function is not implemented.
     /// </exception>
-    Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputBeforeActivation, Matrix[] thisLayerOutputBeforeActivation, float learningRate)
+    Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputActivated, Matrix[] thisLayerOutputBeforeActivation, float learningRate)
     {
         if (errorMatrix.Length != 1)
             throw new ArgumentException("Fully connected layer can only have one input");
@@ -174,7 +174,7 @@ public class FullyConnectedLayer : ILayer
         };
 
         Matrix gradientMatrix = activationDerivativeLayer.ElementWiseMultiply(errorMatrix[0]).ApplyFunction(x => x * learningRate);
-        Matrix deltaWeightsMatrix = Matrix.DotProductMatrices(gradientMatrix, prevLayerOutputBeforeActivation[0].Transpose());
+        Matrix deltaWeightsMatrix = Matrix.DotProductMatrices(gradientMatrix, prevLayerOutputActivated[0].Transpose());
 
         weightsGradientSum = weightsGradientSum.ElementWiseAdd(deltaWeightsMatrix);
         biasesGradientSum = biasesGradientSum.ElementWiseAdd(gradientMatrix);

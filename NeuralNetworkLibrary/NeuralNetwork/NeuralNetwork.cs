@@ -203,24 +203,37 @@ public class NeuralNetwork
 
                 float batchErrorSum = 0;
 
-                Parallel.For(0, batchSamples.Length, (i, loopState) =>
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        loopState.Stop();
-                        return;
-                    }
+                //Parallel.For(0, batchSamples.Length, (i, loopState) =>
+                //{
+                //    if (cancellationToken.IsCancellationRequested)
+                //    {
+                //        loopState.Stop();
+                //        return;
+                //    }
 
-                    (Matrix prediction, Matrix[][] outputsBeforeActivation) = Feedforward(batchSamples[i].inputChannels);
+                //    (Matrix prediction, (Matrix[] activated, Matrix[] beforeActivation)[] layersOutputs) = Feedforward(batchSamples[i].inputChannels);
+                //    prediction = prediction + float.Epsilon;
+
+                //    float error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
+                //    batchErrorSum += error;
+
+                //    Backpropagation(batchSamples[i].output, prediction, layersOutputs);
+
+                //    OnTrainingIteration?.Invoke(epoch + 1, batchBeginIndex + i, error);
+                //});
+
+                for (int i = 0; i < batchSamples.Length; i++)
+                {
+                    (Matrix prediction, (Matrix[] activated, Matrix[] beforeActivation)[] layersOutputs) = Feedforward(batchSamples[i].inputChannels);
                     prediction = prediction + float.Epsilon;
 
                     float error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
                     batchErrorSum += error;
 
-                    Backpropagation(batchSamples[i].output, prediction, outputsBeforeActivation);
+                    Backpropagation(batchSamples[i].output, prediction, layersOutputs);
 
                     OnTrainingIteration?.Invoke(epoch + 1, batchBeginIndex + i, error);
-                });
+                }
 
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -504,26 +517,26 @@ public class NeuralNetwork
     /// Tuple with output matrix and array of layers outputs before activation functions
     /// </returns>
     /// <exception cref="InvalidOperationException"></exception>
-    internal (Matrix output, Matrix[][] layersBeforeActivation) Feedforward(Matrix[] inputChannels)
+    internal (Matrix output, (Matrix[] activated, Matrix[] beforeActivation)[] layersOutputs) Feedforward(Matrix[] inputChannels)
     {
         if (inputChannels.Length != inputDepth || inputChannels[0].RowsAmount != inputRowsAmount || inputChannels[0].ColumnsAmount != inputColumnsAmount)
             throw new InvalidOperationException($" Input channels have wrong dimensions!\n Was {inputChannels.Length}x{inputChannels[0].RowsAmount}x{inputChannels[0].ColumnsAmount} but expected {inputDepth}x{inputRowsAmount}x{inputColumnsAmount}");
 
-        List<Matrix[]> layersBeforeActivation = new(this.layers.Length + 1);
+        List<(Matrix[] activated, Matrix[] beforeActivation)> layersOutputs = new(this.layers.Length + 1);
 
         Matrix[] currentInput = inputChannels;
-        layersBeforeActivation.Add(currentInput);
+        layersOutputs.Add((currentInput, new Matrix[0]));
 
         for (int i = 0; i < layers.Length; i++)
         {
             (currentInput, var otherOutput) = layers[i].Forward(currentInput);
-            layersBeforeActivation.Add(otherOutput);
+            layersOutputs.Add((currentInput, otherOutput));
         }
 
         if (currentInput.Length != 1)
             throw new InvalidOperationException("Prediction should return only one matrix");
 
-        return (currentInput[0], layersBeforeActivation.ToArray());
+        return (currentInput[0], layersOutputs.ToArray());
     }
 
     /// <summary>
@@ -538,7 +551,7 @@ public class NeuralNetwork
     /// <param name="layersBeforeActivation">
     /// Collection of layers outputs before activation functions.
     /// </param>
-    internal void Backpropagation(Matrix expectedResult, Matrix prediction, Matrix[][] layersBeforeActivation)
+    internal void Backpropagation(Matrix expectedResult, Matrix prediction, (Matrix[] activated, Matrix[] beforeActivation)[] layersOutputs)
     {
         var error = expectedResult.ElementWiseSubtract(prediction);
 
@@ -546,9 +559,9 @@ public class NeuralNetwork
 
         for (int i = layers.Length - 1; i >= 0; i--)
         {
-            var thisLayerOutBeforeActivation = layersBeforeActivation[i + 1];
-            var prevLayerOutBeforeActivation = layersBeforeActivation[i];
-            currentError = layers[i].Backward(currentError, prevLayerOutBeforeActivation, thisLayerOutBeforeActivation, LearningRate);
+            var thisLayerOutBeforeActivation = layersOutputs[i + 1].beforeActivation;
+            var prevLayerOut = layersOutputs[i].activated;
+            currentError = layers[i].Backward(currentError, prevLayerOut, thisLayerOutBeforeActivation, LearningRate);
         }
     }
 

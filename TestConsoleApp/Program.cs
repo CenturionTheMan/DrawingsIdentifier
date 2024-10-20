@@ -13,20 +13,16 @@ internal class Program
     private static void Main(string[] args)
     {
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
-        var tester = new NNTrainingTests();
-        tester.RunTests();
-        throw new Exception("END");
+        //var tester = new NNTrainingTests();
+        //tester.RunTests();
+        //throw new Exception("END");
 
-        //TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        //{
-        //    LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 8, stride: 1, activationFunction: ActivationFunction.ReLU),
-        //    LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //    LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 16, stride: 1, activationFunction: ActivationFunction.Sigmoid),
-        //    LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 100, activationFunction: ActivationFunction.ReLU),
-        //    LayerTemplate.CreateDropoutLayer(dropoutRate: 0.5f),
-        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        //}));
+        TestNN(new NeuralNetwork(784, new LayerTemplate[]
+        {
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }));
 
     }
 
@@ -44,7 +40,7 @@ internal class Program
         };
 
         Console.WriteLine("Loading data...");
-        const bool flatten = false;
+        const bool flatten = true;
         var trainData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
         var testData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_test_data.csv");
 

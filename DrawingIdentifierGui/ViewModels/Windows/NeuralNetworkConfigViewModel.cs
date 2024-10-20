@@ -37,7 +37,7 @@ namespace DrawingIdentifierGui.ViewModels.Windows
             if (folderDialog.ShowDialog() == true)
             {
                 var folderName = folderDialog.FolderName;
-                SaveDirectoryPath = folderName;
+                SaveDirectoryPath = folderName + "/";
             }
         });
 
