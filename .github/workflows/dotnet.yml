@@ -16,11 +16,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore DrawingsIdentifier.sln
 
   build:
     runs-on: windows-latest
-    needs: restore  # Build job depends on restore job
+    needs: restore
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -28,11 +28,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build DrawingsIdentifier.sln --no-restore
 
   test:
     runs-on: windows-latest
-    needs: build  # Test job depends on build job
+    needs: build
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -40,4 +40,4 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test DrawingsIdentifier.sln --no-build --verbosity normal
