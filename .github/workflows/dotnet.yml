@@ -7,11 +7,11 @@ on:
     branches: ["master"]
 
 jobs:
-  build:
+  build-test:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET
+      - name: Build and Test .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
@@ -19,15 +19,5 @@ jobs:
         run: dotnet restore DrawingsIdentifier/DrawingsIdentifier.sln
       - name: Build solution
         run: dotnet build DrawingsIdentifier/DrawingsIdentifier.sln --no-restore
-
-  test:
-    runs-on: windows-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
       - name: Test solution
         run: dotnet test DrawingsIdentifier/DrawingsIdentifier.sln --no-build --verbosity normal
