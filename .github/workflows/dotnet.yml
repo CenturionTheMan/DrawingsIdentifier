@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    needs: restore # Build job depends on restore job
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
@@ -23,7 +22,7 @@ jobs:
 
   test:
     runs-on: windows-latest
-    needs: build # Test job depends on build job
+    needs: build
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
