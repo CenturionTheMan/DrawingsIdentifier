@@ -1,5 +1,4 @@
-﻿using Accord.IO;
-using DrawingIdentifierGui.Models;
+﻿using DrawingIdentifierGui.Models;
 using DrawingIdentifierGui.MVVM;
 using Microsoft.Win32;
 using System;

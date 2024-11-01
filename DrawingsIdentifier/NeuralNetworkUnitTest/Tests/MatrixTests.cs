@@ -1,4 +1,4 @@
-namespace NeuralNetworkUnitTest;
+namespace NeuralNetworkUnitTest.Math;
 
 public class MatrixTests
 {

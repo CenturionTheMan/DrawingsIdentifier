@@ -1,5 +1,4 @@
-﻿using Accord.Collections;
-using NeuralNetworkLibrary;
+﻿using NeuralNetworkLibrary;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

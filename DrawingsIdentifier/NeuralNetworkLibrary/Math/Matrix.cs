@@ -262,7 +262,19 @@ public class Matrix
             throw new ArgumentException("Number of columns in the first matrix must be equal to the number of rows in the second matrix");
         }
 
-        return new Matrix(Accord.Math.Matrix.Dot(a.values, b.values));
+        Matrix tmp = new Matrix(a.RowsAmount, b.ColumnsAmount);
+        for (int i = 0; i < a.RowsAmount; i++)
+        {
+            for (int j = 0; j < b.ColumnsAmount; j++)
+            {
+                for (int k = 0; k < a.ColumnsAmount; k++)
+                {
+                    tmp[i,j] += a[i, k] * b[k, j];
+                }
+            }
+        }
+
+        return tmp;
     }
 
     /// <summary>

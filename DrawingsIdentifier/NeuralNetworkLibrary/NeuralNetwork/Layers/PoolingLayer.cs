@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using Accord;
 using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
 namespace NeuralNetworkLibrary;

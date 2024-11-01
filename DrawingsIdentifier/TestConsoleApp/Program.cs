@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using NeuralNetworkLibrary;
 using static NeuralNetworkLibrary.MatrixExtender;
-using Accord.IO;
 using System.Diagnostics;
 
 namespace TestConsoleApp;
