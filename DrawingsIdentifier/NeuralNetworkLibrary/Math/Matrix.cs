@@ -11,7 +11,7 @@ namespace NeuralNetworkLibrary;
 public class Matrix
 {
     private static Random random = new();
-    private float[,] Values { get; set; }
+    private float[,] values;
 
     public readonly int RowsAmount;
     public readonly int ColumnsAmount;
@@ -22,11 +22,11 @@ public class Matrix
     /// <param name="singleColumnValues">Rows amount</param>
     public Matrix(float[] singleColumnValues)
     {
-        this.Values = new float[singleColumnValues.Length, 1];
+        this.values = new float[singleColumnValues.Length, 1];
 
         for (int i = 0; i < singleColumnValues.Length; i++)
         {
-            Values[i, 0] = singleColumnValues[i];
+            values[i, 0] = singleColumnValues[i];
         }
 
         RowsAmount = singleColumnValues.Length;
@@ -36,10 +36,10 @@ public class Matrix
     /// <summary>
     /// Creates a new Matrix based on the given values
     /// </summary>
-    /// <param name="values">Values to be assigned to the matrix</param>
+    /// <param name="values">values to be assigned to the matrix</param>
     public Matrix(float[,] values)
     {
-        this.Values = values;
+        this.values = values;
         RowsAmount = values.GetLength(0);
         ColumnsAmount = values.GetLength(1);
     }
@@ -51,7 +51,7 @@ public class Matrix
     /// <param name="columnsAmount">Columns amount</param>
     public Matrix(int rowsAmount, int columnsAmount)
     {
-        Values = new float[rowsAmount, columnsAmount];
+        values = new float[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
         ColumnsAmount = columnsAmount;
     }
@@ -65,7 +65,7 @@ public class Matrix
     /// <param name="max">Maximum value</param>
     public Matrix(int rowsAmount, int columnsAmount, float min, float max)
     {
-        Values = new float[rowsAmount, columnsAmount];
+        values = new float[rowsAmount, columnsAmount];
         RowsAmount = rowsAmount;
         ColumnsAmount = columnsAmount;
 
@@ -73,7 +73,7 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                Values[i, j] = random.NextSingle() * (max - min) + min;
+                values[i, j] = random.NextSingle() * (max - min) + min;
             }
         }
     }
@@ -111,7 +111,7 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                sum += Values[i, j] * Values[i, j];
+                sum += values[i, j] * values[i, j];
             }
         }
         return sum;
@@ -137,7 +137,7 @@ public class Matrix
             {
                 throw new IndexOutOfRangeException($"Given indexes ([{i},{j}]) are out of range for Matrix of size: {RowsAmount}x{ColumnsAmount}.");
             }
-            return Values[i, j];
+            return values[i, j];
         }
         set
         {
@@ -145,7 +145,7 @@ public class Matrix
             {
                 throw new IndexOutOfRangeException($"Given indexes ([{i},{j}]) are out of range for Matrix of size: {RowsAmount}x{ColumnsAmount}.");
             }
-            Values[i, j] = value;
+            values[i, j] = value;
         }
     }
 
@@ -155,7 +155,7 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                yield return Values[i, j];
+                yield return values[i, j];
             }
         }
     }
@@ -171,7 +171,7 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                if (Values[i, j] != matrix.Values[i, j])
+                if (values[i, j] != matrix.values[i, j])
                 {
                     return false;
                 }
@@ -183,12 +183,12 @@ public class Matrix
 
     public Matrix Copy()
     {
-        return new Matrix((float[,])this.Values.Clone());
+        return new Matrix((float[,])this.values.Clone());
     }
 
     public float[,] ToArray()
     {
-        return (float[,])Values.Clone();
+        return (float[,])values.Clone();
     }
 
     public override string ToString()
@@ -198,7 +198,7 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                sb.AppendFormat("{0,5} ", Values[i, j].ToString("0.00"));
+                sb.AppendFormat("{0,5} ", values[i, j].ToString("0.00"));
             }
             sb.Append("\n");
         }
@@ -213,7 +213,7 @@ public class Matrix
         {
             for (int j = 0; j < ColumnsAmount; j++)
             {
-                sb.Append(Values[i, j].ToString() + " ");
+                sb.Append(values[i, j].ToString() + " ");
             }
             sb.Append("\n");
         }
@@ -262,7 +262,7 @@ public class Matrix
             throw new ArgumentException("Number of columns in the first matrix must be equal to the number of rows in the second matrix");
         }
 
-        return new Matrix(Accord.Math.Matrix.Dot(a.Values, b.Values));
+        return new Matrix(Accord.Math.Matrix.Dot(a.values, b.values));
     }
 
     /// <summary>
@@ -277,7 +277,7 @@ public class Matrix
         {
             throw new ArgumentException("Matrices must have the same dimensions");
         }
-        return EachElementAssignment(a, (i, j) => a.Values[i, j] * b.Values[i, j]);
+        return EachElementAssignment(a, (i, j) => a.values[i, j] * b.values[i, j]);
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public class Matrix
         {
             throw new ArgumentException("Matrices must have the same dimensions");
         }
-        return EachElementAssignment(a, (i, j) => a.Values[i, j] + b.Values[i, j]);
+        return EachElementAssignment(a, (i, j) => a.values[i, j] + b.values[i, j]);
     }
 
     /// <summary>
@@ -307,17 +307,17 @@ public class Matrix
         {
             throw new ArgumentException("Matrices must have the same dimensions");
         }
-        return EachElementAssignment(a, (i, j) => a.Values[i, j] - b.Values[i, j]);
+        return EachElementAssignment(a, (i, j) => a.values[i, j] - b.values[i, j]);
     }
 
     public static Matrix operator *(Matrix a, float b)
     {
-        return EachElementAssignment(a, (i, j) => a.Values[i, j] * b);
+        return EachElementAssignment(a, (i, j) => a.values[i, j] * b);
     }
 
     public static Matrix operator +(Matrix a, float b)
     {
-        return EachElementAssignment(a, (i, j) => a.Values[i, j] + b);
+        return EachElementAssignment(a, (i, j) => a.values[i, j] + b);
     }
 
     /// <summary>
@@ -334,7 +334,7 @@ public class Matrix
         {
             for (int j = 0; j < a.ColumnsAmount; j++)
             {
-                result.Values[i, j] = mathOperation(i, j);
+                result.values[i, j] = mathOperation(i, j);
             }
         }
 
