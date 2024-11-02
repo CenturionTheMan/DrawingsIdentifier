@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Metadata;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 namespace NeuralNetworkLibrary;
 
@@ -140,29 +131,24 @@ public static class ImageEditor
         {
             for (int x = 0; x < cols; x++)
             {
-                // Apply inverse rotation to find the source coordinates
                 float srcXf = (x - centerX) * cos + (y - centerY) * sin + centerX;
                 float srcYf = -(x - centerX) * sin + (y - centerY) * cos + centerY;
 
-                // Bilinear interpolation: calculate weighted average of four nearest pixels
                 int srcX1 = (int)Math.Floor(srcXf);
                 int srcX2 = srcX1 + 1;
                 int srcY1 = (int)Math.Floor(srcYf);
                 int srcY2 = srcY1 + 1;
 
-                // Clamp coordinates within bounds
                 srcX1 = Math.Max(0, Math.Min(cols - 1, srcX1));
                 srcX2 = Math.Max(0, Math.Min(cols - 1, srcX2));
                 srcY1 = Math.Max(0, Math.Min(rows - 1, srcY1));
                 srcY2 = Math.Max(0, Math.Min(rows - 1, srcY2));
 
-                // Calculate weights
                 float weightX2 = srcXf - srcX1;
                 float weightX1 = 1.0f - weightX2;
                 float weightY2 = srcYf - srcY1;
                 float weightY1 = 1.0f - weightY2;
 
-                // Perform bilinear interpolation
                 float interpolatedValue = weightX1 * (weightY1 * matrix[srcX1, srcY1] + weightY2 * matrix[srcX1, srcY2])
                                         + weightX2 * (weightY1 * matrix[srcX2, srcY1] + weightY2 * matrix[srcX2, srcY2]);
 
@@ -178,15 +164,12 @@ public static class ImageEditor
         int originalRows = matrix.RowsAmount;
         int originalCols = matrix.ColumnsAmount;
 
-        // Create a new matrix with the desired dimensions filled with the padding color
         Matrix paddedMatrix = new Matrix(desiredHeight, desiredWidth);
         paddedMatrix = paddedMatrix.ApplyFunction(x => paddingColor);
 
-        // Calculate the starting position to center the original image in the padded matrix
         int startX = (desiredWidth - originalCols) / 2;
         int startY = (desiredHeight - originalRows) / 2;
 
-        // Copy the original image into the center of the new matrix
         for (int y = 0; y < originalRows; y++)
         {
             for (int x = 0; x < originalCols; x++)
@@ -225,7 +208,6 @@ public static class ImageEditor
         int rows = matrix.RowsAmount;
         int cols = matrix.ColumnsAmount;
 
-        // Calculate scaled dimensions
         int scaledWidth = (int)(cols * scale);
         int scaledHeight = (int)(rows * scale);
 
@@ -233,7 +215,6 @@ public static class ImageEditor
 
         float invScale = 1.0f / scale;
 
-        // Calculate offsets to center the scaled image
         float offsetX = (cols - 1) / 2.0f - (scaledWidth - 1) / (2.0f * scale);
         float offsetY = (rows - 1) / 2.0f - (scaledHeight - 1) / (2.0f * scale);
 
@@ -241,17 +222,14 @@ public static class ImageEditor
         {
             for (int x = 0; x < scaledWidth; x++)
             {
-                // Calculate the coordinates in the original image
                 float srcXf = x * invScale + offsetX;
                 float srcYf = y * invScale + offsetY;
 
-                // Calculate the integer coordinates and weights for bilinear interpolation
                 int srcX1 = (int)Math.Floor(srcXf);
                 int srcX2 = Math.Min(srcX1 + 1, cols - 1);
                 int srcY1 = (int)Math.Floor(srcYf);
                 int srcY2 = Math.Min(srcY1 + 1, rows - 1);
 
-                // Check if the indices are within bounds
                 if (srcX1 >= 0 && srcX2 >= 0 && srcY1 >= 0 && srcY2 >= 0 && srcX1 < cols && srcX2 < cols && srcY1 < rows && srcY2 < rows)
                 {
                     float weightX2 = srcXf - srcX1;
@@ -259,7 +237,6 @@ public static class ImageEditor
                     float weightY2 = srcYf - srcY1;
                     float weightY1 = 1.0f - weightY2;
 
-                    // Perform bilinear interpolation
                     float interpolatedValue = weightX1 * (weightY1 * matrix[srcY1, srcX1] + weightY2 * matrix[srcY2, srcX1])
                                             + weightX2 * (weightY1 * matrix[srcY1, srcX2] + weightY2 * matrix[srcY2, srcX2]);
 
@@ -267,7 +244,6 @@ public static class ImageEditor
                 }
                 else
                 {
-                    // Handle out-of-bounds cases by assigning default color
                     scaledMatrix[y, x] = bgColor;
                 }
             }
@@ -288,11 +264,9 @@ public static class ImageEditor
 
         float invScale = 1.0f / scale;
 
-        // Calculate scaled dimensions
         int scaledWidth = (int)(cols * scale);
         int scaledHeight = (int)(rows * scale);
 
-        // Calculate offsets to center the scaled image within the original size
         float offsetX = (cols - scaledWidth) / 2.0f;
         float offsetY = (rows - scaledHeight) / 2.0f;
 
@@ -300,14 +274,11 @@ public static class ImageEditor
         {
             for (int x = 0; x < cols; x++)
             {
-                // Calculate the coordinates in the scaled image
                 float srcXf = (x - offsetX) * invScale;
                 float srcYf = (y - offsetY) * invScale;
 
-                // Check if the coordinates are within bounds of the scaled image
                 if (srcXf >= 0 && srcXf < scaledWidth - 1 && srcYf >= 0 && srcYf < scaledHeight - 1)
                 {
-                    // Calculate the integer coordinates and weights for bilinear interpolation
                     int srcX1 = (int)Math.Floor(srcXf);
                     int srcX2 = srcX1 + 1;
                     int srcY1 = (int)Math.Floor(srcYf);
@@ -318,7 +289,6 @@ public static class ImageEditor
                     float weightY2 = srcYf - srcY1;
                     float weightY1 = 1.0f - weightY2;
 
-                    // Perform bilinear interpolation
                     float interpolatedValue = weightX1 * (weightY1 * matrix[srcY1, srcX1] + weightY2 * matrix[srcY2, srcX1])
                                             + weightX2 * (weightY1 * matrix[srcY1, srcX2] + weightY2 * matrix[srcY2, srcX2]);
 
@@ -326,7 +296,6 @@ public static class ImageEditor
                 }
                 else
                 {
-                    // Pixels outside the scaled image bounds are set to default color
                     scaledMatrix[y, x] = bgColor;
                 }
             }
@@ -339,14 +308,12 @@ public static class ImageEditor
     public static Matrix LoadFromImage(string path)
     {
         using var image = Image.Load<Rgba32>(path);
-
         Matrix matrix = new Matrix(image.Height, image.Width);
 
         for (int y = 0; y < image.Height; y++)
         {
             for (int x = 0; x < image.Width; x++)
             {
-                // Convert the pixel to grayscale
                 Rgba32 pixel = image[x, y];
                 float value = (pixel.R + pixel.G + pixel.B) / 3.0f / 255.0f;
                 matrix[y, x] = value;
@@ -367,10 +334,8 @@ public static class ImageEditor
         {
             for (int x = 0; x < width; x++)
             {
-                // Normalize the float value to a range suitable for image representation (0-255)
-                // This assumes the float values are normalized between 0 and 1
                 byte value = (byte)(matrix[y, x] * 255);
-                image[x, y] = new Rgba32(value, value, value, 255); // Grayscale value
+                image[x, y] = new Rgba32(value, value, value, 255);
             }
         }
 
@@ -397,10 +362,8 @@ public static class ImageEditor
         {
             for (int x = 0; x < width; x++)
             {
-                // Normalize the float value to a range suitable for image representation (0-255)
-                // This assumes the float values are normalized between 0 and 1
                 byte value = (byte)(matrix[y, x] * 255);
-                image[x, y] = new Rgba32(value, value, value, 255); // Grayscale value
+                image[x, y] = new Rgba32(value, value, value, 255); 
             }
         }
 
