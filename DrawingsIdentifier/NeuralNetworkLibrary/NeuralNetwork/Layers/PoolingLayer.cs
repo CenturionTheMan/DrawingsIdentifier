@@ -1,13 +1,14 @@
-﻿using System;
+﻿using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using static NeuralNetworkLibrary.ActivationFunctionsHandler;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.NeuralNetwork;
 
 public class PoolingLayer : ILayer
 {

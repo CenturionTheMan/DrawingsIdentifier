@@ -1,11 +1,7 @@
-﻿using NumSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
+﻿using NeuralNetworkLibrary.ImageProcessing;
+using NeuralNetworkLibrary.Math;
+using NumSharp;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary.QuickDrawHandler;
 

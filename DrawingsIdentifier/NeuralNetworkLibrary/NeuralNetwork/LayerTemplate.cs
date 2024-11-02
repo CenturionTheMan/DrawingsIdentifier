@@ -1,6 +1,6 @@
-using System.Data;
+using NeuralNetworkLibrary.Utils;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.NeuralNetwork;
 
 public class LayerTemplate
 {   

@@ -2,11 +2,11 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using static DrawingIdentifierGui.Utilities.CanvasHelper;
-using System.Drawing.Printing;
 using System.Diagnostics;
 using DrawingIdentifierGui.ViewModels.Windows;
-using System.Reflection;
-using NeuralNetworkLibrary;
+
+using Matrix = NeuralNetworkLibrary.Math.Matrix;
+using static NeuralNetworkLibrary.ImageProcessing.ImageEditor;
 
 namespace DrawingIdentifierGui.Views.Windows;
 

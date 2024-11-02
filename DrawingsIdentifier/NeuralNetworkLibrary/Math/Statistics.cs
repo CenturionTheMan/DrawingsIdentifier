@@ -1,4 +1,4 @@
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.Math;
 
 public static class Statistics
 {

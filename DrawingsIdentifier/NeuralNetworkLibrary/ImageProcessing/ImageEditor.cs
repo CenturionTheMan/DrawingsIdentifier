@@ -1,7 +1,8 @@
-﻿using SixLabors.ImageSharp;
+﻿using NeuralNetworkLibrary.Math;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.ImageProcessing;
 
 public static class ImageEditor
 {
@@ -77,8 +78,8 @@ public static class ImageEditor
         if(top == int.MinValue || bottom == int.MaxValue || left == int.MaxValue || right == int.MinValue)
             return null;
 
-        int size = Math.Max(right - left + 1, top - bottom + 1) + padding *2;
-        int offset = Math.Min(left, bottom) - padding;
+        int size = System.Math.Max(right - left + 1, top - bottom + 1) + padding *2;
+        int offset = System.Math.Min(left, bottom) - padding;
 
         Matrix result = new Matrix(size, size);
 
@@ -120,9 +121,9 @@ public static class ImageEditor
 
         Matrix rotatedMatrix = new Matrix(rows, cols);
 
-        float angleRad = -angleDeg * (float)Math.PI / 180.0f;
-        float cos = (float)Math.Cos(angleRad);
-        float sin = (float)Math.Sin(angleRad);
+        float angleRad = -angleDeg * (float)System.Math.PI / 180.0f;
+        float cos = (float)System.Math.Cos(angleRad);
+        float sin = (float)System.Math.Sin(angleRad);
 
         float centerX = cols / 2.0f;
         float centerY = rows / 2.0f;
@@ -134,15 +135,15 @@ public static class ImageEditor
                 float srcXf = (x - centerX) * cos + (y - centerY) * sin + centerX;
                 float srcYf = -(x - centerX) * sin + (y - centerY) * cos + centerY;
 
-                int srcX1 = (int)Math.Floor(srcXf);
+                int srcX1 = (int)System.Math.Floor(srcXf);
                 int srcX2 = srcX1 + 1;
-                int srcY1 = (int)Math.Floor(srcYf);
+                int srcY1 = (int)System.Math.Floor(srcYf);
                 int srcY2 = srcY1 + 1;
 
-                srcX1 = Math.Max(0, Math.Min(cols - 1, srcX1));
-                srcX2 = Math.Max(0, Math.Min(cols - 1, srcX2));
-                srcY1 = Math.Max(0, Math.Min(rows - 1, srcY1));
-                srcY2 = Math.Max(0, Math.Min(rows - 1, srcY2));
+                srcX1 = System.Math.Max(0, System.Math.Min(cols - 1, srcX1));
+                srcX2 = System.Math.Max(0, System.Math.Min(cols - 1, srcX2));
+                srcY1 = System.Math.Max(0, System.Math.Min(rows - 1, srcY1));
+                srcY2 = System.Math.Max(0, System.Math.Min(rows - 1, srcY2));
 
                 float weightX2 = srcXf - srcX1;
                 float weightX1 = 1.0f - weightX2;
@@ -225,10 +226,10 @@ public static class ImageEditor
                 float srcXf = x * invScale + offsetX;
                 float srcYf = y * invScale + offsetY;
 
-                int srcX1 = (int)Math.Floor(srcXf);
-                int srcX2 = Math.Min(srcX1 + 1, cols - 1);
-                int srcY1 = (int)Math.Floor(srcYf);
-                int srcY2 = Math.Min(srcY1 + 1, rows - 1);
+                int srcX1 = (int)System.Math.Floor(srcXf);
+                int srcX2 = System.Math.Min(srcX1 + 1, cols - 1);
+                int srcY1 = (int)System.Math.Floor(srcYf);
+                int srcY2 = System.Math.Min(srcY1 + 1, rows - 1);
 
                 if (srcX1 >= 0 && srcX2 >= 0 && srcY1 >= 0 && srcY2 >= 0 && srcX1 < cols && srcX2 < cols && srcY1 < rows && srcY2 < rows)
                 {
@@ -279,9 +280,9 @@ public static class ImageEditor
 
                 if (srcXf >= 0 && srcXf < scaledWidth - 1 && srcYf >= 0 && srcYf < scaledHeight - 1)
                 {
-                    int srcX1 = (int)Math.Floor(srcXf);
+                    int srcX1 = (int)System.Math.Floor(srcXf);
                     int srcX2 = srcX1 + 1;
-                    int srcY1 = (int)Math.Floor(srcYf);
+                    int srcY1 = (int)System.Math.Floor(srcYf);
                     int srcY2 = srcY1 + 1;
 
                     float weightX2 = srcXf - srcX1;

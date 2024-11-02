@@ -1,9 +1,10 @@
-﻿using NeuralNetworkLibrary;
-using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Matrix = NeuralNetworkLibrary.Matrix;
+using Matrix = NeuralNetworkLibrary.Math.Matrix;
+
+using static NeuralNetworkLibrary.Math.MatrixExtender;
+using NeuralNetworkLibrary.Math;
 
 namespace DrawingIdentifierGui.Views.Controls;
 

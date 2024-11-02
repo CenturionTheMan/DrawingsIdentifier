@@ -3,6 +3,7 @@ using DrawingIdentifierGui.MVVM;
 using DrawingIdentifierGui.ViewModels.Windows;
 using Microsoft.Win32;
 using NeuralNetworkLibrary;
+using NeuralNetworkLibrary.NeuralNetwork;
 using NeuralNetworkLibrary.QuickDrawHandler;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

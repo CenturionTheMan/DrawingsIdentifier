@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.Math;
 
 public class Matrix
 {
@@ -80,7 +80,7 @@ public class Matrix
 
     public void InitializeXavier()
     {
-        float limit = (float)Math.Sqrt(6.0 / (RowsAmount + ColumnsAmount));
+        float limit = (float)System.Math.Sqrt(6.0 / (RowsAmount + ColumnsAmount));
 
         for (int i = 0; i < RowsAmount; i++)
         {
@@ -93,7 +93,7 @@ public class Matrix
 
     public void InitializeHe()
     {
-        float limit = (float)Math.Sqrt(6.0 / ColumnsAmount);
+        float limit = (float)System.Math.Sqrt(6.0 / ColumnsAmount);
 
         for (int i = 0; i < RowsAmount; i++)
         {
@@ -119,7 +119,7 @@ public class Matrix
 
     public float GetNorm()
     {
-        return (float)Math.Sqrt(GetUnSquaredNorm());
+        return (float)System.Math.Sqrt(GetUnSquaredNorm());
     }
 
     /// <summary>

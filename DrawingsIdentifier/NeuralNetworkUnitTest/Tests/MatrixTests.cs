@@ -1,3 +1,5 @@
+using NeuralNetworkLibrary.Math;
+
 namespace NeuralNetworkUnitTest.Math;
 
 public class MatrixTests

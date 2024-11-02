@@ -1,5 +1,8 @@
 using NeuralNetworkLibrary;
+using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.NeuralNetwork;
 using NeuralNetworkLibrary.QuickDrawHandler;
+using NeuralNetworkLibrary.Utils;
 using SixLabors.ImageSharp;
 
 namespace TestConsoleApp;

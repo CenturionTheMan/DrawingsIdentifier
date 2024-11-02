@@ -1,6 +1,8 @@
+using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.Utils;
 using System.Diagnostics;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.NeuralNetwork;
 
 public class Trainer
 {
@@ -85,15 +87,15 @@ public class Trainer
     /// </returns>
     public Trainer SetPatience(float initialIgnore, float patience, Func<float, int, float>? learningRateModifier = null)
     {
-        initialIgnore = Math.Clamp(initialIgnore, 0, 0.95f);
-        patience = Math.Clamp(patience, 0, 1f);
+        initialIgnore = System.Math.Clamp(initialIgnore, 0, 0.95f);
+        patience = System.Math.Clamp(patience, 0, 1f);
 
         this.userInitialIgnore = initialIgnore;
         this.userPatience = patience;
 
         this.initialIgnore = initialIgnore * 100;
         this.patienceAmount = (int)(data.Length * patience / batchSize);
-        this.patienceAmount = Math.Max(1, patienceAmount);
+        this.patienceAmount = System.Math.Max(1, patienceAmount);
 
         if (learningRateModifier is not null)
             this.learningRateModifier = learningRateModifier;
@@ -247,7 +249,7 @@ public class Trainer
 
         if (slope >= 0)
         {
-            nn.LearningRate = Math.Max(minLearningRate, learningRateModifier(nn.LearningRate, epoch));
+            nn.LearningRate = System.Math.Max(minLearningRate, learningRateModifier(nn.LearningRate, epoch));
         }
         lastAvgBatchErrors!.Clear();
     }

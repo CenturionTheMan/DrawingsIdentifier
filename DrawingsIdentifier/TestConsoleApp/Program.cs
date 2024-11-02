@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using NeuralNetworkLibrary;
-using static NeuralNetworkLibrary.MatrixExtender;
 using System.Diagnostics;
+using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.Utils;
+using NeuralNetworkLibrary.NeuralNetwork;
 
 namespace TestConsoleApp;
 

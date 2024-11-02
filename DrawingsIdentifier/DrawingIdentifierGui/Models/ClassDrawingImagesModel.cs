@@ -4,7 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using NeuralNetworkLibrary;
+using NeuralNetworkLibrary.Math;
 
 namespace DrawingIdentifierGui.Models
 {
@@ -12,12 +12,12 @@ namespace DrawingIdentifierGui.Models
     {
         public ImageSource[] ImagesCollection { get; set; }
 
-        public ClassDrawingImagesModel(NeuralNetworkLibrary.Matrix[] images)
+        public ClassDrawingImagesModel(NeuralNetworkLibrary.Math.Matrix[] images)
         {
             ImagesCollection = images.Select(i => ConvertMatrixToImageSource(i)).ToArray();
         }
 
-        private ImageSource ConvertMatrixToImageSource(NeuralNetworkLibrary.Matrix matrix)
+        private ImageSource ConvertMatrixToImageSource(NeuralNetworkLibrary.Math.Matrix matrix)
         {
             var bm = new Bitmap(matrix.ColumnsAmount, matrix.RowsAmount);
 

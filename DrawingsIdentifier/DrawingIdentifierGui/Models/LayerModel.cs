@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NeuralNetworkLibrary;
 using System.Windows;
+using NeuralNetworkLibrary.Utils;
 
 namespace DrawingIdentifierGui.Models
 {

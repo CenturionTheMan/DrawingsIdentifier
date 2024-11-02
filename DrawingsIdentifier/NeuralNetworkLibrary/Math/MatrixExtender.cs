@@ -1,5 +1,5 @@
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.Math;
 
 public static class MatrixExtender
 {
@@ -217,7 +217,7 @@ public static class MatrixExtender
 
      public static Matrix ClampValues(this Matrix a, float min, float max)
     {
-        return a.ApplyFunction(x => Math.Clamp(x, min, max));
+        return a.ApplyFunction(x => System.Math.Clamp(x, min, max));
     }
 
     public static int IndexOfMax(this Matrix matrix)

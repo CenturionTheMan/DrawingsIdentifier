@@ -1,4 +1,6 @@
 ﻿using NeuralNetworkLibrary;
+using NeuralNetworkLibrary.NeuralNetwork;
+using NeuralNetworkLibrary.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

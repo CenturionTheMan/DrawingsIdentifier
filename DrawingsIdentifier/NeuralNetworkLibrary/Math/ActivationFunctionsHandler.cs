@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NeuralNetworkLibrary.Utils;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("NeuralNetworkUnitTest")]
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.Math;
 
 internal static class ActivationFunctionsHandler
 {
-    
-
     internal static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
     {
         switch (activationFunction)
@@ -71,7 +65,7 @@ internal static class ActivationFunctionsHandler
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += (float)Math.Pow(expected[i, j] - predictions[i, j], 2);
+                sum += (float)System.Math.Pow(expected[i, j] - predictions[i, j], 2);
             }
         }
 
@@ -98,7 +92,7 @@ internal static class ActivationFunctionsHandler
         {
             for (int j = 0; j < predictions.ColumnsAmount; j++)
             {
-                sum += expected[i, j] * (float)Math.Log(predictions[i, j]);
+                sum += expected[i, j] * (float)System.Math.Log(predictions[i, j]);
             }
         }
 
@@ -132,7 +126,7 @@ internal static class ActivationFunctionsHandler
     /// <returns></returns>
     internal static Matrix Sigmoid(Matrix mat)
     {
-        return mat.ApplyFunction(x => 1 / (float)(1 + Math.Exp(-x)));
+        return mat.ApplyFunction(x => 1 / (float)(1 + System.Math.Exp(-x)));
     }
 
     /// <summary>
@@ -144,7 +138,7 @@ internal static class ActivationFunctionsHandler
     {
         return mat.ApplyFunction(x =>
         {
-            var sig = 1 / (1 + (float)Math.Exp(-x));
+            var sig = 1 / (1 + (float)System.Math.Exp(-x));
             return sig * (1 - sig);
         });
     }
@@ -156,18 +150,9 @@ internal static class ActivationFunctionsHandler
     /// <returns></returns>
     internal static Matrix Softmax(Matrix mat)
     {
-        var expMat = mat.ApplyFunction(x => (float)Math.Exp(x));
+        var expMat = mat.ApplyFunction(x => (float)System.Math.Exp(x));
         float sumOfMatrix = expMat.Sum() + float.Epsilon;
         var tmp = expMat.ApplyFunction(x => x / sumOfMatrix);
-
-        // foreach (var item in tmp)
-        // {
-        //     if(float.IsNaN(item) || float.IsInfinity(item))
-        //     {
-        //         throw new InvalidOperationException("Softmax resulted in NaN or Infinity");
-        //     }
-        // }
-
         return tmp;
     }
 

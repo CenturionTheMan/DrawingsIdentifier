@@ -1,8 +1,8 @@
 ﻿using DrawingIdentifierGui.Models;
 using NeuralNetworkLibrary;
-using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Data;
+using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.NeuralNetwork;
+using NeuralNetworkLibrary.Utils;
 using System.Windows;
 
 namespace DrawingIdentifierGui
@@ -24,11 +24,11 @@ namespace DrawingIdentifierGui
         public static NeuralNetwork[] NeuralNetworks = new NeuralNetwork[2];
         public static NeuralNetworkConfigModel[] NeuralNetworkConfigModels = new NeuralNetworkConfigModel[2];
 
-        public static (Matrix[] inputs, Matrix outputs)[] TrainData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
-        public static (Matrix[] inputs, Matrix outputs)[] TestData { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
+        public static (NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)[] TrainData { get; set; } = Array.Empty<(NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)>();
+        public static (NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)[] TestData { get; set; } = Array.Empty<(NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)>();
 
-        public static (Matrix[] inputs, Matrix outputs)[] TrainDataFlat { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
-        public static (Matrix[] inputs, Matrix outputs)[] TestDataFlat { get; set; } = Array.Empty<(Matrix[] inputs, Matrix outputs)>();
+        public static (NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)[] TrainDataFlat { get; set; } = Array.Empty<(NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)>();
+        public static (NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)[] TestDataFlat { get; set; } = Array.Empty<(NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)>();
 
         public static bool IsExampleNN1Loaded;
         public static bool IsExampleNN2Loaded;

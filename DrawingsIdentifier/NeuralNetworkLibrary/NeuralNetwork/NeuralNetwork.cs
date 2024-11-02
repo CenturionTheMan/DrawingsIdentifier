@@ -1,14 +1,10 @@
-﻿using SixLabors.ImageSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.Utils;
 using System.Xml.Linq;
 
-namespace NeuralNetworkLibrary;
+using static NeuralNetworkLibrary.ImageProcessing.ImageEditor;
+
+namespace NeuralNetworkLibrary.NeuralNetwork;
 
 public class NeuralNetwork
 {

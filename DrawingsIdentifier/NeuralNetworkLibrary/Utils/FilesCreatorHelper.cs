@@ -7,9 +7,8 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-using Log = System.Console;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.Utils;
 
 public static class FilesCreatorHelper
 {

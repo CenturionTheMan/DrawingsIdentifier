@@ -1,8 +1,9 @@
-using System.Data.Common;
+using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.Utils;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.NeuralNetwork;
 
 public class FullyConnectedLayer : ILayer
 {

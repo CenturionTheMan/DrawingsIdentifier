@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NeuralNetworkLibrary.Math;
+using NeuralNetworkLibrary.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace NeuralNetworkLibrary;
+namespace NeuralNetworkLibrary.NeuralNetwork;
 
 internal class ConvolutionLayer : ILayer
 {
