@@ -57,9 +57,9 @@ internal class NNTrainingTests
             trainer: new Trainer(
                 new NeuralNetwork(1, 28, 28,
                 [
-                    LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 12, stride: 1, activationFunction: ActivationFunction.ReLU),
+                    LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 12, activationFunction: ActivationFunction.ReLU),
                     LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                    LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 24, stride: 1, activationFunction: ActivationFunction.Sigmoid),
+                    LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 24, activationFunction: ActivationFunction.Sigmoid),
                     LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
                     LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
                     LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),

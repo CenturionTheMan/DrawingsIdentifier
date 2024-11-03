@@ -52,7 +52,7 @@ namespace DrawingIdentifierGui.Models
                         break;
 
                     case LayerType.Convolution:
-                        layerTemplates.Add(LayerTemplate.CreateConvolutionLayer(layer.KernelSize, layer.KernelDepth, 1, layer.ActivationFunction));
+                        layerTemplates.Add(LayerTemplate.CreateConvolutionLayer(layer.KernelSize, layer.KernelDepth, layer.ActivationFunction));
                         break;
 
                     case LayerType.Pooling:

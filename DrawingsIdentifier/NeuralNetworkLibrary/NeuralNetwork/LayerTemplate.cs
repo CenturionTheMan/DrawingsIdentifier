@@ -100,8 +100,9 @@ public class LayerTemplate
     /// <exception cref="NotImplementedException">
     /// Exception thrown when stride is other than 1 (not implemented yet)
     /// </exception>
-    public static LayerTemplate CreateConvolutionLayer(int kernelSize, int depth, int stride, ActivationFunction activationFunction)
+    public static LayerTemplate CreateConvolutionLayer(int kernelSize, int depth, ActivationFunction activationFunction)
     {
+        const int stride = 1;
         if(stride != 1)
             throw new NotImplementedException("Stride != 1 is not implemented yet");
 
