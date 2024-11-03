@@ -1,13 +1,10 @@
 ﻿using NeuralNetworkLibrary.Utils;
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("NeuralNetworkUnitTest")]
 
 namespace NeuralNetworkLibrary.Math;
 
-internal static class ActivationFunctionsHandler
+public static class ActivationFunctionsHandler
 {
-    internal static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
+    public static Matrix ApplyActivationFunction(this Matrix input, ActivationFunction activationFunction)
     {
         switch (activationFunction)
         {
@@ -25,7 +22,7 @@ internal static class ActivationFunctionsHandler
         }
     }
 
-    internal static Matrix DerivativeActivationFunction(this Matrix input, ActivationFunction activationFunction)
+    public static Matrix DerivativeActivationFunction(this Matrix input, ActivationFunction activationFunction)
     {
         switch (activationFunction)
         {
@@ -52,7 +49,7 @@ internal static class ActivationFunctionsHandler
     /// <param name="predictions"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static float CalculateMeanSquaredError(Matrix expected, Matrix predictions)
+    public static float CalculateMeanSquaredError(Matrix expected, Matrix predictions)
     {
         if (predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
         {
@@ -79,7 +76,7 @@ internal static class ActivationFunctionsHandler
     /// <param name="predictions"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static float CalculateCrossEntropyCost(Matrix expected, Matrix predictions)
+    public static float CalculateCrossEntropyCost(Matrix expected, Matrix predictions)
     {
         if (predictions.RowsAmount != expected.RowsAmount || predictions.ColumnsAmount != expected.ColumnsAmount)
         {
@@ -104,7 +101,7 @@ internal static class ActivationFunctionsHandler
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
-    internal static Matrix ReLU(Matrix mat)
+    public static Matrix ReLU(Matrix mat)
     {
         return mat.ApplyFunction(x => { return x > 0 ? x : 0; });
     }
@@ -114,7 +111,7 @@ internal static class ActivationFunctionsHandler
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
-    internal static Matrix DerivativeReLU(Matrix mat)
+    public static Matrix DerivativeReLU(Matrix mat)
     {
         return mat.ApplyFunction(x => { return x >= 0 ? 1.0f : 0.0f; });
     }
@@ -124,7 +121,7 @@ internal static class ActivationFunctionsHandler
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
-    internal static Matrix Sigmoid(Matrix mat)
+    public static Matrix Sigmoid(Matrix mat)
     {
         return mat.ApplyFunction(x => 1 / (float)(1 + System.Math.Exp(-x)));
     }
@@ -134,7 +131,7 @@ internal static class ActivationFunctionsHandler
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
-    internal static Matrix DerivativeSigmoid(Matrix mat)
+    public static Matrix DerivativeSigmoid(Matrix mat)
     {
         return mat.ApplyFunction(x =>
         {
@@ -148,7 +145,7 @@ internal static class ActivationFunctionsHandler
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
-    internal static Matrix Softmax(Matrix mat)
+    public static Matrix Softmax(Matrix mat)
     {
         var expMat = mat.ApplyFunction(x => (float)System.Math.Exp(x));
         float sumOfMatrix = expMat.Sum() + float.Epsilon;
@@ -161,7 +158,7 @@ internal static class ActivationFunctionsHandler
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
-    internal static Matrix DerivativeSoftmax(Matrix mat)
+    public static Matrix DerivativeSoftmax(Matrix mat)
     {
         return Softmax(mat).ApplyFunction(x => x * (1 - x));
     }
