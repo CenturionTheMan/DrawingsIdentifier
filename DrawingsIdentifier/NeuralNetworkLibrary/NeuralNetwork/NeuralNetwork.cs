@@ -68,6 +68,16 @@ public class NeuralNetwork
     /// <param name="layerTemplates">An array of <see cref="LayerTemplate"/> objects representing the layer configurations.</param>
     public NeuralNetwork(int inputDepth, int inputRowsAmount, int inputColumnsAmount, LayerTemplate[] layerTemplates)
     {
+        if(layerTemplates.Length == 0)
+            throw new ArgumentException("At least one layer should be provided");
+
+        if (layerTemplates[^1].LayerType != LayerType.FullyConnected)
+            throw new ArgumentException("Last layer should be fully connected");
+
+        if (layerTemplates[^1].ActivationFunction != ActivationFunction.Softmax)
+            throw new NotImplementedException("Last layer should have softmax activation function");
+
+
         this.inputDepth = inputDepth;
         this.inputRowsAmount = inputRowsAmount;
         this.inputColumnsAmount = inputColumnsAmount;
