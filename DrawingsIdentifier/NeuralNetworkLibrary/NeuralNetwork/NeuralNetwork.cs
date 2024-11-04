@@ -209,27 +209,14 @@ public class NeuralNetwork
 
                 float batchErrorSum = 0;
 
-                //Parallel.For(0, batchSamples.Length, (i, loopState) =>
-                //{
-                //    if (cancellationToken.IsCancellationRequested)
-                //    {
-                //        loopState.Stop();
-                //        return;
-                //    }
-
-                //    (Matrix prediction, (Matrix[] activated, Matrix[] beforeActivation)[] layersOutputs) = Feedforward(batchSamples[i].inputChannels);
-                //    prediction = prediction + float.Epsilon;
-
-                //    float error = ActivationFunctionsHandler.CalculateCrossEntropyCost(batchSamples[i].output, prediction);
-                //    batchErrorSum += error;
-
-                //    Backpropagation(batchSamples[i].output, prediction, layersOutputs);
-
-                //    OnTrainingIteration?.Invoke(epoch + 1, batchBeginIndex + i, error);
-                //});
-
-                for (int i = 0; i < batchSamples.Length; i++)
+                Parallel.For(0, batchSamples.Length, (i, loopState) =>
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        loopState.Stop();
+                        return;
+                    }
+
                     (Matrix prediction, (Matrix[] activated, Matrix[] beforeActivation)[] layersOutputs) = Feedforward(batchSamples[i].inputChannels);
                     prediction = prediction + float.Epsilon;
 
@@ -239,7 +226,7 @@ public class NeuralNetwork
                     Backpropagation(batchSamples[i].output, prediction, layersOutputs);
 
                     OnTrainingIteration?.Invoke(epoch + 1, batchBeginIndex + i, error);
-                }
+                });
 
                 if (cancellationToken.IsCancellationRequested)
                 {
