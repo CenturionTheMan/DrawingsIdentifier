@@ -30,13 +30,12 @@ namespace DrawingIdentifierGui
         public static (NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)[] TrainDataFlat { get; set; } = Array.Empty<(NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)>();
         public static (NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)[] TestDataFlat { get; set; } = Array.Empty<(NeuralNetworkLibrary.Math.Matrix[] inputs, NeuralNetworkLibrary.Math.Matrix outputs)>();
 
-        public static bool IsExampleNN1Loaded;
-        public static bool IsExampleNN2Loaded;
+        public static bool IsExampleNN1Loaded = false;
+        public static bool IsExampleNN2Loaded = false;
 
         static App()
         {
-            App.IsExampleNN1Loaded = TryLoadInitialNN(0);
-            App.IsExampleNN2Loaded = TryLoadInitialNN(1);
+            
 
             if(!IsExampleNN1Loaded)
             {
@@ -54,7 +53,12 @@ namespace DrawingIdentifierGui
                     }
                 };
 
-                NeuralNetworks[0] = NeuralNetworkConfigModels[0].CreateNeuralNetwork();
+                if(TryLoadInitialNN(0))
+                {
+                    IsExampleNN1Loaded = true;
+                }
+                else
+                    NeuralNetworks[0] = NeuralNetworkConfigModels[0].CreateNeuralNetwork();
             }
 
             if(!IsExampleNN2Loaded)
@@ -76,7 +80,12 @@ namespace DrawingIdentifierGui
                     }
                 };
 
-                NeuralNetworks[1] = NeuralNetworkConfigModels[1].CreateNeuralNetwork();
+                if(TryLoadInitialNN(1))
+                {
+                    IsExampleNN2Loaded = true;
+                }
+                else
+                    NeuralNetworks[1] = NeuralNetworkConfigModels[1].CreateNeuralNetwork();
             }
 
             
@@ -89,7 +98,6 @@ namespace DrawingIdentifierGui
 
             try
             {
-                NeuralNetworkConfigModels[index] = new NeuralNetworkConfigModel();
                 NeuralNetworkConfigModels[index].LoadDataFromFile(initNNPaths[index]);
                 NeuralNetworks[index] = nn;
                 return true;

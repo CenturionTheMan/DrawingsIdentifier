@@ -72,12 +72,9 @@ public partial class PredictionsCanvas : UserControl
             }
 
             float div = 1 / 255f;
-            //TODO CutOffBorderToSquare do not work properly
             var scaled = (mat * div).CutOffBorderToSquare((0.0f, 0.5f), padding: 0)?.ResizeSquare(26, 1f).AddPadding(28, 28, 1.0f);
             if (scaled == null) return;
 
-            //to remove
-            scaled.SaveAsPng("./../../../../UserDrawing.png");
 
             RunMethodOnCurrentThread(() =>
             {
