@@ -31,8 +31,17 @@ public class MatrixTests
     public void Indexer_OutOfRange_ThrowsException()
     {
         var matrix = new Matrix(2, 2);
-
         Assert.Throws<IndexOutOfRangeException>(() => matrix[2, 2]);
+    }
+
+    [Fact]
+    public void Indexer_InRange_ReturnsValid()
+    {
+        var matrix = new Matrix(2, 2);
+        Assert.IsAssignableFrom<float>(matrix[1, 1]);
+        Assert.IsAssignableFrom<float>(matrix[0, 0]);
+        Assert.IsAssignableFrom<float>(matrix[1, 0]);
+        Assert.IsAssignableFrom<float>(matrix[0, 1]);
     }
 
     [Fact]
