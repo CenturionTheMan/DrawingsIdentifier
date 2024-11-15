@@ -90,10 +90,15 @@ internal class ConvolutionLayer : ILayer
         changeForKernels = new Matrix[depth, inputShape.inputDepth];
         changeForBiases = new Matrix[depth];
 
+        InitParams();
+    }
+
+    internal void InitParams()
+    {
         (int outputRows, int outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
         for (int i = 0; i < depth; i++)
         {
-            for (int j = 0; j < inputShape.inputDepth; j++)
+            for (int j = 0; j < this.inputDepth; j++)
             {
                 kernels[i, j] = new Matrix(kernelSize, kernelSize);
                 switch (activationFunction)

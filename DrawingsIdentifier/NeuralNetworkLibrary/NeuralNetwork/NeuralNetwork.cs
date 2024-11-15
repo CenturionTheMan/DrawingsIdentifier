@@ -363,6 +363,27 @@ public class NeuralNetwork
         return guessed * 100.0f / testData.Length;
     }
 
+    public void ResetNetworkParams()
+    {
+        foreach (var layer in layers)
+        {
+            switch (layer.LayerType)
+            {
+                case LayerType.Convolution:
+                    var convLayer = (ConvolutionLayer)layer;
+                    convLayer.InitParams();
+                    break;
+
+                case LayerType.FullyConnected:
+                    var fcLayer = (FullyConnectedLayer)layer;
+                    fcLayer.InitParams();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     #endregion INTERACTIONS
 
     #region SAVING / LOADING

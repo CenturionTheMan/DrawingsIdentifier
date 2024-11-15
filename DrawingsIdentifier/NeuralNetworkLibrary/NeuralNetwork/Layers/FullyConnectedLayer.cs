@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace NeuralNetworkLibrary.NeuralNetwork;
 
-public class FullyConnectedLayer : ILayer
+internal class FullyConnectedLayer : ILayer
 {
     #region PARAMS
 
@@ -41,11 +41,22 @@ public class FullyConnectedLayer : ILayer
     /// <exception cref="NotImplementedException">
     /// Exception thrown when activation function is not implemented.
     /// </exception>
-    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction)
+    internal FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction)
     {
         this.weights = new Matrix(layerSize, previousLayerSize);
         this.biases = new Matrix(layerSize, 1);
 
+        this.weightsGradientSum = new Matrix(layerSize, previousLayerSize);
+        this.biasesGradientSum = new Matrix(layerSize, 1);
+
+        this.activationFunction = activationFunction;
+        this.layerSize = layerSize;
+
+        InitParams();
+    }
+
+    internal void InitParams()
+    {
         switch (activationFunction)
         {
             case ActivationFunction.ReLU:
@@ -64,11 +75,8 @@ public class FullyConnectedLayer : ILayer
                 throw new NotImplementedException();
         }
 
-        this.weightsGradientSum = new Matrix(layerSize, previousLayerSize);
-        this.biasesGradientSum = new Matrix(layerSize, 1);
-
-        this.activationFunction = activationFunction;
-        this.layerSize = layerSize;
+        this.weightsGradientSum = new Matrix(this.layerSize, this.weightsGradientSum.ColumnsAmount);
+        this.biasesGradientSum = new Matrix(this.layerSize, 1);
     }
 
     /// <summary>

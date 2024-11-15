@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworkLibrary", "NeuralNetworkLibrary\NeuralNetworkLibrary.csproj", "{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawingIdentifierGui", "DrawingIdentifierGui\DrawingIdentifierGui.csproj", "{7A54F010-27C2-43BD-8168-6F9252E10532}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworkUnitTest", "NeuralNetworkUnitTest\NeuralNetworkUnitTest.csproj", "{4B130441-57F6-45DB-B177-7ACEEDEF04C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsMaker", "TestsMaker\TestsMaker.csproj", "{42F8B5DC-8D94-44AD-A6DC-F0A3AC30386D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +19,14 @@ Global
 		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42F8B5DC-8D94-44AD-A6DC-F0A3AC30386D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42F8B5DC-8D94-44AD-A6DC-F0A3AC30386D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42F8B5DC-8D94-44AD-A6DC-F0A3AC30386D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42F8B5DC-8D94-44AD-A6DC-F0A3AC30386D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

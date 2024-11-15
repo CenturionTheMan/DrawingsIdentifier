@@ -28,6 +28,11 @@ public class Trainer
     private (Matrix[] inputChannels, Matrix output)[]? testData;
     private string trainingLogDir = "";
 
+    private bool isAutoReinitialize = false;
+    private float minAcceptableCorrectness = 0.0f;
+    private int maxAttempts = 0;
+    private int attemptCounter = 0;
+
     private record TrainingIterationData(int epoch, int dataIndex, float error, float learningRate, float elapsedSeconds);
     private record TrainingBatchData(int epoch, float avgBatchError, float learningRate, float elapsedSeconds);
 
@@ -60,6 +65,14 @@ public class Trainer
         this.minLearningRate = minLearningRate;
         this.epochAmount = epochAmount;
         this.batchSize = batchSize;
+    }
+
+    public Trainer SetAutoReinitialize(float minAcceptableCorrectenss, int maxAttempts)
+    {
+        this.minAcceptableCorrectness = minAcceptableCorrectenss;
+        this.maxAttempts = maxAttempts;
+        isAutoReinitialize = true;
+        return this;
     }
 
     /// <summary>
@@ -143,7 +156,7 @@ public class Trainer
     /// <summary>
     /// Run the training.
     /// </summary>
-    public (Task, CancellationTokenSource) RunTrainingOnTask()
+    public void RunTraining()
     {
         var stopwatch = new Stopwatch();
 
@@ -193,20 +206,23 @@ public class Trainer
             {
                 cts?.Cancel();
             }
-        };
 
-        Thread consoleThread = new Thread(() =>
-        {
-            while (cts!.IsCancellationRequested == false)
+            if (isAutoReinitialize && correctness < minAcceptableCorrectness)
             {
-                var pressedKey = Console.ReadLine();
-                if (pressedKey?.ToLower() == "q")
-                {
-                    cts!.Cancel();
-                }
+                attemptCounter++;
+                if (attemptCounter >= maxAttempts) return;
+
+                cts?.Cancel();
+                trainingIterationData = new(epochAmount * data.Length);
+                trainingBatchData = new(data.Length * epochAmount / batchSize);
+                trainCorrectness = new(epochAmount + 1);
+                lastBatchErrors = new(patienceAmount);
+                neuralNetwork.ResetNetworkParams();
+                cts = new CancellationTokenSource();
+                stopwatch.Restart();
+                neuralNetwork.TrainOnNewTask(data, initialLearningRate, epochAmount, batchSize, cts!.Token).Wait();
             }
-        });
-        consoleThread.Start();
+        };
 
         neuralNetwork.OnTrainingFinished += () =>
         {
@@ -217,8 +233,7 @@ public class Trainer
         };
 
         stopwatch.Start();
-        var task = neuralNetwork.TrainOnNewTask(data, initialLearningRate, epochAmount, batchSize, cts.Token);
-        return (task, cts);
+        neuralNetwork.TrainOnNewTask(data, initialLearningRate, epochAmount, batchSize, cts.Token).Wait();
     }
 
     /// <summary>
