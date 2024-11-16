@@ -108,21 +108,21 @@ internal class NNTrainingTests
         //        );
         //    }
         //}
-        const int rep = 5;
+        const int rep = 2;
 
 
         for (int r = 0; r < rep; r++)
         {
-            for (int i = 8; i <= 32; i += 8)
+            for (int i = 5; i <= 15; i += 5)
             {
                 SingleConvConstTrainer(
                     new NeuralNetwork(1, 28, 28,
                     [
                         LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: i, activationFunction: ActivationFunction.ReLU),
                         LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 32, activationFunction: ActivationFunction.Sigmoid),
+                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
                         LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
                         LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
                     ]),
                     groupNum: 1,
@@ -133,16 +133,16 @@ internal class NNTrainingTests
 
         for (int r = 0; r < rep; r++)
         {
-            for (int i = 8; i <= 32; i += 8)
+            for (int i = 15; i <= 25; i += 5)
             {
                 SingleConvConstTrainer(
                     new NeuralNetwork(1, 28, 28,
                     [
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 16, activationFunction: ActivationFunction.ReLU),
+                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
                         LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
                         LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: i, activationFunction: ActivationFunction.Sigmoid),
                         LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
                         LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
                     ]),
                     groupNum: 2,
@@ -153,14 +153,14 @@ internal class NNTrainingTests
 
         for (int r = 0; r < rep; r++)
         {
-            for (int i = 32; i <= 128; i += 32)
+            for (int i = 30; i <= 90; i += 30)
             {
                 SingleConvConstTrainer(
                     new NeuralNetwork(1, 28, 28,
                     [
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 16, activationFunction: ActivationFunction.ReLU),
+                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
                         LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 32, activationFunction: ActivationFunction.Sigmoid),
+                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
                         LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
                         LayerTemplate.CreateFullyConnectedLayer(layerSize: i, activationFunction: ActivationFunction.ReLU),
                         LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
@@ -181,7 +181,7 @@ internal class NNTrainingTests
                 nn,
                 data: trainDataFlatten,
                 initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.001f)
+                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
                 .SetAutoReinitialize(minExpectedCorrectness, 3),
             groupNum
         );
@@ -196,8 +196,9 @@ internal class NNTrainingTests
                 nn,
                 data: trainData,
                 initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.001f)
-                .SetAutoReinitialize(minExpectedCorrectness, 3),
+                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                .SetAutoReinitialize(minExpectedCorrectness, 3
+            ),
             groupNum
         );
     }
@@ -222,7 +223,7 @@ internal class NNTrainingTests
                             );
         };
 
-        trainer.NeuralNetwork.OnEpochTrainingIteration += (epoch, error) =>
+        trainer.NeuralNetwork.OnEpochTrainingIteration += (epoch, correctnes_) =>
         {
             sampleCorrectness = trainer.NeuralNetwork.CalculateCorrectness(samples);
         };

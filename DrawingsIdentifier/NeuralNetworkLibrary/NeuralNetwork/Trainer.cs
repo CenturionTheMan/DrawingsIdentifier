@@ -197,10 +197,18 @@ public class Trainer
             }
         };
 
-        trainCorrectness.Add((0, neuralNetwork.CalculateCorrectness(data.Take(1000).ToArray())));
+        if(saveToLog)
+        {
+            var tmp = neuralNetwork.CalculateCorrectness(testData!.Take(1000).ToArray());
+            trainCorrectness.Add((0, tmp));
+        }
         neuralNetwork.OnEpochTrainingIteration += (epoch, correctness) =>
         {
-            trainCorrectness.Add((epoch, correctness));
+            if(saveToLog)
+            {
+                var tmp = neuralNetwork.CalculateCorrectness(testData!.Take(1000).ToArray());
+                trainCorrectness.Add((epoch, tmp));
+            }
 
             if (neuralNetwork.LearningRate <= minLearningRate)
             {
@@ -352,8 +360,8 @@ public class Trainer
             if (!QuickDrawHandler.QuickDrawSet.IndexToCategory.TryGetValue(i, out string? className))
                 className = "Unknown";
 
-            var testCorrectness = testData is null ? "null" : neuralNetwork.CalculateCorrectness(testData.Where(s => s.output[i, 0] == 1.0f).ToArray()).ToString("0.000") + "%";
-            var trainCorrectness = neuralNetwork.CalculateCorrectness(this.data.Where(s => s.output[i, 0] == 1.0f).Take(1000).ToArray()).ToString("0.000") + "%";
+            var testCorrectness = testData is null ? "null" : neuralNetwork.CalculateCorrectness(testData.Where(s => s.output[i, 0] == 1.0f).ToArray()).ToString("0.000");
+            var trainCorrectness = neuralNetwork.CalculateCorrectness(this.data.Where(s => s.output[i, 0] == 1.0f).Take(1000).ToArray()).ToString("0.000");
 
             data.Add([i, className, testCorrectness, trainCorrectness]);
         }

@@ -359,9 +359,9 @@ public class NeuralNetwork
                 Interlocked.Increment(ref guessed);
             }
         });
-
         return guessed * 100.0f / testData.Length;
     }
+
 
     public void ResetNetworkParams()
     {
