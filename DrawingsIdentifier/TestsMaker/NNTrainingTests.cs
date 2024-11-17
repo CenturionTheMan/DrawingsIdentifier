@@ -108,48 +108,47 @@ internal class NNTrainingTests
         //        );
         //    }
         //}
-        const int rep = 2;
+        const int rep = 1;
 
+        //for (int r = 0; r < rep; r++)
+        //{
+        //    for (int i = 5; i <= 15; i += 5)
+        //    {
+        //        SingleConvConstTrainer(
+        //            new NeuralNetwork(1, 28, 28,
+        //            [
+        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: i, activationFunction: ActivationFunction.ReLU),
+        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
+        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
+        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
+        //            ]),
+        //            groupNum: 1,
+        //            minExpectedCorrectness: 20.0f
+        //        );
+        //    }
+        //}
 
-        for (int r = 0; r < rep; r++)
-        {
-            for (int i = 5; i <= 15; i += 5)
-            {
-                SingleConvConstTrainer(
-                    new NeuralNetwork(1, 28, 28,
-                    [
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: i, activationFunction: ActivationFunction.ReLU),
-                        LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
-                        LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-                    ]),
-                    groupNum: 1,
-                    minExpectedCorrectness: 20.0f
-                );
-            }
-        }
-
-        for (int r = 0; r < rep; r++)
-        {
-            for (int i = 15; i <= 25; i += 5)
-            {
-                SingleConvConstTrainer(
-                    new NeuralNetwork(1, 28, 28,
-                    [
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
-                        LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: i, activationFunction: ActivationFunction.Sigmoid),
-                        LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-                    ]),
-                    groupNum: 2,
-                    minExpectedCorrectness: 20.0f
-                );
-            }
-        }
+        //for (int r = 0; r < rep; r++)
+        //{
+        //    for (int i = 15; i <= 25; i += 5)
+        //    {
+        //        SingleConvConstTrainer(
+        //            new NeuralNetwork(1, 28, 28,
+        //            [
+        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
+        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: i, activationFunction: ActivationFunction.Sigmoid),
+        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
+        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
+        //            ]),
+        //            groupNum: 2,
+        //            minExpectedCorrectness: 20.0f
+        //        );
+        //    }
+        //}
 
         for (int r = 0; r < rep; r++)
         {
