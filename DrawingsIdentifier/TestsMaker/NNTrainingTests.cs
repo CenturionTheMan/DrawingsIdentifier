@@ -18,11 +18,13 @@ internal class NNTrainingTests
 
     (Matrix[] inputChannels, Matrix output)[] trainData;
     (Matrix[] inputChannels, Matrix output)[] testData;
-
-
     (Matrix[] inputChannels, Matrix output)[] trainDataFlatten;
     (Matrix[] inputChannels, Matrix output)[] testDataFlatten;
 
+    (Matrix[] inputChannels, Matrix output)[] trainDataMnist;
+    (Matrix[] inputChannels, Matrix output)[] testDataMnist;
+    (Matrix[] inputChannels, Matrix output)[] trainDataFlattenMnist;
+    (Matrix[] inputChannels, Matrix output)[] testDataFlattenMnist;
 
     public void RunTests()
     {
@@ -34,141 +36,55 @@ internal class NNTrainingTests
         //RESHAPE INTO SINGLE DIMENSION
         trainDataFlatten = trainData.Select(x => (new Matrix[] { MatrixExtender.FlattenMatrix(x.inputChannels) }, x.output)).ToArray();
         testDataFlatten = testData.Select(x => (new Matrix[] { MatrixExtender.FlattenMatrix(x.inputChannels) }, x.output)).ToArray();
+
+
+        trainDataMnist = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
+        testDataMnist = GetMnistDataMatrix(false, MnistDataDirPath + "mnist_test_data.csv");
+        trainDataFlattenMnist = GetMnistDataMatrix(true, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
+        testDataFlattenMnist = GetMnistDataMatrix(true, MnistDataDirPath + "mnist_test_data.csv");
+
+
         Console.WriteLine("Running tests");
+        SingleConvConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }), groupNum: 1, 20.0f);
+        SingleConvConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }), groupNum: 2, 20.0f);
+        SingleMLPConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }), groupNum: 3, 20.0f);
 
 
-        //Single(
-        //    testData: testData,
+        SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 128, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }), groupNum: 4, 20.0f);
 
-        //    trainer: new Trainer(
-        //        new NeuralNetwork(1, 28, 28,
-        //        [
-        //            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 2, activationFunction: ActivationFunction.ReLU),
-        //            LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //            LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 4, activationFunction: ActivationFunction.Sigmoid),
-        //            LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 32, activationFunction: ActivationFunction.ReLU),
-        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 32, activationFunction: ActivationFunction.ReLU),
-        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //        ]),
-        //        data: trainData,
-        //        initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 1, batchSize: 50)
-        //        .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.001f
-        //    )
-        //);
-
-
-        //for (int i = 8; i <= 16; i += 8)
-        //{
-        //    for (int j = 8; j <= 32; j += 8)
-        //    {
-        //        SingleConvConstTrainer(
-        //            new NeuralNetwork(1, 28, 28,
-        //            [
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: i, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: j, activationFunction: ActivationFunction.Sigmoid),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //            ]),
-        //            groupNum: 1)
-        //        ;
-        //    }
-        //}
-
-        //for (int j = 32; j <= 32; j += 4)
-        //{
-        //    SingleConvConstTrainer(
-        //        new NeuralNetwork(1, 28, 28,
-        //        [
-        //            LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: j, activationFunction: ActivationFunction.ReLU),
-        //            LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-        //            LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //        ]),
-        //        groupNum: 2
-        //    );
-        //}
-
-        //for (int i = 16; i <= 64; i += 16)
-        //{
-        //    for (int j = 16; j <= 64; j += 16)
-        //    {
-        //        SingleMLPConstTrainer(
-        //            new NeuralNetwork(784,
-        //            [
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: i, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: j, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //            ]),
-        //            groupNum: 3
-        //        );
-        //    }
-        //}
-        const int rep = 1;
-
-        //for (int r = 0; r < rep; r++)
-        //{
-        //    for (int i = 5; i <= 15; i += 5)
-        //    {
-        //        SingleConvConstTrainer(
-        //            new NeuralNetwork(1, 28, 28,
-        //            [
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: i, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //            ]),
-        //            groupNum: 1,
-        //            minExpectedCorrectness: 20.0f
-        //        );
-        //    }
-        //}
-
-        //for (int r = 0; r < rep; r++)
-        //{
-        //    for (int i = 15; i <= 25; i += 5)
-        //    {
-        //        SingleConvConstTrainer(
-        //            new NeuralNetwork(1, 28, 28,
-        //            [
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: i, activationFunction: ActivationFunction.Sigmoid),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 60, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //            ]),
-        //            groupNum: 2,
-        //            minExpectedCorrectness: 20.0f
-        //        );
-        //    }
-        //}
-
-        //for (int r = 0; r < rep; r++)
-        //{
-        //    for (int i = 30; i <= 90; i += 30)
-        //    {
-        //        SingleConvConstTrainer(
-        //            new NeuralNetwork(1, 28, 28,
-        //            [
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
-        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: i, activationFunction: ActivationFunction.ReLU),
-        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-        //            ]),
-        //            groupNum: 3,
-        //            minExpectedCorrectness: 20.0f
-        //        );
-        //    }
-        //}
+        SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 128, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }), groupNum: 5, 20.0f);
     }
 
     private void SingleMLPConstTrainer(NeuralNetwork nn, int groupNum, float minExpectedCorrectness = 20.0f)
@@ -194,6 +110,37 @@ internal class NNTrainingTests
             trainer: new Trainer(
                 nn,
                 data: trainData,
+                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
+                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                .SetAutoReinitialize(minExpectedCorrectness, 3
+            ),
+            groupNum
+        );
+    }
+
+    private void SingleMLPConstTrainerMnist(NeuralNetwork nn, int groupNum, float minExpectedCorrectness = 20.0f)
+    {
+        Single(
+            testData: testDataFlattenMnist,
+
+            trainer: new Trainer(
+                nn,
+                data: trainDataFlattenMnist,
+                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
+                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                .SetAutoReinitialize(minExpectedCorrectness, 3),
+            groupNum
+        );
+    }
+
+    private void SingleConvConstTrainerMnist(NeuralNetwork nn, int groupNum, float minExpectedCorrectness = 20.0f)
+    {
+        Single(
+            testData: testDataMnist,
+
+            trainer: new Trainer(
+                nn,
+                data: trainDataMnist,
                 initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
                 .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
                 .SetAutoReinitialize(minExpectedCorrectness, 3
@@ -246,5 +193,43 @@ internal class NNTrainingTests
         trainer.NeuralNetwork.SaveFeatureMaps(testData[0].inputChannels, mapsDir + "/");
 
         Console.WriteLine();
+    }
+
+
+    private static (Matrix[] inputChannels, Matrix expectedOutput)[] GetMnistDataMatrix(bool flatten, params string[] paths)
+    {
+        var results = new List<(Matrix[], Matrix)>();
+        int[] filter = [];
+        foreach (var path in paths)
+        {
+            var data = FilesCreatorHelper.ReadInputFromCSV(path, ',').Skip(1);
+            foreach (var item in data)
+            {
+                Matrix tmpIn = new Matrix(28, 28);
+
+                float[] input = item.Skip(1).Select(x => (float)(float.Parse(x) / 255.0)).ToArray();
+                float[] expected = new float[10];
+                int numer = int.Parse(item[0]);
+                expected[numer] = 1;
+
+                if (filter.Contains(numer)) continue;
+
+                Matrix tmpOut = new Matrix(expected);
+
+                for (int i = 0; i < 28; i++)
+                {
+                    for (int j = 0; j < 28; j++)
+                    {
+                        tmpIn[i, j] = input[i * 28 + j];
+                    }
+                }
+
+                if (flatten)
+                    results.Add(([MatrixExtender.FlattenMatrix(tmpIn)], tmpOut));
+                else
+                    results.Add(([tmpIn], tmpOut));
+            }
+        }
+        return results.ToArray();
     }
 }
