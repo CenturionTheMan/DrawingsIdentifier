@@ -26,14 +26,17 @@ internal class ConvolutionLayer : ILayer
     private ActivationFunction activationFunction;
 
     private Matrix[,] kernels;
-    private Matrix[] biases;
+    private float[] biases;
 
     private Matrix[,] changeForKernels;
-    private Matrix[] changeForBiases;
+    private float[] changeForBiases;
 
     private int inputDepth;
     private int inputWidth;
     private int inputHeight;
+
+    private int outputColumns;
+    private int outputRows;
 
     #endregion PARAMS
 
@@ -85,17 +88,18 @@ internal class ConvolutionLayer : ILayer
         this.inputHeight = inputShape.inputHeight;
 
         kernels = new Matrix[depth, inputShape.inputDepth];
-        biases = new Matrix[depth];
+        biases = new float[depth];
 
         changeForKernels = new Matrix[depth, inputShape.inputDepth];
-        changeForBiases = new Matrix[depth];
+        changeForBiases = new float[depth];
 
         InitParams();
     }
 
     internal void InitParams()
     {
-        (int outputRows, int outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
+        (outputRows, outputColumns) = MatrixExtender.GetSizeAfterConvolution((inputHeight, inputWidth), (kernelSize, kernelSize), stride);
+
         for (int i = 0; i < depth; i++)
         {
             for (int j = 0; j < this.inputDepth; j++)
@@ -121,8 +125,7 @@ internal class ConvolutionLayer : ILayer
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
 
-            biases[i] = new Matrix(outputRows, outputColumns);
-            changeForBiases[i] = new Matrix(outputRows, outputColumns);
+            //biases[i] = new Matrix(outputRows, outputColumns);
         }
     }
 
@@ -189,7 +192,7 @@ internal class ConvolutionLayer : ILayer
             if (!int.TryParse(indexStr, out int i) || !Matrix.TryParse(biasStr, out Matrix biasMatrix))
                 return null;
 
-            layer.biases[i] = biasMatrix;
+            //layer.biases[i] = biasMatrix; TODO FIX
         }
 
         return layer;
@@ -217,8 +220,8 @@ internal class ConvolutionLayer : ILayer
 
         for (int i = 0; i < depth; i++)
         {
-            A[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
-            Z[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
+            A[i] = new Matrix(outputRows, outputColumns);
+            Z[i] = new Matrix(outputRows, outputColumns);
         }
 
         for (int i = 0; i < depth; i++)
@@ -228,7 +231,7 @@ internal class ConvolutionLayer : ILayer
                 var single = inputs[j].CrossCorrelationValid(kernels[i, j], stride: this.stride);
                 Z[i] = Z[i].ElementWiseAdd(single);
             }
-            Z[i] = Z[i].ElementWiseAdd(biases[i]);
+            Z[i] = Z[i] + biases[i];
 
             A[i] = Z[i].ApplyActivationFunction(activationFunction);
         }
@@ -280,7 +283,7 @@ internal class ConvolutionLayer : ILayer
                 dA[j] = dA[j].ElementWiseAdd(dASingle);
             }
 
-            changeForBiases[i] = changeForBiases[i].ElementWiseAdd(dZ[i] * learningRate);
+            changeForBiases[i] = changeForBiases[i] + (dZ[i].Sum() * learningRate);
         }
 
         return dA;
@@ -308,8 +311,8 @@ internal class ConvolutionLayer : ILayer
                 kernels[i, j] = kernels[i, j].ElementWiseAdd(change);
                 changeForKernels[i, j] = new Matrix(kernelSize, kernelSize);
             }
-            biases[i] = biases[i].ElementWiseAdd(changeForBiases[i] * multiplier);
-            changeForBiases[i] = new Matrix(biases[i].RowsAmount, biases[i].ColumnsAmount);
+            biases[i] += changeForBiases[i] * multiplier;
+            changeForBiases[i] = 0;
         }
     }
 
@@ -351,7 +354,7 @@ internal class ConvolutionLayer : ILayer
         {
             doc.WriteStartElement("Bias");
             doc.WriteAttributeString("Index", $"{i}");
-            doc.WriteString(biases[i].ToFileString());
+            //doc.WriteString(biases[i].ToFileString()); TODO FIX
             doc.WriteEndElement();
         }
         doc.WriteEndElement();

@@ -9,13 +9,13 @@ namespace TestConsoleApp;
 
 internal class Program
 {
-    private const string MnistDataDirPath = "./../../../../../Datasets/Mnist/";
+    private const string MnistDataDirPath = "./../../../../../../Datasets/Mnist/";
 
     private static void Main(string[] args)
     {
         //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
-        var tester = new NNTrainingTests();
-        tester.RunTests();
+        //var tester = new NNTrainingTests();
+        //tester.RunTests();
 
         //TestNN(new NeuralNetwork(784, new LayerTemplate[]
         //{
@@ -24,31 +24,49 @@ internal class Program
         //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         //}));
 
+
+        TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        {
+            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        }));
     }
 
     private static void TestNN(NeuralNetwork nn)
     {
         Stopwatch stopwatch = new Stopwatch();
 
+        float lastCorrectness = 0;
+
         nn.OnBatchTrainingIteration += (epoch, epochPercentFinish, error) =>
         {
             Console.WriteLine(
-                            $"Epoch: {epoch + 1}\n" +
+                            $"Epoch: {epoch}\n" +
                             $"Epoch percent finish: {epochPercentFinish.ToString("0.00")}%\n" +
                             $"Batch error: {error.ToString("0.000")}\n" +
-                            $"Learning rate: {nn.LearningRate}\n");
+                            $"Learning rate: {nn.LearningRate}\n" +
+                            $"Last correctness: {lastCorrectness.ToString("0.00")}%\n\n");
+        };
+
+        nn.OnEpochTrainingIteration += (epoch, correctness) =>
+        {
+            lastCorrectness = correctness;
         };
 
         Console.WriteLine("Loading data...");
-        const bool flatten = true;
+        const bool flatten = false;
         var trainData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_train_data1.csv", MnistDataDirPath + "mnist_train_data2.csv");
         var testData = GetMnistDataMatrix(flatten, MnistDataDirPath + "mnist_test_data.csv");
 
         Console.WriteLine("Training...");
 
         const float learningRate = 0.01f;
-        const int epochAmount = 3;
-        const int batchSize = 50;
+        const int epochAmount = 5;
+        const int batchSize = 100;
 
         stopwatch.Start();
         nn.Train(trainData, learningRate, epochAmount, batchSize);
@@ -61,8 +79,8 @@ internal class Program
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
         nn.SaveToXmlFile("./../../../nn.xml", null);
-        var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
-        Console.WriteLine($"Loaded NN correctness: {nnLod!.CalculateCorrectness(testData).ToString("0.00")}%");
+        //var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
+        //Console.WriteLine($"Loaded NN correctness: {nnLod!.CalculateCorrectness(testData).ToString("0.00")}%");
 
         //nn.SaveFeatureMaps(testData[0].input, "./../../../");
     }

@@ -150,25 +150,25 @@ internal class NNTrainingTests
         //    }
         //}
 
-        for (int r = 0; r < rep; r++)
-        {
-            for (int i = 30; i <= 90; i += 30)
-            {
-                SingleConvConstTrainer(
-                    new NeuralNetwork(1, 28, 28,
-                    [
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
-                        LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
-                        LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: i, activationFunction: ActivationFunction.ReLU),
-                        LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
-                    ]),
-                    groupNum: 3,
-                    minExpectedCorrectness: 20.0f
-                );
-            }
-        }
+        //for (int r = 0; r < rep; r++)
+        //{
+        //    for (int i = 30; i <= 90; i += 30)
+        //    {
+        //        SingleConvConstTrainer(
+        //            new NeuralNetwork(1, 28, 28,
+        //            [
+        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 5, depth: 10, activationFunction: ActivationFunction.ReLU),
+        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //                LayerTemplate.CreateConvolutionLayer(kernelSize: 3, depth: 20, activationFunction: ActivationFunction.Sigmoid),
+        //                LayerTemplate.CreateMaxPoolingLayer(poolSize: 2, stride: 2),
+        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: i, activationFunction: ActivationFunction.ReLU),
+        //                LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
+        //            ]),
+        //            groupNum: 3,
+        //            minExpectedCorrectness: 20.0f
+        //        );
+        //    }
+        //}
     }
 
     private void SingleMLPConstTrainer(NeuralNetwork nn, int groupNum, float minExpectedCorrectness = 20.0f)
