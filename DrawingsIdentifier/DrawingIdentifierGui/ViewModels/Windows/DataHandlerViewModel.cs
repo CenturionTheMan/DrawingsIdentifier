@@ -54,6 +54,7 @@ public class DataHandlerViewModel : ViewModelBase
 
         Task.Factory.StartNew(() =>
         {
+            //TODO check if randomlyShiftData is not better when false....
             var quickDrawData = NeuralNetworkLibrary.QuickDrawHandler.QuickDrawDataReader.LoadQuickDrawSamplesFromDirectory(openFolderDialog.FolderName, SamplesPerFile, true, true, 255, cancellationTokenSource.Token, (i) =>
             {
                 ForceMainThread(() =>
