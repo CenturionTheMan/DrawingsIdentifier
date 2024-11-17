@@ -189,10 +189,10 @@ internal class ConvolutionLayer : ILayer
             if (indexStr == null || biasStr == null)
                 return null;
 
-            if (!int.TryParse(indexStr, out int i) || !Matrix.TryParse(biasStr, out Matrix biasMatrix))
+            if (!int.TryParse(indexStr, out int i) || !float.TryParse(biasStr, out float biasVal))
                 return null;
 
-            //layer.biases[i] = biasMatrix; TODO FIX
+            layer.biases[i] = biasVal;
         }
 
         return layer;
@@ -354,7 +354,7 @@ internal class ConvolutionLayer : ILayer
         {
             doc.WriteStartElement("Bias");
             doc.WriteAttributeString("Index", $"{i}");
-            //doc.WriteString(biases[i].ToFileString()); TODO FIX
+            doc.WriteString(biases[i].ToString());
             doc.WriteEndElement();
         }
         doc.WriteEndElement();

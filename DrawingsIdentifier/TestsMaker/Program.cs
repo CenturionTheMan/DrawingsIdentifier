@@ -17,21 +17,22 @@ internal class Program
         //var tester = new NNTrainingTests();
         //tester.RunTests();
 
-        //TestNN(new NeuralNetwork(784, new LayerTemplate[]
+
+
+        //TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
         //{
-        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
-        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 16, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateMaxPoolingLayer(2,2),
+        //    LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateMaxPoolingLayer(2,2),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
         //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         //}));
 
-
         TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        {
+            {
             LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         }));
     }
@@ -65,7 +66,7 @@ internal class Program
         Console.WriteLine("Training...");
 
         const float learningRate = 0.01f;
-        const int epochAmount = 5;
+        const int epochAmount = 1;
         const int batchSize = 100;
 
         stopwatch.Start();
@@ -79,8 +80,8 @@ internal class Program
         Console.WriteLine($"Correctness: {correctness.ToString("0.00")}%");
 
         nn.SaveToXmlFile("./../../../nn.xml", null);
-        //var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
-        //Console.WriteLine($"Loaded NN correctness: {nnLod!.CalculateCorrectness(testData).ToString("0.00")}%");
+        var nnLod = NeuralNetwork.LoadFromXmlFile("./../../../nn.xml");
+        Console.WriteLine($"Loaded NN correctness: {nnLod!.CalculateCorrectness(testData).ToString("0.00")}%");
 
         //nn.SaveFeatureMaps(testData[0].input, "./../../../");
     }
