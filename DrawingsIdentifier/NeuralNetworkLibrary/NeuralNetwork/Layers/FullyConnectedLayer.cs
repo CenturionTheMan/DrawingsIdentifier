@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace NeuralNetworkLibrary.NeuralNetwork;
 
-public class FullyConnectedLayer : ILayer
+internal class FullyConnectedLayer : ILayer
 {
     #region PARAMS
 
@@ -41,7 +41,7 @@ public class FullyConnectedLayer : ILayer
     /// <exception cref="NotImplementedException">
     /// Exception thrown when activation function is not implemented.
     /// </exception>
-    public FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction)
+    internal FullyConnectedLayer(int previousLayerSize, int layerSize, ActivationFunction activationFunction)
     {
         this.weights = new Matrix(layerSize, previousLayerSize);
         this.biases = new Matrix(layerSize, 1);

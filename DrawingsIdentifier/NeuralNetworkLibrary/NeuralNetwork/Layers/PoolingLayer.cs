@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 namespace NeuralNetworkLibrary.NeuralNetwork;
 
-public class PoolingLayer : ILayer
+internal class PoolingLayer : ILayer
 {
     #region PARAMS
 
@@ -32,7 +32,7 @@ public class PoolingLayer : ILayer
     /// <param name="stride">
     /// Stride of the pooling window.
     /// </param>
-    public PoolingLayer(int poolSize, int stride)
+    internal PoolingLayer(int poolSize, int stride)
     {
         this.poolSize = poolSize;
         this.stride = stride;

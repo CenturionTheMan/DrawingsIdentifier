@@ -27,7 +27,7 @@ internal class ReshapeFeatureToClassificationLayer : ILayer
     /// <param name="columnsAmount">
     /// Columns amount of the input data.
     /// </param>
-    public ReshapeFeatureToClassificationLayer(int rowsAmount, int columnsAmount)
+    internal ReshapeFeatureToClassificationLayer(int rowsAmount, int columnsAmount)
     {
         this.rowsAmount = rowsAmount;
         this.columnsAmount = columnsAmount;
