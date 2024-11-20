@@ -13,9 +13,10 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        //TODO perform tests (is new architecture better than old one? Is pooling layer correct? etc.)
-        //var tester = new NNTrainingTests();
-        //tester.RunTests();
+        //TODO perform tests(is new architecture better than old one ? Is pooling layer correct ? etc.)
+        var tester = new NNTrainingTests();
+        tester.RunTests();
+        Console.ReadLine();
 
 
 
@@ -29,12 +30,18 @@ internal class Program
         //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
         //}));
 
-        TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-            {
-            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }));
+        //TestNN(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        //    {
+        //    LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateMaxPoolingLayer(2,2),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //}));
+
+       
+
+        
+
+
     }
 
     private static void TestNN(NeuralNetwork nn)

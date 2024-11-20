@@ -30,7 +30,7 @@ internal class NNTrainingTests
     {
         //TODO test: https://github.com/amelie-vogel/image-classification-quickdraw
         Console.WriteLine("Loading data...");
-        QuickDrawSet qds = QuickDrawDataReader.LoadQuickDrawSamplesFromDirectory(QuickDrawDirPath, amountToLoadFromEachFile: 10000, randomlyShift: true);
+        QuickDrawSet qds = QuickDrawDataReader.LoadQuickDrawSamplesFromDirectory(QuickDrawDirPath, amountToLoadFromEachFile: 10000, randomlyShift: false);
         (trainData, testData) = qds.SplitIntoTrainTest();
 
         //RESHAPE INTO SINGLE DIMENSION
@@ -45,46 +45,62 @@ internal class NNTrainingTests
 
 
         Console.WriteLine("Running tests");
-        SingleConvConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        {
-            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }), groupNum: 1, 20.0f);
-        SingleConvConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        {
-            LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }), groupNum: 2, 20.0f);
-        SingleMLPConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        {
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }), groupNum: 3, 20.0f);
+        //for (int i = 0; i < repAmount; i++)
+        //{
+        //    SingleConvConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        //    {
+        //        LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
+        //        LayerTemplate.CreateMaxPoolingLayer(2,2),
+        //        LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
+        //        LayerTemplate.CreateMaxPoolingLayer(2,2),
+        //        LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+        //        LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //    }), groupNum: 1, 20.0f);
 
+        //    SingleConvConstTrainerMnist(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        //    {
+        //    LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //    }), groupNum: 2, 20.0f);
 
-        SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+        //    SingleMLPConstTrainerMnist(new NeuralNetwork(784, new LayerTemplate[]
+        //    {
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
+        //    LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
+        //    }), groupNum: 3, 20.0f);
+        //}
+        //return;
+
+        const int repAmount = 3;
+
+        for (int i = 0; i < repAmount; i++)
         {
+
+            SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+            {
             LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            LayerTemplate.CreateConvolutionLayer(3, 32, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateMaxPoolingLayer(2,2),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 128, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 64, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }), groupNum: 4, 20.0f);
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
+            }), groupNum: 1, 20.0f);
 
-        SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
-        {
-            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateMaxPoolingLayer(2,2),
+            SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
+            {
+            LayerTemplate.CreateConvolutionLayer(5, 32, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateConvolutionLayer(3, 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
+            }), groupNum: 2, 20.0f);
+
+            SingleMLPConstTrainer(new NeuralNetwork(784, new LayerTemplate[]
+            {
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 128, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateFullyConnectedLayer(layerSize: 10, activationFunction: ActivationFunction.Softmax),
-        }), groupNum: 5, 20.0f);
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 128, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
+            }), groupNum: 3, 20.0f);
+        }
     }
 
     private void SingleMLPConstTrainer(NeuralNetwork nn, int groupNum, float minExpectedCorrectness = 20.0f)
@@ -126,8 +142,8 @@ internal class NNTrainingTests
             trainer: new Trainer(
                 nn,
                 data: trainDataFlattenMnist,
-                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 5, batchSize: 100)
+                //.SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
                 .SetAutoReinitialize(minExpectedCorrectness, 3),
             groupNum
         );
@@ -141,8 +157,8 @@ internal class NNTrainingTests
             trainer: new Trainer(
                 nn,
                 data: trainDataMnist,
-                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 5, batchSize: 100)
+                //.SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
                 .SetAutoReinitialize(minExpectedCorrectness, 3
             ),
             groupNum
