@@ -152,8 +152,9 @@ public class Trainer
         Queue<TrainingIterationData> trainingIterationData = new(epochAmount * data.Length);
         Queue<TrainingBatchData> trainingBatchData = new(data.Length * epochAmount / batchSize);
 
-        List<(int, float)> trainCorrectness = new(epochAmount + 1);
+        List<(int, float, float)> trainCorrectness = new(epochAmount + 1);
         Queue<(float error, float seconds)>? lastBatchErrors = new(patienceAmount);
+
 
         neuralNetwork.OnTrainingIteration += (epoch, dataIndex, error) =>
         {
@@ -184,10 +185,13 @@ public class Trainer
             }
         };
 
-        trainCorrectness.Add((0, neuralNetwork.CalculateCorrectness(data.Take(1000).ToArray())));
-        neuralNetwork.OnEpochTrainingIteration += (epoch, correctness) =>
+        var epochLogData = testData is null ? data.Take(1000).ToArray() : testData;
+        trainCorrectness.Add((0, neuralNetwork.CalculateCorrectness(epochLogData), neuralNetwork.CalculateError(epochLogData)));
+        neuralNetwork.OnEpochTrainingIteration += (epoch, _) =>
         {
-            trainCorrectness.Add((epoch, correctness));
+            var correctness = neuralNetwork.CalculateCorrectness(epochLogData);
+            var error = neuralNetwork.CalculateError(epochLogData);
+            trainCorrectness.Add((epoch, correctness, error));
 
             if (neuralNetwork.LearningRate <= minLearningRate)
             {
@@ -266,7 +270,7 @@ public class Trainer
     /// <param name="trainEpochCorrectness">
     /// Epoch correctness.
     /// </param>
-    private void SaveTrainingData(string dirPath, TrainingIterationData[] trainingIterationData, TrainingBatchData[] trainingBatchData, (int, float)[] trainEpochCorrectness)
+    private void SaveTrainingData(string dirPath, TrainingIterationData[] trainingIterationData, TrainingBatchData[] trainingBatchData, (int, float, float)[] trainEpochCorrectness)
     {
         trainingIterationData = trainingIterationData.Where(x => x is not null).ToArray();
         trainingBatchData = trainingBatchData.Where(x => x is not null).ToArray();
@@ -287,18 +291,16 @@ public class Trainer
         FilesCreatorHelper.CreateCsvFile(data, dirPath + "BatchError.csv");
         data.Clear();
 
-        data = [["Epoch", "Correctness", "AvgError", "MinError", "MaxError", "ElapsedSeconds"]];
+        data = [["Epoch", "Correctness", "TestError", "AvgTrainError", "ElapsedSeconds"]];
         int dataLength = trainingIterationData.Length / trainEpochCorrectness.Length;
         for (int i = 0; i < trainEpochCorrectness.Length; i++)
         {
             var tmp = trainingIterationData.Where(x => x.epoch == i).ToArray();
 
             string avgError = tmp.Count() > 0 ? tmp.Average(x => x.error).ToString() : "null";
-            string minError = tmp.Count() > 0 ? tmp.Min(x => x.error).ToString() : "null";
-            string maxError = tmp.Count() > 0 ? tmp.Max(x => x.error).ToString() : "null";
             string elapsedSeconds = tmp.Count() > 0 ? tmp.Max(x => x.elapsedSeconds).ToString() : "0";
 
-            data.Add([i, trainEpochCorrectness[i].Item2, avgError, minError, maxError, elapsedSeconds]);
+            data.Add([i, trainEpochCorrectness[i].Item2, trainEpochCorrectness[i].Item3, avgError, elapsedSeconds]);
         }
         FilesCreatorHelper.CreateCsvFile(data, dirPath + "EpochError.csv");
         data.Clear();
