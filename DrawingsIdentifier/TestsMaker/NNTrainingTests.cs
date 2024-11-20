@@ -79,9 +79,9 @@ internal class NNTrainingTests
 
             SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
             {
-            LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateConvolutionLayer(5, 8, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateMaxPoolingLayer(2,2),
-            LayerTemplate.CreateConvolutionLayer(3, 32, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateConvolutionLayer(3, 16, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateMaxPoolingLayer(2,2),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 128, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
@@ -89,8 +89,8 @@ internal class NNTrainingTests
 
             SingleConvConstTrainer(new NeuralNetwork(1, 28, 28, new LayerTemplate[]
             {
-            LayerTemplate.CreateConvolutionLayer(5, 32, activationFunction: ActivationFunction.ReLU),
-            LayerTemplate.CreateConvolutionLayer(3, 64, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateConvolutionLayer(5, 16, activationFunction: ActivationFunction.ReLU),
+            LayerTemplate.CreateConvolutionLayer(3, 32, activationFunction: ActivationFunction.ReLU),
             LayerTemplate.CreateFullyConnectedLayer(layerSize: 9, activationFunction: ActivationFunction.Softmax),
             }), groupNum: 2, 20.0f);
 

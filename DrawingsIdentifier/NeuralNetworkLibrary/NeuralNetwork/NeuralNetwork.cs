@@ -337,6 +337,22 @@ public class NeuralNetwork
         }
     }
 
+    public float CalculateError((Matrix[] inputChannels, Matrix expectedOutput)[] testData)
+    {
+        float errorSum = 0;
+
+        Parallel.ForEach(testData, item =>
+        {
+            var prediction = Predict(item.inputChannels);
+            prediction = prediction + float.Epsilon;
+
+            float error = ActivationFunctionsHandler.CalculateCrossEntropyCost(item.expectedOutput, prediction);
+            errorSum += error;
+        });
+
+        return errorSum / testData.Length;
+    }
+
     /// <summary>
     /// Calculates the correctness of the neural network on the given test data.
     /// </summary>
