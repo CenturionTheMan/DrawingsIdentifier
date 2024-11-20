@@ -186,12 +186,17 @@ public class Trainer
         };
 
         var epochLogData = testData is null ? data.Take(1000).ToArray() : testData;
-        trainCorrectness.Add((0, neuralNetwork.CalculateCorrectness(epochLogData), neuralNetwork.CalculateError(epochLogData)));
+        
+        if(saveToLog)
+            trainCorrectness.Add((0, neuralNetwork.CalculateCorrectness(epochLogData), neuralNetwork.CalculateError(epochLogData)));
         neuralNetwork.OnEpochTrainingIteration += (epoch, _) =>
         {
-            var correctness = neuralNetwork.CalculateCorrectness(epochLogData);
-            var error = neuralNetwork.CalculateError(epochLogData);
-            trainCorrectness.Add((epoch, correctness, error));
+            if(saveToLog)
+            {
+                var correctness = neuralNetwork.CalculateCorrectness(epochLogData);
+                var error = neuralNetwork.CalculateError(epochLogData);
+                trainCorrectness.Add((epoch, correctness, error));
+            }
 
             if (neuralNetwork.LearningRate <= minLearningRate)
             {
