@@ -43,8 +43,10 @@ namespace DrawingIdentifierGui
                 {
                     InitialLearningRate = 0.01f,
                     MinLearningRate = 0.001f,
-                    EpochAmount = 30,
-                    BatchSize = 50,
+                    EpochAmount = 5,
+                    BatchSize = 100,
+                    Patience = 0.3f,
+                    InitialIgnore = 0.9f,
                     NeuralNetworkLayers = new()
                     {
                         new LayerModel() { LayerType = LayerType.FullyConnected, LayerSize = 16, ActivationFunction = ActivationFunction.ReLU},
@@ -67,8 +69,10 @@ namespace DrawingIdentifierGui
                 {
                     InitialLearningRate = 0.01f,
                     MinLearningRate = 0.001f,
-                    EpochAmount = 30,
-                    BatchSize = 50,
+                    EpochAmount = 5,
+                    BatchSize = 100,
+                    Patience = 0.3f,
+                    InitialIgnore = 0.9f,
                     NeuralNetworkLayers = new()
                     {
                         new LayerModel() { LayerType = LayerType.Convolution, KernelSize = 5, KernelDepth = 8},
