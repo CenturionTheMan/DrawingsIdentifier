@@ -72,7 +72,7 @@ internal class NNTrainingTests
         //}
         //return;
 
-        const int repAmount = 3;
+        const int repAmount = 7;
 
         for (int i = 0; i < repAmount; i++)
         {
@@ -111,8 +111,7 @@ internal class NNTrainingTests
             trainer: new Trainer(
                 nn,
                 data: trainDataFlatten,
-                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 5, batchSize: 100)
                 .SetAutoReinitialize(minExpectedCorrectness, 3),
             groupNum
         );
@@ -126,8 +125,7 @@ internal class NNTrainingTests
             trainer: new Trainer(
                 nn,
                 data: trainData,
-                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 10, batchSize: 100)
-                .SetPatience(initialIgnore: 0.9f, patience: 0.3f, learningRateModifier: (lr, epoch) => lr - 0.002f)
+                initialLearningRate: 0.01f, minLearningRate: 0.0001f, epochAmount: 5, batchSize: 100)
                 .SetAutoReinitialize(minExpectedCorrectness, 3
             ),
             groupNum
