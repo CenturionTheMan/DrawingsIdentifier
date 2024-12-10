@@ -88,9 +88,6 @@ public class LayerTemplate
     /// <param name="depth">
     /// Depth of the kernel (amount).
     /// </param>
-    /// <param name="stride">
-    /// Stride of the kernel.
-    /// </param>
     /// <param name="activationFunction">
     /// Activation function of the layer.
     /// </param>

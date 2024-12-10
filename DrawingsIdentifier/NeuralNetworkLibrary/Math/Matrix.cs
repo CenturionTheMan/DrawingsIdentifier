@@ -336,7 +336,6 @@ public class Matrix
     /// Creates new matrix which is result of applying given function to each element of the a matrix.
     /// </summary>
     /// <param name="a">Matrix to apply function to</param>
-    /// <param name="b">Second matrix. Method will use if only for checking dimensions</param>
     /// <param name="mathOperation">Function to apply</param>
     private static Matrix EachElementAssignment(Matrix a, Func<int, int, float> mathOperation)
     {

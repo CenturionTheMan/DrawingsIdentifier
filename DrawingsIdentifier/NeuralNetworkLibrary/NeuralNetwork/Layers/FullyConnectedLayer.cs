@@ -140,27 +140,6 @@ internal class FullyConnectedLayer : ILayer
     /// <summary>
     /// Backward pass for fully connected layer.
     /// </summary>
-    /// <param name="errorMatrix">
-    /// Error matrix from the next layer.
-    /// </param>
-    /// <param name="prevLayerOutputBeforeActivation">
-    /// Previous layer (next in general order) output before activation.
-    /// </param>
-    /// <param name="thisLayerOutputBeforeActivation">
-    /// This layer output before activation.
-    /// </param>
-    /// <param name="learningRate">
-    /// Learning rate.
-    /// </param>
-    /// <returns>
-    /// Error matrix for the previous layer.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Exception thrown when fully connected layer has more than one input.
-    /// </exception>
-    /// <exception cref="NotImplementedException">
-    /// Exception thrown when activation function is not implemented.
-    /// </exception>
     Matrix[] ILayer.Backward(Matrix[] errorMatrix, Matrix[] prevLayerOutputActivated, Matrix[] thisLayerOutputBeforeActivation, float learningRate)
     {
         if (errorMatrix.Length != 1)
