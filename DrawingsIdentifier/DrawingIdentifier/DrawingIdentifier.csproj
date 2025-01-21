@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\app-exit.png" />
+    <None Remove="Images\app-hide.png" />
+    <None Remove="Images\edit.png" />
+    <None Remove="Images\nav-data.png" />
+    <None Remove="Images\nav-learning.png" />
+    <None Remove="Images\nav-one.png" />
+    <None Remove="Images\nav-painting.png" />
+    <None Remove="Images\nav-question-mark.png" />
+    <None Remove="Images\nav-question.png" />
+    <None Remove="Images\nav-two.png" />
+    <None Remove="Images\toolbar-clear.png" />
+    <None Remove="Images\toolbar-pen.png" />
+    <None Remove="Images\toolbar-rubber.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\nav-question-mark.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ToyNeuralNetwork\ToyNeuralNetwork.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\app-exit.png" />
+    <Resource Include="Images\app-hide.png" />
+    <Resource Include="Images\nav-data.png" />
+    <Resource Include="Images\nav-learning.png" />
+    <Resource Include="Images\nav-one.png" />
+    <Resource Include="Images\nav-painting.png" />
+    <Resource Include="Images\nav-two.png" />
+    <Resource Include="Images\toolbar-clear.png" />
+    <Resource Include="Images\toolbar-pen.png" />
+    <Resource Include="Images\toolbar-rubber.png" />
+  </ItemGroup>
+
+</Project>

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworkLibrary", "NeuralNetworkLibrary\NeuralNetworkLibrary.csproj", "{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToyNeuralNetwork", "ToyNeuralNetwork\ToyNeuralNetwork.csproj", "{F3B85ED0-8C24-4E91-BE1F-830D06639B35}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawingIdentifierGui", "DrawingIdentifierGui\DrawingIdentifierGui.csproj", "{7A54F010-27C2-43BD-8168-6F9252E10532}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToyNeuralNetworkTests", "ToyNeuralNetworkTests\ToyNeuralNetworkTests.csproj", "{25312357-53E3-4B24-9899-0E66E98E140C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworkUnitTest", "NeuralNetworkUnitTest\NeuralNetworkUnitTest.csproj", "{4B130441-57F6-45DB-B177-7ACEEDEF04C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingIdentifier", "DrawingIdentifier\DrawingIdentifier.csproj", "{9CB765E1-4DF6-4269-8FAC-426CCB8D959F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,18 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5B44A14-1F4E-47D5-8F10-4E0FE8ABDBAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A54F010-27C2-43BD-8168-6F9252E10532}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B130441-57F6-45DB-B177-7ACEEDEF04C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3B85ED0-8C24-4E91-BE1F-830D06639B35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3B85ED0-8C24-4E91-BE1F-830D06639B35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3B85ED0-8C24-4E91-BE1F-830D06639B35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3B85ED0-8C24-4E91-BE1F-830D06639B35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25312357-53E3-4B24-9899-0E66E98E140C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25312357-53E3-4B24-9899-0E66E98E140C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25312357-53E3-4B24-9899-0E66E98E140C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25312357-53E3-4B24-9899-0E66E98E140C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CB765E1-4DF6-4269-8FAC-426CCB8D959F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CB765E1-4DF6-4269-8FAC-426CCB8D959F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CB765E1-4DF6-4269-8FAC-426CCB8D959F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CB765E1-4DF6-4269-8FAC-426CCB8D959F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

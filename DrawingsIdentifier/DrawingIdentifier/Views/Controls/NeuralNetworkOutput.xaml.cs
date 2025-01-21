@@ -1,0 +1,74 @@
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using Matrix = ToyNeuralNetwork.Math.Matrix;
+
+using static ToyNeuralNetwork.Math.MatrixExtender;
+using ToyNeuralNetwork.Math;
+
+namespace DrawingIdentifierGui.Views.Controls;
+
+/// <summary>
+/// Interaction logic for NeuralNetworkOutput.xaml
+/// </summary>
+public partial class NeuralNetworkOutput : UserControl
+{
+    public int NeuralNetworkType
+    {
+        get { return (int)GetValue(NeuralNetworkTypeProperty); }
+        set { SetValue(NeuralNetworkTypeProperty, value); }
+    }
+
+    public static readonly DependencyProperty NeuralNetworkTypeProperty =
+        DependencyProperty.Register("NeuralNetworkType", typeof(int), typeof(NeuralNetworkOutput), new PropertyMetadata(-1));
+
+    public string HeaderText
+    {
+        get { return (string)GetValue(HeaderTextProperty); }
+        set { SetValue(HeaderTextProperty, value); }
+    }
+
+    public static readonly DependencyProperty HeaderTextProperty =
+        DependencyProperty.Register("HeaderText", typeof(string), typeof(NeuralNetworkOutput), new PropertyMetadata("NONE"));
+
+    public Brush DefaultNodeBg
+    {
+        get { return (Brush)GetValue(DefaultNodeBgProperty); }
+        set { SetValue(DefaultNodeBgProperty, value); }
+    }
+
+    public static readonly DependencyProperty DefaultNodeBgProperty =
+        DependencyProperty.Register("DefaultNodeBgProperty", typeof(Brush), typeof(NeuralNetworkOutput), null);
+
+    public Brush ActiveNodeBg
+    {
+        get { return (Brush)GetValue(ActiveNodeBgProperty); }
+        set { SetValue(ActiveNodeBgProperty, value); }
+    }
+
+    public static readonly DependencyProperty ActiveNodeBgProperty =
+        DependencyProperty.Register("ActiveNodeBgProperty", typeof(Brush), typeof(NeuralNetworkOutput), new PropertyMetadata(Brushes.Yellow));
+
+    private SingleNNOutput[] singleNNNodes;
+
+    public NeuralNetworkOutput()
+    {
+        InitializeComponent();
+        //this.DataContext = this;
+
+        singleNNNodes = this.HolderGrid.Children.OfType<SingleNNOutput>().ToArray();
+    }
+
+    public void UpdatePrecidtions(Matrix mat)
+    {
+        var input = App.NeuralNetworks[NeuralNetworkType].GetInputShape().columnsAmount == 1 && App.NeuralNetworks[NeuralNetworkType].GetInputShape().depth == 1 ? MatrixExtender.FlattenMatrix(mat) : mat;
+        Matrix predition = App.NeuralNetworks[NeuralNetworkType].Predict(input);
+
+        for (int i = 0; i < singleNNNodes.Length; i++)
+        {
+            singleNNNodes[i].SetPredictionValue(predition[i, 0], DefaultNodeBg);
+        }
+
+        singleNNNodes[predition.IndexOfMax()].ActivateBest(ActiveNodeBg);
+    }
+}
