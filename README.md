@@ -1,3 +1,7 @@
+[![Toy Neural Network](https://img.shields.io/badge/Toy%20Neural%20Network-Repository-blue)](https://github.com/CenturionTheMan/ToyNeuralNetwork/tree/main)
+
+
+
 # Introduction
 
 ![](.github/readme_img/mainImg.png?raw=true)
